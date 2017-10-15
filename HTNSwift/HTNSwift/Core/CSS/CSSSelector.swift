@@ -9,5 +9,5 @@
 import Foundation
 
 public class CSSSelector {
-    
+    public var path = ""
 }

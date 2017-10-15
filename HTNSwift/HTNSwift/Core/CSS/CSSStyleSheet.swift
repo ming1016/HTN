@@ -9,5 +9,5 @@
 import Foundation
 
 public class CSSStyleSheet {
-    
+    public var ruleList = [CSSRule]()
 }

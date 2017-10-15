@@ -9,5 +9,6 @@
 import Foundation
 
 public class CSSProperty {
-    
+    public var key = ""
+    public var value = ""
 }

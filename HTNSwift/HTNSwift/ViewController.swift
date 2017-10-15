@@ -16,8 +16,8 @@ class ViewController: NSViewController {
         let htmlStr = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\"><!--comment --><html><head><script type=\"text/javascript\">try{document.execCommand(\"BackgroundImageCache\", false, true);}catch(e){}</script><style type=\"text/css\">.dice-example td, .dice-example th { border: solid thin; width: 1.35em; height: 1.05em; text-align: center; padding: 0; }</style></head><body background=\"#!kd\" style=\"dskf*&^$#\">as<aaa/><input text=\"\"/>dfs</body></html>"
         let treeBuilder = HTMLTreeBuilder(htmlStr)
         let doc = treeBuilder.parse()
-        
-        print("\(doc)")
+        let cssStyle = CSSParser(treeBuilder.doc.allStyle()).parseSheet()
+        print("\(doc)\(cssStyle)")
         // Do any additional setup after loading the view.
     }
 
