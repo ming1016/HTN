@@ -9,5 +9,13 @@
 import Foundation
 
 public class CSSSelector {
-    public var path = ""
+    public var path : String {
+        get {
+            return String()
+        }
+        set(newPath) {
+            self.matchList = newPath.lowercased().trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).components(separatedBy: " ")
+        }
+    }
+    public var matchList = [String]()
 }

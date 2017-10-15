@@ -21,7 +21,15 @@ public class CSSParser {
     
     init(_ input: String) {
         self.styleSheet = CSSStyleSheet()
-        _input = input
+        
+        //过滤注释
+        var newStr = ""
+        let annotationBlockPattern = "/\\*[\\s\\S]*?\\*/" //匹配/*...*/这样的注释
+        let regexBlock = try! NSRegularExpression(pattern: annotationBlockPattern, options: NSRegularExpression.Options(rawValue:0))
+        newStr = regexBlock.stringByReplacingMatches(in: input, options: NSRegularExpression.MatchingOptions(rawValue:0), range: NSMakeRange(0, input.characters.count), withTemplate: "")
+        _input = newStr
+        
+        //初始化
         _index = input.startIndex
         _bufferStr = ""
         _currentSelector = CSSSelector()
@@ -31,6 +39,7 @@ public class CSSParser {
     
     //解析 CSS 样式表
     public func parseSheet() -> CSSStyleSheet {
+        
         let stateMachine = HTNStateMachine<S, E>(S.UnknownState)
         
         stateMachine.listen(E.CommaEvent, transit: [S.UnknownState, S.SelectorState], to: S.SelectorState) { (t) in

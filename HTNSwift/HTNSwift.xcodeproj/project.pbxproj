@@ -26,6 +26,8 @@
 		0A852D091F932F8500B61F95 /* CSSSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A852D081F932F8500B61F95 /* CSSSelector.swift */; };
 		0A852D0B1F932F9800B61F95 /* CSSDeclaration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A852D0A1F932F9800B61F95 /* CSSDeclaration.swift */; };
 		0A852D0D1F93776B00B61F95 /* CSSProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A852D0C1F93776B00B61F95 /* CSSProperty.swift */; };
+		0A852D101F939CA500B61F95 /* RenderObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A852D0F1F939CA500B61F95 /* RenderObject.swift */; };
+		0A852D121F939FAF00B61F95 /* StyleResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A852D111F939FAF00B61F95 /* StyleResolver.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -51,6 +53,8 @@
 		0A852D081F932F8500B61F95 /* CSSSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSSSelector.swift; sourceTree = "<group>"; };
 		0A852D0A1F932F9800B61F95 /* CSSDeclaration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSSDeclaration.swift; sourceTree = "<group>"; };
 		0A852D0C1F93776B00B61F95 /* CSSProperty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSSProperty.swift; sourceTree = "<group>"; };
+		0A852D0F1F939CA500B61F95 /* RenderObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderObject.swift; sourceTree = "<group>"; };
+		0A852D111F939FAF00B61F95 /* StyleResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleResolver.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,8 +115,9 @@
 		0A64CBD21F8F06C0003ACB5F /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				0A852D011F93216200B61F95 /* CSS */,
+				0A852D0E1F93968B00B61F95 /* Layout */,
 				0A64CBD31F8F070A003ACB5F /* HTNFundation */,
+				0A852D011F93216200B61F95 /* CSS */,
 				0A64CBBB1F8E1FD8003ACB5F /* HTML */,
 			);
 			path = Core;
@@ -138,6 +143,15 @@
 				0A852D0C1F93776B00B61F95 /* CSSProperty.swift */,
 			);
 			path = CSS;
+			sourceTree = "<group>";
+		};
+		0A852D0E1F93968B00B61F95 /* Layout */ = {
+			isa = PBXGroup;
+			children = (
+				0A852D0F1F939CA500B61F95 /* RenderObject.swift */,
+				0A852D111F939FAF00B61F95 /* StyleResolver.swift */,
+			);
+			path = Layout;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -219,6 +233,7 @@
 				0A64CBC91F8E4BFA003ACB5F /* Element.swift in Sources */,
 				0A64CBCB1F8E4CFE003ACB5F /* Node.swift in Sources */,
 				0A64CBBF1F8E48C2003ACB5F /* HTMLTreeBuilder.swift in Sources */,
+				0A852D101F939CA500B61F95 /* RenderObject.swift in Sources */,
 				0A852D051F932D0700B61F95 /* CSSStyleSheet.swift in Sources */,
 				0A852D0D1F93776B00B61F95 /* CSSProperty.swift in Sources */,
 				0A64CBC31F8E4986003ACB5F /* Document.swift in Sources */,
@@ -226,6 +241,7 @@
 				0A64CBCF1F8E4F80003ACB5F /* Attribute.swift in Sources */,
 				0A852D071F932F7600B61F95 /* CSSRule.swift in Sources */,
 				0A64CBAC1F8E1FB9003ACB5F /* AppDelegate.swift in Sources */,
+				0A852D121F939FAF00B61F95 /* StyleResolver.swift in Sources */,
 				0A852D0B1F932F9800B61F95 /* CSSDeclaration.swift in Sources */,
 				0A64CBBD1F8E2007003ACB5F /* HTMLTokenizer.swift in Sources */,
 			);
