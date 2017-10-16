@@ -11,10 +11,12 @@ import Foundation
 public class Element : Node {
     public var startTagToken: HTMLToken?
     public var charToken: HTMLToken?
+    public var propertyList = [CSSProperty]()
     override init() {
-        //
+        
     }
     init(token: HTMLToken) {
+        
         if token.type == .StartTag {
             self.startTagToken = token
         }

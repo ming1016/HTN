@@ -47,7 +47,7 @@ public class CSSParser {
             self.addSelector()
             self.advanceIndexAndResetCurrentStr()
         }
-        stateMachine.listen(E.BraceLeftEvent, transit: S.SelectorState, to: S.PropertyKeyState) { (t) in
+        stateMachine.listen(E.BraceLeftEvent, transit: [S.UnknownState, S.SelectorState], to: S.PropertyKeyState) { (t) in
             self._currentSelector.path = self._bufferStr
             self.addSelector()
             self.advanceIndexAndResetCurrentStr()

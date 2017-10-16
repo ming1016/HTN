@@ -14,8 +14,10 @@ public class CSSSelector {
             return String()
         }
         set(newPath) {
-            self.matchList = newPath.lowercased().trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).components(separatedBy: " ")
+            self.identifier = newPath.lowercased().trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+            self.matchList = self.identifier.components(separatedBy: " ")
         }
     }
     public var matchList = [String]()
+    public var identifier = ""
 }

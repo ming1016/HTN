@@ -86,9 +86,9 @@ public class HTMLTreeBuilder {
                 if tk.selfClosing {
                     _ = stackElement.popLast()
                     _currentParent = stackElement.last
-                    _currentParent?.children.append(_currentElement)
+                    self.parentAppendChild()
                 } else {
-                    _currentParent?.children.append(_currentElement)
+                    self.parentAppendChild()
                     _currentParent = _currentElement
                 }
                 
@@ -98,7 +98,7 @@ public class HTMLTreeBuilder {
             //Char
             if tk.type == .Char {
                 //添加子结点
-                _currentParent?.children.append(_currentElement)
+                self.parentAppendChild()
                 hasTrigger = stateMachine.trigger(E.CharEvent)
             }
             
@@ -119,6 +119,11 @@ public class HTMLTreeBuilder {
         }
         
         return tks
+    }
+    
+    func parentAppendChild() {
+        _currentElement.parent = _currentParent
+        _currentParent?.children.append(_currentElement)
     }
     
     //TODO: 按照 w3c 的状态来。

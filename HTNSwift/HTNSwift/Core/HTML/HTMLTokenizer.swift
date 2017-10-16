@@ -34,10 +34,13 @@ public class HTMLTokenizer {
                                                      S.TagOpenState,
                                                      S.EndTagOpenState,
                                                      S.AfterAttributeValueQuotedState,
+                                                     S.BeforeDOCTYPENameState,
                                                      S.AfterDOCTYPEPublicIdentifierState]
         stateMachine.listen(E.AngleBracketRight, transit: anglebracketRightEventFromStatesArray, to: S.DataState) { (t) in
             if t.fromState == S.TagOpenState || t.fromState == S.EndTagOpenState {
-                self._bufferToken.data = self._bufferStr.lowercased()
+                if self._bufferStr.count > 0 {
+                    self._bufferToken.data = self._bufferStr.lowercased()
+                }
             }
             self.addHTMLToken()
             self.advanceIndexAndResetCurrentStr()
@@ -45,6 +48,7 @@ public class HTMLTokenizer {
         
         //DataState
         stateMachine.listen(E.AngleBracketLeft, transit: S.DataState, to: S.TagOpenState) { (t) in
+            self._bufferStr = self._bufferStr.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
             if self._bufferStr.count > 0 {
                 self._bufferToken.type = .Char
                 self._bufferToken.data = self._bufferStr
@@ -76,7 +80,7 @@ public class HTMLTokenizer {
         }
         //AttributeNameState
         stateMachine.listen(E.Equal, transit: [S.AttributeNameState,S.AfterAttributeValueQuotedState], to: S.BeforeAttributeValueState) { (t) in
-            self._bufferToken.currentAttribute.name = self._bufferStr
+            self._bufferToken.currentAttribute.name = self._bufferStr.lowercased()
             self.advanceIndexAndResetCurrentStr()
         }
         //BeforeAttributeValueState
