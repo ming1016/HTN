@@ -114,10 +114,10 @@ stateMachine.listen(E.AngleBracketRight, transit: anglebracketRightEventFromStat
 ```
 
 W3C 也定义每个状态的处理，非常详细完整，WebKit 基本把这些定义都实现了，HTN 目前只实现了能够满足构建 DOM 树的部分。W3C 的定义可以举个 StartTags 的状态如下图
-![01](/uploads/html-to-native-htn-development-record/01.png)
+![01](https://ming1016.github.io/uploads/html-to-native-htn-development-record/01.png)
 
 在进入构建 DOM 树之前我们需要设计一些类和结构来记录我们的内容，这里采用了 WebKit 类似的类结构设计，下图是 WebKit 的 DOM 树相关的类设计图
-![02](/uploads/html-to-native-htn-development-record/02.png)
+![02](https://ming1016.github.io/uploads/html-to-native-htn-development-record/02.png)
 
 完成了这些状态处理，接下来就可以根据这些 HTMLToken 来组装我们的 DOM 树了。这部分的实现在 HTML/HTMLTreeBuilder.swift 里。构建 DOM 树同样使用了先前的写的状态机，只是这里的状态集和事件集不同而已，W3C 也定义一些状态可以用
 ```swift
@@ -199,7 +199,7 @@ enum E: HTNEventType {
 ```
 
 同样在状态的处理过程中也需要一个合理的类结构关系设计来满足，这里也参考了 WebKit 里的设计，如下：
-![03](/uploads/html-to-native-htn-development-record/03.png)
+![03](https://ming1016.github.io/uploads/html-to-native-htn-development-record/03.png)
 
 ## 布局
 布局处理目前 HTN 主要是将样式属性和 DOM 树里的 Element 对应上。具体实现是在 Layout/StyleResolver.swift 里。思路是先将所有 CSSRule 和对应的 CSSSelector 做好映射，接着在递归 DOM 树的过程中与每个 Element 对应上。主要代码实现如下：
