@@ -34,6 +34,54 @@ public class Document : Element {
         return allScript
     }
     
+    //打印 Dom 树
+    public func des() {
+        for elm in self.children {
+            desElement(elm: elm as! Element, level: 0)
+        }
+    }
+    
+    private func desElement(elm:Element, level:Int) {
+        var propertyStr = "[CSS]:"
+        var attributeStr = "[ATTR]:"
+        if elm.startTagToken != nil {
+            if elm.startTagToken!.attributeList.count > 0 {
+                for attr in (elm.startTagToken?.attributeList)! {
+                    attributeStr += " \(attr.name):\(attr.value)"
+                }
+            } else {
+                attributeStr = ""
+            }
+        }
+        if elm.propertyMap.count > 0 {
+            for property in elm.propertyMap {
+                propertyStr += " \(property.key):\(property.value)"
+            }
+        } else {
+            propertyStr = ""
+        }
+        var frontStr = "";
+        for _ in 0...level {
+            if level > 0 {
+                frontStr += "    "
+            }
+        }
+        print("\(frontStr)[\(elm.startTagToken?.data ?? "char")] \(attributeStr) \(propertyStr)")
+        if elm.children.count > 0 {
+            for child in elm.children {
+                self.desElement(elm: child as! Element, level: level + 1)
+            }
+        }
+    }
+    
 }
+
+
+
+
+
+
+
+
 
 

@@ -20,7 +20,7 @@ class ViewController: NSViewController {
         let tks = treeBuilder.parse()
         let cssStyle = CSSParser(treeBuilder.doc.allStyle()).parseSheet()
         let document = StyleResolver().resolver(treeBuilder.doc, styleSheet: cssStyle)
-        
+        document.des() //打印 DOM 树
         print("\(tks)\(cssStyle)\(document)")
         
         //TODO: 转原生，待完成，先前实现了转 Yoga 原生代码，在项目在 https://github.com/ming1016/smck 里，具体转原生的代码实现在：https://github.com/ming1016/smck/blob/master/smck/Plugin/H5ToSwiftByFlexBoxPlugin.swift 。

@@ -53,11 +53,11 @@ public class CSSParser {
             self.advanceIndexAndResetCurrentStr()
         }
         stateMachine.listen(E.ColonEvent, transit: S.PropertyKeyState, to: S.PropertyValueState) { (t) in
-            self._currentProperty.key = self._bufferStr
+            self._currentProperty.key = self._bufferStr.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).lowercased()
             self.advanceIndexAndResetCurrentStr()
         }
         stateMachine.listen(E.SemicolonEvent, transit: S.PropertyValueState, to: S.PropertyKeyState) { (t) in
-            self._currentProperty.value = self._bufferStr
+            self._currentProperty.value = self._bufferStr.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).lowercased()
             self.addProperty()
             self.advanceIndexAndResetCurrentStr()
         }
