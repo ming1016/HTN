@@ -42,23 +42,21 @@ public class Document : Element {
     }
     
     private func desElement(elm:Element, level:Int) {
-        var propertyStr = "[CSS]:"
-        var attributeStr = "[ATTR]:"
+        var propertyStr = ""
+        var attributeStr = ""
         if elm.startTagToken != nil {
             if elm.startTagToken!.attributeList.count > 0 {
+                attributeStr = "[ATTR]:"
                 for attr in (elm.startTagToken?.attributeList)! {
                     attributeStr += " \(attr.name):\(attr.value)"
                 }
-            } else {
-                attributeStr = ""
             }
         }
         if elm.propertyMap.count > 0 {
+            propertyStr = "[CSS]:"
             for property in elm.propertyMap {
                 propertyStr += " \(property.key):\(property.value)"
             }
-        } else {
-            propertyStr = ""
         }
         var frontStr = "";
         for _ in 0...level {
@@ -66,7 +64,7 @@ public class Document : Element {
                 frontStr += "    "
             }
         }
-        print("\(frontStr)[\(elm.startTagToken?.data ?? "char")] \(attributeStr) \(propertyStr)")
+        print("\(frontStr)[\(elm.startTagToken?.data.uppercased() ?? "CHAR")] \(attributeStr) \(propertyStr)")
         if elm.children.count > 0 {
             for child in elm.children {
                 self.desElement(elm: child as! Element, level: level + 1)

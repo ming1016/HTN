@@ -21,16 +21,16 @@ public class CSSParser {
     
     init(_ input: String) {
         self.styleSheet = CSSStyleSheet()
-        
         //过滤注释
         var newStr = ""
         let annotationBlockPattern = "/\\*[\\s\\S]*?\\*/" //匹配/*...*/这样的注释
         let regexBlock = try! NSRegularExpression(pattern: annotationBlockPattern, options: NSRegularExpression.Options(rawValue:0))
         newStr = regexBlock.stringByReplacingMatches(in: input, options: NSRegularExpression.MatchingOptions(rawValue:0), range: NSMakeRange(0, input.characters.count), withTemplate: "")
+        newStr = "html, address,blockquote,body, dd, div,dl, dt, fieldset, form,frame, frameset,h1, h2, h3, h4,h5, h6, noframes,ol, p, ul, center,dir, hr, menu, pre   { display: block; unicode-bidi: embed }li              { display: list-item }head            { display: none }table           { display: table }tr              { display: table-row }thead           { display: table-header-group }tbody           { display: table-row-group }tfoot           { display: table-footer-group }col             { display: table-column }colgroup        { display: table-column-group }td, th          { display: table-cell }caption         { display: table-caption }th              { font-weight: bolder; text-align: center }caption         { text-align: center }body            { margin: 8px }h1              { font-size: 2em; margin: .67em 0 }h2              { font-size: 1.5em; margin: .75em 0 }h3              { font-size: 1.17em; margin: .83em 0 }h4, p,blockquote, ul,fieldset, form,ol, dl, dir,menu            { margin: 1.12em 0 }h5              { font-size: .83em; margin: 1.5em 0 }h6              { font-size: .75em; margin: 1.67em 0 }h1, h2, h3, h4,h5, h6, b,strong          { font-weight: bolder }blockquote      { margin-left: 40px; margin-right: 40px }i, cite, em,var, address    { font-style: italic }pre, tt, code,kbd, samp       { font-family: monospace }pre             { white-space: pre }button, textarea,input, select   { display: inline-block }big             { font-size: 1.17em }small, sub, sup { font-size: .83em }sub             { vertical-align: sub }sup             { vertical-align: super }table           { border-spacing: 2px; }thead, tbody,tfoot           { vertical-align: middle }td, th, tr      { vertical-align: inherit }s, strike, del  { text-decoration: line-through }hr              { border: 1px inset }ol, ul, dir,menu, dd        { margin-left: 40px }ol              { list-style-type: decimal }ol ul, ul ol,ul ul, ol ol    { margin-top: 0; margin-bottom: 0 }u, ins          { text-decoration: underline }center          { text-align: center }" + newStr
         _input = newStr
         
         //初始化
-        _index = input.startIndex
+        _index = _input.startIndex
         _bufferStr = ""
         _currentSelector = CSSSelector()
         _currentProperty = CSSProperty()
@@ -61,7 +61,12 @@ public class CSSParser {
             self.addProperty()
             self.advanceIndexAndResetCurrentStr()
         }
-        stateMachine.listen(E.BraceRightEvent, transit: S.PropertyKeyState, to: S.UnknownState) { (t) in
+        //加上 PropertyValueState 的原因是需要支持 property 最后一个不需要写 ; 的情况
+        stateMachine.listen(E.BraceRightEvent, transit: [S.PropertyKeyState,S.PropertyValueState], to: S.UnknownState) { (t) in
+            if self._bufferStr.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).count > 0 {
+                self._currentProperty.value = self._bufferStr.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).lowercased()
+                self.addProperty()
+            }
             self.addRule()
             self.advanceIndexAndResetCurrentStr()
         }
