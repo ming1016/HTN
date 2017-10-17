@@ -11,7 +11,7 @@ import Foundation
 public class Element : Node {
     public var startTagToken: HTMLToken?
     public var charToken: HTMLToken?
-    public var propertyList = [CSSProperty]()
+    public var propertyMap = [String:String]() //属性映射表
     override init() {
         
     }

@@ -115,6 +115,7 @@
 		0A64CBD21F8F06C0003ACB5F /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				0AE212111F95F24C00473E6D /* JavaScript */,
 				0A852D0E1F93968B00B61F95 /* Layout */,
 				0A64CBD31F8F070A003ACB5F /* HTNFundation */,
 				0A852D011F93216200B61F95 /* CSS */,
@@ -152,6 +153,13 @@
 				0A852D111F939FAF00B61F95 /* StyleResolver.swift */,
 			);
 			path = Layout;
+			sourceTree = "<group>";
+		};
+		0AE212111F95F24C00473E6D /* JavaScript */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = JavaScript;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

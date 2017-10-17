@@ -32,23 +32,18 @@ public class StyleResolver {
         
         return doc
     }
-    
+    //递归将样式属性都加上
     func attach(_ element:Element, matchMap:[String:[String:CSSRule]]) {
         
         guard let token = element.startTagToken else {
             return
         }
         if matchMap[token.data] != nil {
-            //TODO 还不支持 selector 里多个标签名组合，后期加上
-            if matchMap[token.data]![token.data] != nil {
-                let ruleList = matchMap[token.data]![token.data]!
-                //将属性加入 element 的属性列表里
-                for property in ruleList.propertyList {
-                    element.propertyList.append(property)
-                }
-            }
+            //TODO: 还不支持 selector 里多个标签名组合，后期加上
+            addProperty(token.data, matchMap: matchMap, element: element)
         }
-        addProperty(token.data, matchMap: matchMap, element: element)
+        
+        //增加 property 通过处理 token 里的属性列表里的 class 和 id 在 matchMap 里找
         for attr in token.attributeList {
             if attr.name == "class" {
                 addProperty("." + attr.value, matchMap: matchMap, element: element)
@@ -67,12 +62,12 @@ public class StyleResolver {
     
     func addProperty(_ key:String, matchMap:[String:[String:CSSRule]], element:Element) {
         if matchMap[key] != nil {
-            //TODO 还不支持 selector 里多个标签名组合，后期加上
+            //TODO: 还不支持 selector 里多个标签名组合，后期加上
             if matchMap[key]![key] != nil {
                 let ruleList = matchMap[key]![key]!
                 //将属性加入 element 的属性列表里
                 for property in ruleList.propertyList {
-                    element.propertyList.append(property)
+                    element.propertyMap[property.key] = property.value
                 }
             }
         }
