@@ -279,9 +279,11 @@ func addProperty(_ key:String, matchMap:[String:[String:CSSRule]], element:Eleme
 
 ## 规划
 * 对样式表更多属性的支持，目前仅处理了 flexbox 相关属性的原生映射，基本属性，默认属性设置，包括 block inline 等都还没有支持。
-* HTN 的 Objective-C 版。
-* 支持转 Texture 原生代码。
-* 支持转 Objective-C 的原生代码。
 * CSS Selector 的 Tag 路径支持，Tag 和 class，id 的组合选择。
+* 支持转 Texture 原生代码。
+
+* HTN 的 Objective-C 版。
+* 支持转 Objective-C 的原生代码。
 * 解析转换器内嵌在应用程序内部，支持服务器下发 h5 代码转换。
+
 * HTML 内 JS 解析，支持逻辑控制 HTML
