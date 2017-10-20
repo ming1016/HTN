@@ -11,7 +11,7 @@ import Foundation
 public class StyleResolver {
     public func resolver(_ doc:Document, styleSheet:CSSStyleSheet) -> Document{
         //样式映射表
-        //TODO: 需要把结构改成 [String:[String:CSSProperty]] 这样能够支持重复 selector 能够合并 Property
+        //这种结构能够支持多级 Selector
         var matchMap = [String:[String:CSSRule]]()
         for rule in styleSheet.ruleList {
             for selector in rule.selectorList {
@@ -34,7 +34,6 @@ public class StyleResolver {
     }
     //递归将样式属性都加上
     func attach(_ element:Element, matchMap:[String:[String:CSSRule]]) {
-        
         guard let token = element.startTagToken else {
             return
         }

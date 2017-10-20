@@ -160,6 +160,7 @@ public class HTMLTokenizer {
         }
         
         while let aChar = currentChar {
+            
             let aStr = aChar.description
             var hasAStrTrigger = false
             var hasBufferStrTrigger = false
