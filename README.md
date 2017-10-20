@@ -234,16 +234,11 @@ func attach(_ element:Element, matchMap:[String:[String:CSSRule]]) {
         return
     }
     if matchMap[token.data] != nil {
-        //TODO 还不支持 selector 里多个标签名组合，后期加上
-        if matchMap[token.data]![token.data] != nil {
-            let ruleList = matchMap[token.data]![token.data]!
-            //将属性加入 element 的属性列表里
-            for property in ruleList.propertyList {
-                element.propertyList.append(property)
-            }
-        }
+        //TODO: 还不支持 selector 里多个标签名组合，后期加上
+        addProperty(token.data, matchMap: matchMap, element: element)
     }
-    addProperty(token.data, matchMap: matchMap, element: element)
+    
+    //增加 property 通过处理 token 里的属性列表里的 class 和 id 在 matchMap 里找
     for attr in token.attributeList {
         if attr.name == "class" {
             addProperty("." + attr.value, matchMap: matchMap, element: element)
@@ -262,12 +257,12 @@ func attach(_ element:Element, matchMap:[String:[String:CSSRule]]) {
 
 func addProperty(_ key:String, matchMap:[String:[String:CSSRule]], element:Element) {
     if matchMap[key] != nil {
-        //TODO 还不支持 selector 里多个标签名组合，后期加上
+        //TODO: 还不支持 selector 里多个标签名组合，后期加上
         if matchMap[key]![key] != nil {
             let ruleList = matchMap[key]![key]!
             //将属性加入 element 的属性列表里
             for property in ruleList.propertyList {
-                element.propertyList.append(property)
+                element.propertyMap[property.key] = property.value
             }
         }
     }
@@ -279,9 +274,12 @@ func addProperty(_ key:String, matchMap:[String:[String:CSSRule]], element:Eleme
 
 ## 规划
 * 对样式表更多属性的支持，目前仅处理了 flexbox 相关属性的原生映射，基本属性，默认属性设置，包括 block inline 等都还没有支持。
-* HTN 的 Objective-C 版。
-* 支持转 Texture 原生代码。
-* 支持转 Objective-C 的原生代码。
 * CSS Selector 的 Tag 路径支持，Tag 和 class，id 的组合选择。
+* 支持转 Texture 原生代码。
+
+* HTN 的 Objective-C 版。
+* 支持转 Objective-C 的原生代码。
 * 解析转换器内嵌在应用程序内部，支持服务器下发 h5 代码转换。
+* 应用内转换时的缓存的处理，将render树结构体进行缓存的处理
+
 * HTML 内 JS 解析，支持逻辑控制 HTML
