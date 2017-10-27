@@ -91,6 +91,7 @@ public class HTMLTokenizer {
         stateMachine.listen(E.Quotation, transit: S.AttributeValueDoubleQuotedState, to: S.AfterAttributeValueQuotedState) { (t) in
             self._bufferToken.currentAttribute.value = self._bufferStr
             self._bufferToken.attributeList.append(self._bufferToken.currentAttribute)
+            self._bufferToken.attributeDic[self._bufferToken.currentAttribute.name] = self._bufferToken.currentAttribute.value
             self._bufferToken.currentAttribute = Attribute()
             self.advanceIndexAndResetCurrentStr()
         }

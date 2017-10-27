@@ -13,6 +13,7 @@ public class HTMLToken {
     public var data: String
     public var selfClosing: Bool
     public var attributeList: [Attribute]
+    public var attributeDic: [String:String]
     public var currentAttribute: Attribute
     
     init() {
@@ -20,6 +21,7 @@ public class HTMLToken {
         self.data = ""
         self.selfClosing = false
         self.attributeList = [Attribute]()
+        self.attributeDic = [String:String]()
         self.currentAttribute = Attribute()
     }
     
