@@ -27,6 +27,19 @@ class JSNode : Node {
         var callExpression: CallExpressionNode?
         var  memberExpression: MemberExpressionNode?
     }
+    class LeftHandSideExpressionForInNode: JSNode {
+//        var callExpressionForIn =
+    }
+    class callExpressionForInNode: JSNode {
+        var memberExpressionForIn = MemberExpressionForInNode()
+        var argumentList = [AssignmentExpressionNode]()
+        var callExpressionPart = [CallExpressionPartNode]()
+    }
+    class MemberExpressionForInNode: JSNode {
+        var functionExpression: FunctionExpressionNode?
+        var PrimaryExpression: PrimaryExpressionNode?
+        var memberExpressionPartList = [MemberExpressionPartNode]()
+    }
     class CallExpressionNode: JSNode {
         var memberExpression = MemberExpressionNode()
         var argumentList = [AssignmentExpressionNode]() // 通过 "(" 和 ")" 把以 "," 分割的 AssignmentExpressionNode 集到一起
@@ -56,12 +69,10 @@ class JSNode : Node {
     }
     class FunctionExpressionNode: JSNode {
         var identifier: String? // "function" 后跟的函数名
-        var formalParameterList: FormalParameterListNode? //"(" 和 ")" 里的参数列表
+        var formalParameterList: [String]? //"(" 和 ")" 里的参数列表
         var functionBody = FunctionBodyNode()
     }
-    class FormalParameterListNode: JSNode {
-        var identifierList = [String]() //根据 "," 区分为不同的参数
-    }
+    
     class FunctionBodyNode: JSNode {
         var sourceElementList: [SourceElementNode]?
     }
@@ -71,7 +82,7 @@ class JSNode : Node {
     }
     class FunctionDeclarationNode: JSNode {
         var identifier = "" // "function" 后跟的函数名
-        var formalParameterList: FormalParameterListNode? //"(" 和 ")" 里的参数列表
+        var formalParameterList: [String]? //"(" 和 ")" 里的参数列表。根据 "," 区分为不同的参数
         var functionBody = FunctionBodyNode()
     }
     class StatementNode: JSNode {
@@ -169,23 +180,89 @@ class JSNode : Node {
         //RelationalOperator ::= ( "<" | ">" | "<=" | ">=" | "instanceof" | "in" )
         var shiftExpressionLeft = ShiftExpressionNode()
         var shiftExpressionRight = ShiftExpressionNode()
-        var relationalOperatorType = RelationalOperator.Unknown
+        var relationalOperatorType = RelationalOperatorType.Unknown
     }
     class ShiftExpressionNode: JSNode {
         //ShiftExpression ::= AdditiveExpression ( ShiftOperator AdditiveExpression )*
         //ShiftOperator ::= ( "<<" | ">>" | ">>>" )
         var additiveExpressionLeft = AdditiveExpressionNode()
         var additiveExpressionRight = AdditiveExpressionNode()
-        
+        var shiftOperatorType = ShiftOperatorType.Unknown
     }
     class AdditiveExpressionNode: JSNode {
-        
+        //AdditiveExpression ::= MultiplicativeExpression ( AdditiveOperator MultiplicativeExpression )*
+        //AdditiveOperator ::= ( "+" | "-" )
+        var multiplicativeExpressionLeft = MultiplicativeExpressionNode()
+        var multiplicativeExpressionRight = MultiplicativeExpressionNode()
+        var additiveExpressionType = AdditiveOperatorType.Unknown
+    }
+    class MultiplicativeExpressionNode: JSNode {
+        //MultiplicativeExpression ::= UnaryExpression ( MultiplicativeOperator UnaryExpression )*
+        //MultiplicativeOperator ::= ( "*" | <SLASH> | "%" )
+        var unaryExpressionLeft = UnaryExpressionNode()
+        var unaryExpressionRight = UnaryExpressionNode()
+        var multiplicativeOperatorType = MultiplicativeOperatorType.Unknown
+    }
+    //一元表达式
+    class UnaryExpressionNode: JSNode {
+        //UnaryExpression ::= ( PostfixExpression | ( UnaryOperator UnaryExpression )+ )
+        //UnaryOperator ::= ( "delete" | "void" | "typeof" | "++" | "--" | "+" | "-" | "~" | "!" )
+        var postfixExpression = PostfixExpressionNode()
+        var unaryExpression = UnaryExpressionNode()
+        var unaryOperatorType = UnaryOperatorType.Unknown
+    }
+    class PostfixExpressionNode: JSNode {
+        //PostfixExpression    ::=    LeftHandSideExpression ( PostfixOperator )?
+        var leftHandSideExpression = LeftHandSideExpressionNode()
+        var postfixOperatorType = PostfixOperatorType.Unknown
     }
     
-    //S
+    //PostfixOperator Type
+    enum PostfixOperatorType {
+        case Unknown
+        case DoubleAdd   // ++
+        case DoubleMinus // --
+    }
+    
+    //UnaryOperator Type
+    enum UnaryOperatorType {
+        case Unknown
+        case Delete                  // delete
+        case Void                    // void
+        case Typeof                  // typeof
+        case DoubleAdd               // ++
+        case DoubleMinus             // --
+        case Add                     // +
+        case Minus                   // -
+        case Tilde                   // ~
+        case ExclamationMark         // !
+    }
+    
+    //MultiplicativeOperator Type
+    enum MultiplicativeOperatorType {
+        case Unknown
+        case Asterisk  // *
+        case Slash     // /
+        case Percent   // %
+    }
+    
+    //AdditiveExpression Type
+    enum AdditiveOperatorType {
+        case Unknown
+        case Add     // +
+        case Minus   // -
+    }
+    
+    //ShiftOperator Type
+    enum ShiftOperatorType {
+        case Unknown
+        case DoubleAngleBracketLeft  // <<
+        case DoubleAngleBracketRIght // >>
+        case TripleAngleBracketRight // >>>
+    }
     
     //RelationalOperator Type
-    enum RelationalOperator {
+    enum RelationalOperatorType {
         case Unknown
         case AngleBracketLeft       // <
         case AngleBracketRight      // >
@@ -253,52 +330,121 @@ class JSNode : Node {
         case TryStatement
     }
     class BlockNode: JSNode {
-        
+        //在 "{" 和 "}" 里
+        var statementList: [StatementNode]?
     }
     class JScriptVarStatementNode: JSNode {
-        
+        //"var" 开头 "," 分割，";" 结束或者换行结束
+        var jscriptVarDeclarationList = [JScriptVarDeclarationNode]()
+    }
+    class JScriptVarDeclarationNode: JSNode {
+        //JScriptVarDeclaration ::= Identifier ":" <IDENTIFIER_NAME> ( Initialiser )?
+        var identifier = ""
+        var identifierName = ""
+        var initialiser: InitialiserNode?
+    }
+    class InitialiserNode: JSNode {
+        //"=" 后面的表达式
+        var assignmentExpression = AssignmentExpressionNode()
     }
     class VariableStatementNode: JSNode {
-        
+        //"var" 开头 "," 分割，";" 结束或者换行结束
+        var variableDeclarationList = [VariableDeclarationNode]()
+    }
+    class VariableDeclarationNode: JSNode {
+        //VariableDeclaration ::= Identifier ( Initialiser )?
+        var identifier = ""
+        var initialiser: InitialiserNode?
     }
     class EmptyStatementNode: JSNode {
-        
+        //EmptyStatement ::= ";"
     }
     class LabelledStatementNode: JSNode {
-        
+        //LabelledStatement ::= Identifier ":" Statement
+        var identifier = ""
+        var statement = StatementNode()
     }
     class ExpressionStatementNode: JSNode {
-        
+        var expression = ExpressionNode()
     }
     class IfStatementNode: JSNode {
-        
+        var expression = ExpressionNode()
+        var ifStatement = StatementNode()
+        var elseStatement = StatementNode()
     }
     class IterationStatementNode: JSNode {
-        
+        var iterationStatementType = IterationStatementType.Unknown
+        var statement: StatementNode?
+        var expressionFirst = ExpressionNode()
+        var expressionSecond: ExpressionNode?
+        var variableDeclarationList: [VariableDeclarationNode]?
+        var leftHandSideExpressionForIn: LeftHandSideExpressionForInNode?
     }
+    
+    //IterationStatement Type
+    enum IterationStatementType {
+        case Unknown
+        case DoWhile      //( "do" Statement "while" "(" Expression ")" ( ";" )? )
+        case WhileOnly    //( "while" "(" Expression ")" Statement )
+        //TODO: ExpressionNoIn 的处理，BNF 是 ( "for" "(" ( ExpressionNoIn )? ";" ( Expression )? ";" ( Expression )? ")" Statement )
+        case ForVar       //( "for" "(" "var" VariableDeclarationList ";" ( Expression )? ";" ( Expression )? ")" Statement )
+        //TODO: VariableDeclarationNoIn 的处理 ，BNF 是 ( "for" "(" "var" VariableDeclarationNoIn "in" Expression ")" Statement )
+        case ForIn        //( "for" "(" LeftHandSideExpressionForIn "in" Expression ")" Statement )
+    }
+    
     class ContinueStatementNode: JSNode {
-        
+        //ContinueStatement ::= "continue" ( Identifier )? ( ";" )?
+        var identifier: String?
     }
     class BreakStatementNode: JSNode {
-        
+        //BreakStatement ::= "break" ( Identifier )? ( ";" )?
+        var identifier: String?
     }
     class ImportStatementNode: JSNode {
-        
+        //ImportStatement ::= "import" Name ( "." "*" )? ";"
+        var name = [String]() //Name ::= <IDENTIFIER_NAME> ( "." <IDENTIFIER_NAME> )*
     }
     class ReturnStatementNode: JSNode {
-        
+        //ReturnStatement ::= "return" ( Expression )? ( ";" )?
+        var expression: ExpressionNode?
     }
     class WithStatementNode: JSNode {
-        
+        //WithStatement ::= "with" "(" Expression ")" Statement
+        var expression = ExpressionNode()
+        var statement = StatementNode()
     }
     class SwitchStatementNode: JSNode {
-        
+        //SwitchStatement ::= "switch" "(" Expression ")" CaseBlock
+        var expression = ExpressionNode()
+        var caseBlock = CaseBlockNode()
+    }
+    class CaseBlockNode: JSNode {
+        //CaseBlock ::= "{" ( CaseClauses )? ( "}" | DefaultClause ( CaseClauses )? "}" )
+        var caseClauseList: [CaseClauseNode]?
+        var defaultClauseList: [DefaultClauseNode]?
+    }
+    class CaseClauseNode: JSNode {
+        //CaseClause ::= ( ( "case" Expression ":" ) ) ( StatementList )?
+        var expression = ExpressionNode()
+        var statementList: [StatementNode]?
+    }
+    class DefaultClauseNode: JSNode {
+        //DefaultClause ::= ( ( "default" ":" ) ) ( StatementList )?
+        var statementList: [StatementNode]?
     }
     class ThrowStatementNode: JSNode {
-        
+        //ThrowStatement ::= "throw" Expression ( ";" )?
+        var expression = ExpressionNode()
     }
     class TryStatementNode: JSNode {
-        
+        //TryStatement ::= "try" Block ( ( Finally | Catch ( Finally )? ) )
+        var tryBlock = BlockNode()
+        var finallyBlock: BlockNode?
+        var catchNode: CatchNode?
+    }
+    class CatchNode: JSNode {
+        var identifier = ""
+        var block = BlockNode()
     }
 }
 
