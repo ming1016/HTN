@@ -99,7 +99,7 @@ class ViewController: NSViewController {
         _ = treeBuilder.parse()
         let cssStyle = CSSParser(treeBuilder.doc.allStyle()).parseSheet()
         let document = StyleResolver().resolver(treeBuilder.doc, styleSheet: cssStyle)
-        document.des() //打印包含样式信息的 DOM 树
+//        document.des() //打印包含样式信息的 DOM 树
 //        print("\(tks)\(cssStyle)\(document)")
         
         //TODO: 转原生，待完成，先前实现了转 Yoga 原生代码，在项目在 https://github.com/ming1016/smck 里，具体转原生的代码实现在：https://github.com/ming1016/smck/blob/master/smck/Plugin/H5ToSwiftByFlexBoxPlugin.swift 。
@@ -114,6 +114,12 @@ function foo(o) {
 for (var i = 0; i < 100; ++i)
     print(foo({x:1.5, y:2.5}));
 """
+        let jsTokenizer = JSTokenizer(jsStr)
+        let tks = jsTokenizer.parse()
+        print("\(tks)")
+        for str in tks {
+            print("\(str.data)")
+        }
     }
 
 }

@@ -32,13 +32,19 @@ public class JSTokenizer {
         let stateMachine = HTNStateMachine<S, E>(S.Data)
         
         stateMachine.listen(E.SignleKeywordEvent, transit: S.Data, to: S.Data) { (t) in
+            self._bufferToken.type = .Char
+            self._bufferToken.data = self._bufferStr.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+            if self._bufferToken.data != "" {
+                self.addToken()
+            }
             self.advanceIndexAndResetCurrentBuffer()
         }
         stateMachine.listen(E.MultiKeywordEvent, transit: S.Data, to: S.Data) { (t) in
+            self._bufferToken.type = .KeyWords
+            self._bufferToken.data = self._bufferStr.lowercased().trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
             self.addToken()
             self.advanceIndexAndResetCurrentBuffer()
         }
-        
         
         let singleCharKeywordArray = [",",".",":",";","?","(",")","[","]","{","}","|","^","&","<",">","+","-","*","/","%","~","=","\"","'","!","\n"]
         let multiCharKeywordArray = ["instance","in","delete","void","typeof","var","new","function","do","while","for","in","continue","break","import","return","with","switch","case","default","throw","try","finally","catch"];
@@ -47,24 +53,30 @@ public class JSTokenizer {
             let aStr = aChar.description
             if singleCharKeywordArray.contains(aStr) {
                 //添加 bufferStr
+                if multiCharKeywordArray.contains(_bufferStr.lowercased().trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)) {
+                    _ = stateMachine.trigger(E.MultiKeywordEvent)
+                } else {
+                    _ = stateMachine.trigger(E.SignleKeywordEvent)
+                }
                 
-                _bufferToken.type = .Char
-                self.addToken()
+                
                 //添加 keyword
                 _bufferToken.data = aStr
                 _bufferToken.type = .KeyWords
                 _tks.append(_bufferToken)
-                _ = stateMachine.trigger(E.SignleKeywordEvent)
+                _bufferToken = JSToken()
                 continue
             } else {
                 addBufferStr(aStr)
             }
             
-            //处理多字符非符号关键字
-            if multiCharKeywordArray.contains(_bufferStr.lowercased()) {
-                _ = stateMachine.trigger(E.MultiKeywordEvent)
-                continue
+            if aStr == " " {
+                if multiCharKeywordArray.contains(_bufferStr.lowercased().trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)) {
+                    _ = stateMachine.trigger(E.MultiKeywordEvent)
+                    continue
+                }
             }
+            
             self.advanceIndex()
         }
         
@@ -98,8 +110,6 @@ public class JSTokenizer {
         return false
     }
     
-    
-    
     //添加 token
     func addToken() {
         let tk = _bufferToken
@@ -120,6 +130,7 @@ public class JSTokenizer {
     }
     enum E: HTNEventType {
         case SignleKeywordEvent
+        case SpaceEvent
         case MultiKeywordEvent
 //        case CommaEvent             // , expression 里区分不同的 expression
 //        case DotEvent               // .
