@@ -30,6 +30,8 @@
 		0A852D0D1F93776B00B61F95 /* CSSProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A852D0C1F93776B00B61F95 /* CSSProperty.swift */; };
 		0A852D101F939CA500B61F95 /* RenderObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A852D0F1F939CA500B61F95 /* RenderObject.swift */; };
 		0A852D121F939FAF00B61F95 /* StyleResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A852D111F939FAF00B61F95 /* StyleResolver.swift */; };
+		3F29BFE91FA1944600062CD7 /* HTMLToTexture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F29BFE81FA1944600062CD7 /* HTMLToTexture.swift */; };
+		3F7816391FA07AA400456F0E /* LayoutElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F7816381FA07AA400456F0E /* LayoutElement.swift */; };
 		0A8BE3121FA082EB00906BC9 /* JSNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8BE3111FA082EB00906BC9 /* JSNode.swift */; };
 /* End PBXBuildFile section */
 
@@ -60,6 +62,8 @@
 		0A852D0C1F93776B00B61F95 /* CSSProperty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSSProperty.swift; sourceTree = "<group>"; };
 		0A852D0F1F939CA500B61F95 /* RenderObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderObject.swift; sourceTree = "<group>"; };
 		0A852D111F939FAF00B61F95 /* StyleResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleResolver.swift; sourceTree = "<group>"; };
+		3F29BFE81FA1944600062CD7 /* HTMLToTexture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTMLToTexture.swift; sourceTree = "<group>"; };
+		3F7816381FA07AA400456F0E /* LayoutElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutElement.swift; sourceTree = "<group>"; };
 		0A8BE3111FA082EB00906BC9 /* JSNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSNode.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -156,6 +160,8 @@
 			children = (
 				0A852D0F1F939CA500B61F95 /* RenderObject.swift */,
 				0A852D111F939FAF00B61F95 /* StyleResolver.swift */,
+				3F7816381FA07AA400456F0E /* LayoutElement.swift */,
+				3F29BFE81FA1944600062CD7 /* HTMLToTexture.swift */,
 			);
 			path = Layout;
 			sourceTree = "<group>";
@@ -244,6 +250,7 @@
 			files = (
 				0A852D031F932C3D00B61F95 /* CSSParser.swift in Sources */,
 				0A852D091F932F8500B61F95 /* CSSSelector.swift in Sources */,
+				3F7816391FA07AA400456F0E /* LayoutElement.swift in Sources */,
 				0A64CBC71F8E4A84003ACB5F /* HTMLToken.swift in Sources */,
 				0A64CBD51F8F0726003ACB5F /* HTNStateMachine.swift in Sources */,
 				0A7CCDAE1FA715ED0032EBB2 /* JSTreeBuilder.swift in Sources */,
@@ -261,6 +268,7 @@
 				0A852D071F932F7600B61F95 /* CSSRule.swift in Sources */,
 				0A64CBAC1F8E1FB9003ACB5F /* AppDelegate.swift in Sources */,
 				0A852D121F939FAF00B61F95 /* StyleResolver.swift in Sources */,
+				3F29BFE91FA1944600062CD7 /* HTMLToTexture.swift in Sources */,
 				0A8BE3121FA082EB00906BC9 /* JSNode.swift in Sources */,
 				0A852D0B1F932F9800B61F95 /* CSSDeclaration.swift in Sources */,
 				0A64CBBD1F8E2007003ACB5F /* HTMLTokenizer.swift in Sources */,
