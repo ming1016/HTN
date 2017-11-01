@@ -1,0 +1,177 @@
+//
+//  LayoutElement.swift
+//  HTNSwift
+//
+//  Created by sunshinelww on 2017/10/25.
+//  Copyright © 2017年 Starming. All rights reserved.
+//
+
+import Foundation
+/**
+ 布局类
+ **/
+class LayoutElement {
+
+    public func createRenderer(doc:Document)->Document {
+        layoutBlockChildren(doc)
+        return doc
+    }
+    
+    /**
+     给每个需要显示的节点创建RenderObject
+     **/
+    private func layoutBlockChildren(_ elem:Element){
+        if(shouldCreateRenderer(elem)){
+            elem.createRenderObject(); //创建RenderObject
+            parseMargin(elem)  //解析margin
+            parsePadding(elem) //解析padding
+            if elem.children.count > 0{
+                for child in elem.children{
+                    let e = child as! Element;
+                    layoutBlockChildren(e); //递归渲染子元素
+                }
+            }
+        }
+    }
+    
+    /**
+     判断是否需要给节点创建Render
+    **/
+    private func shouldCreateRenderer(_ elem:Element) -> Bool{
+        //Css display:none的元素不需要
+        for property in elem.propertyMap {
+            if(property.key=="display" && property.value == "none"){
+                return false
+            }
+        }
+        return true
+    }
+    
+    private func parseMargin(_ elem :Element){
+        for property in elem.propertyMap {
+            if property.key == "margin"{
+                let results = property.value.split(separator: " ")
+                if results.count == 1 {//只有一个值
+                    if let value=Double(cutNumberMark(str: String(results[0]))){
+                        elem.renderer?.margin_top = Double(value);
+                        elem.renderer?.margin_left = Double(value);
+                        elem.renderer?.margin_bottom = Double(value);
+                        elem.renderer?.margin_right = Double(value);
+                    }
+                }
+                else if results.count == 2{
+                    if let value=Double(cutNumberMark(str: String(results[0]))){
+                        elem.renderer?.margin_top = Double(value);
+                        elem.renderer?.margin_bottom = Double(value);
+                    }
+                    if let value=Double(cutNumberMark(str: String(results[1]))){
+                        elem.renderer?.margin_left = Double(value);
+                        elem.renderer?.margin_right = Double(value);
+                    }
+                }
+                else if results.count == 3{
+                    if let value=Double(cutNumberMark(str: String(results[0]))){
+                        elem.renderer?.margin_top = Double(value);
+                    }
+                    if let value=Double(cutNumberMark(str: String(results[1]))){
+                        elem.renderer?.margin_left = Double(value);
+                        elem.renderer?.margin_right = Double(value);
+                    }
+                    if let value=Double(cutNumberMark(str: String(results[2]))){
+                        elem.renderer?.margin_bottom = Double(value);
+                    }
+                }
+                else if results.count == 4{
+                    if let value=Double(cutNumberMark(str: String(results[0]))){
+                        elem.renderer?.margin_top = Double(value);
+                    }
+                    if let value=Double(cutNumberMark(str: String(results[1]))){
+                        elem.renderer?.margin_right = Double(value);
+                    }
+                    if let value=Double(cutNumberMark(str: String(results[2]))){
+                        elem.renderer?.margin_bottom = Double(value);
+                    }
+                    if let value=Double(cutNumberMark(str: String(results[3]))){
+                        elem.renderer?.margin_left = Double(value);
+                    }
+                }
+            }
+            else if property.key == "margin-top"{
+                if let value = Double(cutNumberMark(str: String(property.value))){
+                    elem.renderer?.margin_top = value;
+                }
+            }
+            else if property.key == "margin-left"{
+                if let value = Double(cutNumberMark(str: String(property.value))){
+                    elem.renderer?.margin_left = value;
+                }
+            }
+            else if property.key == "margin_bottom"{
+                if let value = Double(cutNumberMark(str: String(property.value))){
+                    elem.renderer?.margin_bottom = value;
+                }
+            }
+            else if property.key == "margin_right"{
+                if let value = Double(cutNumberMark(str: String(property.value))){
+                    elem.renderer?.margin_right = value;
+                }
+            }
+        }
+    }
+    
+    private func parsePadding(_ elem :Element){
+        for property in elem.propertyMap {
+            if property.key == "padding"{
+                let results = property.value.split(separator: " ")
+                if results.count == 1 {//只有一个值
+                    if let value=Double(cutNumberMark(str: String(results[0]))){
+                        elem.renderer?.padding_top = Double(value);
+                        elem.renderer?.padding_right = Double(value);
+                        elem.renderer?.padding_bottom = Double(value);
+                        elem.renderer?.padding_left = Double(value);
+                    }
+                }
+                else if results.count == 4{
+                    if let value=Double(cutNumberMark(str: String(results[0]))){
+                        elem.renderer?.padding_top = Double(value);
+                    }
+                    if let value=Double(cutNumberMark(str: String(results[1]))){
+                        elem.renderer?.padding_right = Double(value);
+                    }
+                    if let value=Double(cutNumberMark(str: String(results[2]))){
+                        elem.renderer?.padding_bottom = Double(value);
+                    }
+                    if let value=Double(cutNumberMark(str: String(results[3]))){
+                        elem.renderer?.padding_left = Double(value);
+                    }
+                }
+            }
+            else if property.key == "padding-top"{
+                if let value = Double(cutNumberMark(str: String(property.value))){
+                    elem.renderer?.padding_top = value;
+                }
+            }
+            else if property.key == "padding-left"{
+                if let value = Double(cutNumberMark(str: String(property.value))){
+                    elem.renderer?.padding_left = value;
+                }
+            }
+            else if property.key == "padding_bottom"{
+                if let value = Double(cutNumberMark(str: String(property.value))){
+                    elem.renderer?.padding_bottom = value;
+                }
+            }
+            else if property.key == "padding_right"{
+                if let value = Double(cutNumberMark(str: String(property.value))){
+                    elem.renderer?.padding_right = value;
+                }
+            }
+        }
+    }
+    
+    func cutNumberMark(str:String) -> String {
+        var re = str.replacingOccurrences(of: "pt", with: "")
+        re = re.replacingOccurrences(of: "px", with: "")
+        return re
+    }
+}

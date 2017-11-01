@@ -29,18 +29,18 @@ class ViewController: NSViewController {
   <style>
     #six {
       flex-grow: 0;
-      flex-basis: 120pt;
+      flex-basis: 120px;
       align-self: flex-end;
     }
     .big {
-      width: 120pt; height: 200pt; background-color: black; margin: 10pt; color: white;
+      width: 120px; height: 200px; background-color: #00FF00; margin: 10px; color: #000000;
     }
     .small {
       width: 100pt;
       height: 40pt;
       background-color: orange;
       margin: 10pt;
-      color: white;
+      color: #FF0000;
       display: flex;
       flex-direction: row;
     }
@@ -104,6 +104,8 @@ class ViewController: NSViewController {
         
         //TODO: 转原生，待完成，先前实现了转 Yoga 原生代码，在项目在 https://github.com/ming1016/smck 里，具体转原生的代码实现在：https://github.com/ming1016/smck/blob/master/smck/Plugin/H5ToSwiftByFlexBoxPlugin.swift 。
         //接下来打算将其转换成 Texture 让效率更高
+        let layoutElement = LayoutElement().createRenderer(doc: document)
+        _ = HTMLToTexture(nodeName:"Flexbox").converter(layoutElement);
         
         //TODO: 支持 JS Parser 成 AST
         let jsStr = """
