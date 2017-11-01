@@ -23,6 +23,36 @@ public class JSTreeBuilder {
     }
     
     func parser() {
-        let combinedKeywordArray = ["*=","/=","%=","+=","-=","<<=",">>=",">>>=","&=","^=","|="]
+//        let combinedKeywordArray = ["*=","/=","%=","+=","-=","<<=",">>=",">>>=","&=","^=","|="]
+        let tks = tokenizer.parse()
+        var stackNode = [JSNode]()
+        let stateMachine = HTNStateMachine<S,E>(S.UnknownState)
+        
+        stateMachine.listen(E.VarEvent, transit: S.UnknownState, to: S.BeforeJScriptVarStatementState) { (t) in
+            self._currentNode = JSNode.JScriptVarStatementNode()
+            if self._currentNode is JSNode.JScriptVarStatementNode {
+                
+            }
+        }
+        
+        for tk in tks {
+            //
+            if tk.type == .KeyWords {
+                //JScriptVarStatement
+                if tk.data == "var" {
+                    _ = stateMachine.trigger(E.VarEvent)
+                }
+            }
+        }
     }
+    
+    enum S: HTNStateType {
+        case UnknownState
+        case BeforeJScriptVarStatementState
+    }
+    enum E: HTNEventType {
+        case VarEvent
+    }
+    
+    
 }

@@ -59,7 +59,6 @@ public class JSTokenizer {
                     _ = stateMachine.trigger(E.SignleKeywordEvent)
                 }
                 
-                
                 //添加 keyword
                 _bufferToken.data = aStr
                 _bufferToken.type = .KeyWords
@@ -130,7 +129,6 @@ public class JSTokenizer {
     }
     enum E: HTNEventType {
         case SignleKeywordEvent
-        case SpaceEvent
         case MultiKeywordEvent
 //        case CommaEvent             // , expression 里区分不同的 expression
 //        case DotEvent               // .

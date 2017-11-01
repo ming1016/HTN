@@ -116,6 +116,10 @@ for (var i = 0; i < 100; ++i)
 """
         let jsTokenizer = JSTokenizer(jsStr)
         let tks = jsTokenizer.parse()
+        
+        let jsTreeBuilder = JSTreeBuilder(jsStr)
+        jsTreeBuilder.parser()
+        
         print("\(tks)")
         for str in tks {
             print("\(str.data)")
