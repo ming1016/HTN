@@ -28,7 +28,7 @@ public class JSTreeBuilder {
         var stackNode = [JSNode]()
         let stateMachine = HTNStateMachine<S,E>(S.UnknownState)
         
-        stateMachine.listen(E.VarEvent, transit: S.UnknownState, to: S.BeforeJScriptVarStatementState) { (t) in
+        stateMachine.listen(E.VarEvent, transit: S.UnknownState, to: S.StartJScriptVarDeclarationState) { (t) in
             self._currentNode = JSNode.JScriptVarStatementNode()
             if self._currentNode is JSNode.JScriptVarStatementNode {
                 
@@ -38,7 +38,7 @@ public class JSTreeBuilder {
         for tk in tks {
             //
             if tk.type == .KeyWords {
-                //JScriptVarStatement
+                //开始 JScriptVarDeclarationNode
                 if tk.data == "var" {
                     _ = stateMachine.trigger(E.VarEvent)
                 }
@@ -48,10 +48,13 @@ public class JSTreeBuilder {
     
     enum S: HTNStateType {
         case UnknownState
-        case BeforeJScriptVarStatementState
+        case StartJScriptVarDeclarationState
+        
     }
     enum E: HTNEventType {
+        //开始新 Node 的事件
         case VarEvent
+//        case
     }
     
     

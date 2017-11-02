@@ -12,98 +12,269 @@ class ViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-//        let htmlStr = "<html><head><title>First parse</title></head><body><p>Parsed HTML into a doc.</p></body></html>"
-//        let htmlStr = "<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><!--comment --><html><head><script type="text/javascript">try{document.execCommand("BackgroundImageCache", false, true);}catch(e){}</script><style type="text/css">.dice-example td, .dice-example th { border: solid thin; width: 1.35em; height: 1.05em; text-align: center; padding: 0; } .aa {border:solid;} aaa {border:lll;} #cccs {border:cccsss;kkk:999;lll:0px;}</style></head><body background="#!kd" style="dskf*&^$#">as<aaa/><input class="aa" text=""/>dfs<li id="cccs"></li></body></html>"
-//        let htmlStr = "<!doctype html><html><head> <meta charset="UTF-8" /> <title>FlexboxViewController</title> <script src="vue.js"></script> <script src="axios.min.js"></script> <script src="lodash.min.js"></script> <script src="currency-validator.js"></script> <style> #six { flex-grow: 0;  flex-basis: 120pt;  align-self: flex-end;  } .big { width: 120pt; height: 200pt; background-color: black; margin: 10pt; color: white; } .small { width: 100pt; height: 40pt; background-color: orange; margin: 10pt; color: white; display: flex; flex-direction: row; } .tinyBox { width: 10pt; height: 10pt; background-color: red; margin: 5pt; } #main { display: flex; flex-direction: row;  flex-wrap: wrap; flex-flow: row wrap; justify-content: flex-start; align-items: center; align-content: flex-start; } ul { display: flex; flex-direction: column; justify-content: center; list-style-type: none; align-items: center; flex-wrap: wrap; -webkit-padding-start: 0pt; } </style></head><body> <div id="main"> <div class="big" id="smallbox"> <p class="small"></p> </div> <ul class="big"> <li class="tinyBox"></li> <li class="tinyBox"></li> <li class="tinyBox"></li> </ul> <ul class="big" id="more"> <li class="small"> <div class="tinyBox"></div> <div class="tinyBox"></div> <div class="tinyBox"></div> <div class="tinyBox"></div> <div class="tinyBox"></div> </li> <li class="small"></li> <li class="small"></li> </ul> <div class="big" id="six"></div> <div class="big"></div> <div class="big"></div> </div></body></html>"
-        let htmlStr = """
-<!doctype html>
-<html>
-
-<head>
-  <meta charset="UTF-8" />
-  <title>FlexboxViewController</title>
-  <script src="vue.js"></script>
-  <script src="axios.min.js"></script>
-  <script src="lodash.min.js"></script>
-  <script src="currency-validator.js"></script>
-  <style>
-    #six {
-      flex-grow: 0;
-      flex-basis: 120px;
-      align-self: flex-end;
-    }
-    .big {
-      width: 120px; height: 200px; background-color: #00FF00; margin: 10px; color: #000000;
-    }
-    .small {
-      width: 100pt;
-      height: 40pt;
-      background-color: orange;
-      margin: 10pt;
-      color: #FF0000;
-      display: flex;
-      flex-direction: row;
-    }
-    .tinyBox {
-      width: 10pt; height: 10pt; background-color: red; margin: 5pt;
-    }
-    #main {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      flex-flow: row wrap;
-      justify-content: flex-start;
-      align-items: center;
-      align-content: flex-start;
-    }
-    ul {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      list-style-type: none;
-      align-items: center;
-      flex-wrap: wrap;
-      -webkit-padding-start: 0pt;
-    }
-  </style>
-</head>
-<body>
-  <div id="main">
-    <div class="big" id="smallbox">
-      <p class="small"></p>
-    </div>
-    <ul class="big">
-      <li class="tinyBox"></li>
-      <li class="tinyBox"></li>
-      <li class="tinyBox"></li>
-    </ul>
-    <ul class="big" id="more">
-      <li class="small">
-        <div class="tinyBox"></div>
-        <div class="tinyBox"></div>
-        <div class="tinyBox"></div>
-        <div class="tinyBox"></div>
-        <div class="tinyBox"></div>
-      </li>
-      <li class="small"></li>
-      <li class="small"></li>
-    </ul>
-    <div class="big" id="six"></div>
-    <div class="big"></div>
-    <div class="big"></div>
-  </div>
-</body>
-</html>
-"""
+        var htmlStr = ""
+//        htmlStr = """
+//<!doctype html>
+//<html>
+//
+//<head>
+//  <meta charset="UTF-8" />
+//  <title>FlexboxViewController</title>
+//  <script src="vue.js"></script>
+//  <script src="axios.min.js"></script>
+//  <script src="lodash.min.js"></script>
+//  <script src="currency-validator.js"></script>
+//  <style>
+//    #six {
+//      flex-grow: 0;
+//      flex-basis: 120px;
+//      align-self: flex-end;
+//    }
+//    .big {
+//      width: 120px; height: 200px; background-color: #00FF00; margin: 10px; color: #000000;
+//    }
+//    .small {
+//      width: 100pt;
+//      height: 40pt;
+//      background-color: orange;
+//      margin: 10pt;
+//      color: #FF0000;
+//      display: flex;
+//      flex-direction: row;
+//    }
+//    .tinyBox {
+//      width: 10pt; height: 10pt; background-color: red; margin: 5pt;
+//    }
+//    #main {
+//      display: flex;
+//      flex-direction: row;
+//      flex-wrap: wrap;
+//      flex-flow: row wrap;
+//      justify-content: flex-start;
+//      align-items: center;
+//      align-content: flex-start;
+//    }
+//    ul {
+//      display: flex;
+//      flex-direction: column;
+//      justify-content: center;
+//      list-style-type: none;
+//      align-items: center;
+//      flex-wrap: wrap;
+//      -webkit-padding-start: 0pt;
+//    }
+//  </style>
+//</head>
+//<body>
+//  <div id="main">
+//    <div class="big" id="smallbox">
+//      <p class="small"></p>
+//    </div>
+//    <ul class="big">
+//      <li class="tinyBox"></li>
+//      <li class="tinyBox"></li>
+//      <li class="tinyBox"></li>
+//    </ul>
+//    <ul class="big" id="more">
+//      <li class="small">
+//        <div class="tinyBox"></div>
+//        <div class="tinyBox"></div>
+//        <div class="tinyBox"></div>
+//        <div class="tinyBox"></div>
+//        <div class="tinyBox"></div>
+//      </li>
+//      <li class="small"></li>
+//      <li class="small"></li>
+//    </ul>
+//    <div class="big" id="six"></div>
+//    <div class="big"></div>
+//    <div class="big"></div>
+//  </div>
+//</body>
+//</html>
+//"""
+        htmlStr = """
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <title></title>
+        <style type="text/css">
+        .stream {
+        display: flex;
+        -ms-flex-direction: column-reverse;
+        flex-direction: column-reverse
+        }
+        .post {
+        margin-bottom: 5px
+        }
+        .post {
+        display: -ms-flexbox;
+        display: flex
+        }
+        .postUser {
+        -ms-flex: 0 1 auto;
+        flex: 0 1 auto;
+        padding-bottom: 10px
+        }
+        .postUser__portrait {
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-pack: center;
+        justify-content: center;
+        -ms-flex-align: center;
+        align-items: center;
+        width: 100px;
+        height: 90px;
+        font-size: 70px;
+        line-height: 0
+        }
+        .icon {
+        color: #BCD2DA;
+        width: 70px;
+        height: 70px
+        }
+        .postBody__content,
+        .postUser__name {
+        color: #57727C;
+        font-size: 12px
+        }
+        
+        .postUser__name {
+        font-weight: 700;
+        line-height: 1;
+        text-align: center
+        }
+        .postBody {
+        -ms-flex: 1 1 0%;
+        flex: 1 1 0%;
+        position: relative;
+        padding: 15px;
+        border: 1px solid #CAD0D2;
+        border-radius: 4px
+        }
+        .postBody:after,
+        .postBody:before {
+        right: 100%;
+        top: 35px;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none
+        }
+        .postBody:after {
+        border-color: transparent #fff transparent transparent;
+        border-width: 8px;
+        margin-top: -8px
+        }
+        .postBody:before {
+        border-color: transparent #CAD0D2 transparent transparent;
+        border-width: 9px;
+        margin-top: -9px
+        }
+        .postBody__date {
+        margin-top: 5px;
+        color: #86969C;
+        font-size: 10px
+        }
+        .fpDemoPanel__codeType,
+        .fpSectionTitle,
+        .postBody__date {
+        text-transform: uppercase;
+        letter-spacing: 1px
+        }
+        
+        
+        </style>
+        </head>
+        <body>
+        <div class="stream">
+        <div class="post">
+        <div class="postUser">
+        <div class="postUser__portrait">
+        <span class="icon"></span>
+        </div>
+        <div class="postUser__name">CJ C.</div>
+        </div>
+        <div class="postBody">
+        <div class="postBody__content">
+        Going hiking with @karla in Yosemite!
+        </div>
+        <div class="postBody__date">
+        May 27
+        </div>
+        </div>
+        </div>
+        
+        <div class="post">
+        <div class="postUser">
+        <div class="postUser__portrait">
+        <span class="icon"></span>
+        </div>
+        <div class="postUser__name">Jatesh V.</div>
+        </div>
+        <div class="postBody">
+        <div class="postBody__content">
+        Flexboxpatterns.com is the most amazing flexbox resource I've ever used! It's changed my
+        life forever and now everybody tells me that *I'M* amazing, too! Use flexboxpatterns.com!
+        Love flexboxpatterns.com!
+        </div>
+        <div class="postBody__date">
+        May 28
+        </div>
+        </div>
+        </div>
+        
+        <div class="post">
+        <div class="postUser">
+        <div class="postUser__portrait">
+        <span class="icon"></span>
+        </div>
+        <div class="postUser__name">Damien S.</div>
+        </div>
+        <div class="postBody">
+        <div class="postBody__content">
+        Anybody else wondering when the Blade Runner and Westworld tie-in will be released? #crossover
+        #replicant
+        </div>
+        <div class="postBody__date">
+        June 1
+        </div>
+        </div>
+        </div>
+        
+        <div class="post">
+        <div class="postUser">
+        <div class="postUser__portrait">
+        <span class="icon"></span>
+        </div>
+        <div class="postUser__name">Ziggie G.</div>
+        </div>
+        <div class="postBody">
+        <div class="postBody__content">
+        I love eating pizza!!!!!!!
+        </div>
+        <div class="postBody__date">
+        June 5
+        </div>
+        </div>
+        </div>
+        </div>
+        </body>
+        </html>
+        
+        """
+        
         let treeBuilder = HTMLTreeBuilder(htmlStr)
         _ = treeBuilder.parse()
         let cssStyle = CSSParser(treeBuilder.doc.allStyle()).parseSheet()
         let document = StyleResolver().resolver(treeBuilder.doc, styleSheet: cssStyle)
-//        document.des() //打印包含样式信息的 DOM 树
+        document.des() //打印包含样式信息的 DOM 树
 //        print("\(tks)\(cssStyle)\(document)")
         
-        //TODO: 转原生，待完成，先前实现了转 Yoga 原生代码，在项目在 https://github.com/ming1016/smck 里，具体转原生的代码实现在：https://github.com/ming1016/smck/blob/master/smck/Plugin/H5ToSwiftByFlexBoxPlugin.swift 。
-        //接下来打算将其转换成 Texture 让效率更高
+        //转 Textrue
+
         let layoutElement = LayoutElement().createRenderer(doc: document)
         _ = HTMLToTexture(nodeName:"Flexbox").converter(layoutElement);
         

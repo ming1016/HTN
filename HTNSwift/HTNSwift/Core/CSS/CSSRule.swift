@@ -11,4 +11,5 @@ import Foundation
 public class CSSRule {
     public var selectorList = [CSSSelector]()
     public var propertyList = [CSSProperty]()
+    public var propertyMap = [String:String]()
 }

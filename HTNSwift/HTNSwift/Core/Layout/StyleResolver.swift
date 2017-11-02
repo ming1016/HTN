@@ -12,7 +12,7 @@ public class StyleResolver {
     public func resolver(_ doc:Document, styleSheet:CSSStyleSheet) -> Document{
         //样式映射表
         //这种结构能够支持多级 Selector
-        var matchMap = [String:[String:CSSRule]]()
+        var matchMap = [String:[String:[String:String]]]()
         for rule in styleSheet.ruleList {
             for selector in rule.selectorList {
                 guard let matchLast = selector.matchList.last else {
@@ -20,10 +20,18 @@ public class StyleResolver {
                 }
                 var matchDic = matchMap[matchLast]
                 if matchDic == nil {
-                    matchDic = [String:CSSRule]()
+                    matchDic = [String:[String:String]]()
                     matchMap[matchLast] = matchDic
                 }
-                matchMap[matchLast]![selector.identifier] = rule
+                
+                //这里可以按照后加入 rulelist 的优先级更高的原则进行覆盖操作
+//                let cssRule = matchMap[matchLast]![selector.identifier]
+                if matchMap[matchLast]![selector.identifier] == nil {
+                    matchMap[matchLast]![selector.identifier] = [String:String]()
+                }
+                for a in rule.propertyList {
+                    matchMap[matchLast]![selector.identifier]![a.key] = a.value
+                }
             }
         }
         for elm in doc.children {
@@ -33,7 +41,7 @@ public class StyleResolver {
         return doc
     }
     //递归将样式属性都加上
-    func attach(_ element:Element, matchMap:[String:[String:CSSRule]]) {
+    func attach(_ element:Element, matchMap:[String:[String:[String:String]]]) {
         guard let token = element.startTagToken else {
             return
         }
@@ -45,10 +53,10 @@ public class StyleResolver {
         //增加 property 通过处理 token 里的属性列表里的 class 和 id 在 matchMap 里找
         for attr in token.attributeList {
             if attr.name == "class" {
-                addProperty("." + attr.value, matchMap: matchMap, element: element)
+                addProperty("." + attr.value.lowercased(), matchMap: matchMap, element: element)
             }
             if attr.name == "id" {
-                addProperty("#" + attr.value, matchMap: matchMap, element: element)
+                addProperty("#" + attr.value.lowercased(), matchMap: matchMap, element: element)
             }
         }
         
@@ -59,13 +67,13 @@ public class StyleResolver {
         }
     }
     
-    func addProperty(_ key:String, matchMap:[String:[String:CSSRule]], element:Element) {
+    func addProperty(_ key:String, matchMap:[String:[String:[String:String]]], element:Element) {
         if matchMap[key] != nil {
             //TODO: 还不支持 selector 里多个标签名组合，后期加上
             if matchMap[key]![key] != nil {
                 let ruleList = matchMap[key]![key]!
                 //将属性加入 element 的属性列表里
-                for property in ruleList.propertyList {
+                for property in ruleList {
                     element.propertyMap[property.key] = property.value
                 }
             }
