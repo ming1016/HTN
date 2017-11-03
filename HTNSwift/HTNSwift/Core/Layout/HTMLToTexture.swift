@@ -60,7 +60,7 @@ class HTMLToTexture {
             case .TEXT_NODE_TYPE:
                 varName =  "textNode_\(HTMLToTexture.index)"
             case .DISPALY_NODE_TYPE:
-                varName = "displayNode_\(HTMLToTexture.index)"
+                varName = "\(elem.startTagToken?.data ?? "displayNode")_\(HTMLToTexture.index)"
             }
             HTMLToTexture.index += 1;
         }
@@ -68,6 +68,22 @@ class HTMLToTexture {
             varName = id!
         }
         return varName
+    }
+    
+    private func convertStringToVar(_ text: String) -> (varName:String, codeStr: String){
+        let varName = "str_\(HTMLToTexture.index)"
+        HTMLToTexture.index += 1
+        if text.trimmingCharacters(in: .whitespaces).isEmpty{
+            return (varName, "NSString *\(varName) = @\"\";");
+        }
+        var codeStr = """
+        NSMutableString *\(varName)= [[NSMutableString alloc] init];\n
+        """
+        let textArr = text.split(separator: "\n")
+        for subText  in textArr {
+            codeStr += "[\(varName) appendString:@\"\(subText)\"];\n"
+        }
+        return (varName, codeStr)
     }
     
     //布局方向
@@ -150,7 +166,7 @@ class HTMLToTexture {
             \(codeStr)
             
             return [ASInsetLayoutSpec insetLayoutSpecWithInsets:UIEdgeInsetsMake(\(renderObj!.margin_top), \(renderObj!.margin_left), \(renderObj!.margin_bottom), \(renderObj!.margin_right))
-            child:\(varName)];
+            child:\(classPropertyArray.keys.contains(varName) ? "self."+varName : varName)];
             };\n
             """
         }
@@ -159,7 +175,7 @@ class HTMLToTexture {
             self.\(nodeVarName).layoutSpecBlock = ^ASLayoutSpec * _Nonnull(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
             @strongify(self);
             \(codeStr)
-            return [ASWrapperLayoutSpec wrapperWithLayoutElement:\(varName)];
+            return [ASWrapperLayoutSpec wrapperWithLayoutElement:\(classPropertyArray.keys.contains(varName) ? "self."+varName : varName)];
             };\n
             """
         }
@@ -178,28 +194,27 @@ class HTMLToTexture {
         var justify_content = "flex-start"
         var align_items = "flex-start"
         
-        for attr in elem.propertyMap{
-            if( attr.key == "flex-direction"){
-                flex_direction = attr.value
-            }
-            
-            if( attr.key == "justify-content"){
-                justify_content = attr.value
-            }
-            
-            if(attr.key == "align-items"){
-                align_items = attr.value
-            }
+        if let value = elem.propertyMap["flex-direction"]{
+            flex_direction = value
+        }
+        
+        if let value = elem.propertyMap["justify-content"]{
+            justify_content = value
+        }
+        
+        if let value = elem.propertyMap["align-items"]{
+            align_items = value
         }
         var str="";
         var childArray="@[";
-        for child in elem.children{
+        let updateOrderChild = (flex_direction == "row-reverse" || flex_direction == "column-reverse") ? elem.children.reversed() : elem.children ;
+        for child in updateOrderChild{
             guard let transformedStr = commonConverter(elem :child as! Element) else{
                 continue
             }
             str += transformedStr.codeStr
             childArray.append(classPropertyArray.keys.contains(transformedStr.varName) ? "self."+transformedStr.varName : transformedStr.varName)
-            if(child !== elem.children.last!){
+            if(child !== updateOrderChild.last!){
                 childArray.append(",")
             }
         }
@@ -207,6 +222,27 @@ class HTMLToTexture {
         if childArray == "@[]"{ //没有子元素，则不用返回布局
             return nil
         }
+        
+        if flex_direction == "row-reverse"{
+            flex_direction = "row"
+            if justify_content == "flex-start"{
+                justify_content = "flex-end"
+            }
+            else if justify_content == "flex-end"{
+                justify_content = "flex-start"
+            }
+        }
+        
+        if flex_direction == "column-reverse"{
+            flex_direction = "column"
+            if justify_content == "flex-start"{
+                justify_content = "flex-end"
+            }
+            else if justify_content == "flex-end"{
+                justify_content = "flex-start"
+            }
+        }
+        
         str += """
         ASStackLayoutSpec * \(layoutVarName) = [ASStackLayoutSpec stackLayoutSpecWithDirection:\(HTMLToTexture.flexDirectionMap[flex_direction]!) spacing:0 justifyContent: \(HTMLToTexture.justifyContentMap[justify_content]!) alignItems: \(HTMLToTexture.alignItemMap[align_items]!) children:\(childArray)];
         
@@ -230,7 +266,7 @@ class HTMLToTexture {
                 repeat{
                     result = commonConverter(elem: elem.children[i] as! Element)
                     i += 1
-                } while i < elem.children.count && result != nil
+                } while i < elem.children.count && result == nil
                 
                 guard result != nil else{
                     return nil //没有一个合法的child,则不用布局了
@@ -244,10 +280,11 @@ class HTMLToTexture {
                     guard let result = commonConverter(elem: currElem) else{
                         continue
                     }
-                    let childArray = "\(varName), \(classPropertyArray.keys.contains(result.varName) ? "self."+result.varName : result.varName)"
+                    let childArray = "\(classPropertyArray.keys.contains(varName) ? "self."+varName : varName), \(classPropertyArray.keys.contains(result.varName) ? "self."+result.varName : result.varName)"
                     let layoutVarName = "\(varName)_\(result.varName)"
                     codeStr += """
-                    ASStackLayoutSpec * \(layoutVarName) = [ASStackLayoutSpec stackLayoutSpecWithDirection:\(HTMLToTexture.flexDirectionMap["column"]!) spacing:0.f  justifyContent: \(HTMLToTexture.justifyContentMap["flex-start"]!) alignItems: \(HTMLToTexture.alignItemMap["flerx"]!) children:\(childArray)];
+                    \(result.codeStr)
+                    ASStackLayoutSpec * \(layoutVarName) = [ASStackLayoutSpec stackLayoutSpecWithDirection:\(HTMLToTexture.flexDirectionMap["column"]!) spacing:0.f  justifyContent: \(HTMLToTexture.justifyContentMap["flex-start"]!) alignItems: \(HTMLToTexture.alignItemMap["flex-start"]!) children:@[\(childArray)]];
                     """
                     varName = layoutVarName
                 }
@@ -259,8 +296,36 @@ class HTMLToTexture {
                 }
                 return (varName, codeStr)
             }
-            else { //非容器节点，暂时考虑两种，DIV和IMG
+            else { //非容器节点
                 switch tagName{
+                case "span","SPAN":
+                    let varName = generateVarName(elem, varType: .DISPALY_NODE_TYPE)
+                    var codeAtrr = ""
+                    for attr in elem.propertyMap{
+                        switch attr.key {
+                        case "width":
+                            codeAtrr.append("_\(varName).style.width = ASDimensionMakeWithPoints(\(cutNumberMark(str: attr.value)));\n")
+                        case "height":
+                            codeAtrr.append("_\(varName).style.height = ASDimensionMakeWithPoints(\(cutNumberMark(str: attr.value)));\n")
+                        case "background-color":
+                            codeAtrr.append("_\(varName).backgroundColor = [UIColor colorWithHexString:@\"\(attr.value)\"];\n")
+                        default:
+                            print("Unknown text css atrribute:div---- \(attr.key)---- function :\(#function)")
+                        }
+                    }
+                    let declareStr = "@property (strong, nonatomic) ASDisplayNode *\(varName);"
+                    let instanStr = """
+                    _\(varName) = [[ASDisplayNode alloc] init];
+                    \(codeAtrr)
+                    """
+                    let clsProperty = ClassProperty(varName,declareStr: declareStr, instantiationStr:instanStr)
+                    classPropertyArray [varName] = clsProperty //保存Node节点作为类属性
+                    var layoutCodeStr = ""
+                    if shouldHandleMargin(elem: elem){
+                        let layoutVarName = handleMargin(elem: elem, varName: varName, codeStr: &layoutCodeStr)
+                        return (layoutVarName, layoutCodeStr)
+                    }
+                    return (varName,layoutCodeStr)
                 case "DIV","div"://没有子节点的DIV
                     let varName = generateVarName(elem, varType: .DISPALY_NODE_TYPE)
                     var codeAtrr = ""
@@ -289,7 +354,7 @@ class HTMLToTexture {
                         return (layoutVarName, layoutCodeStr)
                     }
                     return (varName,layoutCodeStr)
-                case "IMG,img":
+                case "IMG","img":
                     var src: String?
                     for attr in (elem.startTagToken?.attributeList)! {
                         if(attr.name == "attr"){
@@ -356,10 +421,13 @@ class HTMLToTexture {
                 }
             }
             if(!textAttr.isEmpty) {textAttr.removeFirst()}
+            let textData = elem.charToken?.data ?? ""
+            let result = convertStringToVar(textData)
             let declareStr = "@property (strong, nonatomic) ASTextNode *\(nodeVarName);"
             let instanStr = """
+            \(result.codeStr)
             _\(nodeVarName) = [[ASTextNode alloc] init];
-            _\(nodeVarName).attributedText = [[NSAttributedString alloc] initWithString:@"\(elem.charToken?.data ?? "")"  attributes:@{ \(textAttr)}];
+            _\(nodeVarName).attributedText = [[NSAttributedString alloc] initWithString:\(result.varName)  attributes:@{ \(textAttr)}];
             """
             
             let clsProperty = ClassProperty(nodeVarName,declareStr: declareStr, instantiationStr:instanStr)
@@ -370,8 +438,8 @@ class HTMLToTexture {
     
     //是否采用Flex布局
     private func isFlex(elem: Element) -> Bool{
-        if let i = elem.propertyMap.keys.index(of:"display") {
-            return elem.propertyMap.values[i] == "flex"
+        if let value = elem.propertyMap["display"] {
+            return value == "flex"
         }
         return false
     }
