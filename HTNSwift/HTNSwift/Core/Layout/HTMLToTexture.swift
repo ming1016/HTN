@@ -184,6 +184,52 @@ class HTMLToTexture {
         return nodeVarName
     }
     
+    func shouldHandleFlex(elem: Element) -> Bool {
+        if let value = elem.propertyMap["flex"]{
+            if value == "none"{
+                return false
+            }
+            return true
+        }
+        return false
+    }
+    
+    func handleFlexAttr(flexAttrStr: String, varName: String, codeStr: inout String) {
+        let flexAttrArray = flexAttrStr.split(separator: " ").map(String.init)
+        let varName0 = classPropertyArray.keys.contains(varName) ? "self."+varName : varName
+        if flexAttrArray.count == 1{
+            if flexAttrArray[0] == "auto" {
+                codeStr += """
+                \(varName0).style.flexShrink = 1;
+                \(varName0).style.flexGrow = 1;
+                \(varName0).style.flexBasis = \(varName0).style.width;\n
+                """
+            }
+            else if  flexAttrArray[0] == "1"{
+                codeStr += """
+                \(varName0).style.flexShrink = 1;
+                \(varName0).style.flexGrow = 1;
+                \(varName0).style.flexBasis = \(varName0).style.width;\n
+                """
+            }
+        }
+        else {
+            codeStr += """
+            \(varName0).style.flexShrink = \(flexAttrArray[0]);
+            \(varName0).style.flexGrow = \(flexAttrArray[1]);\n
+            """
+            if flexAttrArray[2] == "auto"{
+                codeStr += "\(varName0).style.flexBasis = \(varName0).style.width;\n";
+            }
+            else if flexAttrArray[2] == "0%"{ //暂时发现这种写法 当flex-basis设置为0%的时候，其设置的宽度将不起任何作用，如item1中的wdith
+                codeStr += "\(varName0).style.flexBasis = ASDimensionAuto;\n";
+            }
+            else {
+                codeStr += "\(varName0).style.flexBasis =\(flexAttrArray[2]);\n";
+            }
+        }
+    }
+    
     /**
      返回一个stackLayout布局
      **/
@@ -250,6 +296,9 @@ class HTMLToTexture {
         if shouldHandleMargin(elem: elem){
             layoutVarName = handleMargin(elem: elem, varName: layoutVarName, codeStr: &str)
         }
+        if shouldHandleFlex(elem: elem){
+            handleFlexAttr(flexAttrStr: elem.propertyMap["flex"]!, varName: layoutVarName, codeStr: &str)
+        }
         return (layoutVarName, str)
     }
     
@@ -294,6 +343,9 @@ class HTMLToTexture {
                 if shouldHandleMargin(elem: elem){
                     varName = handleMargin(elem: elem, varName: varName, codeStr: &codeStr)
                 }
+                if shouldHandleFlex(elem: elem){
+                    handleFlexAttr(flexAttrStr: elem.propertyMap["flex"]!, varName: varName, codeStr: &codeStr)
+                }
                 return (varName, codeStr)
             }
             else { //非容器节点
@@ -321,11 +373,14 @@ class HTMLToTexture {
                     let clsProperty = ClassProperty(varName,declareStr: declareStr, instantiationStr:instanStr)
                     classPropertyArray [varName] = clsProperty //保存Node节点作为类属性
                     var layoutCodeStr = ""
+                    var layoutVarName = varName
                     if shouldHandleMargin(elem: elem){
-                        let layoutVarName = handleMargin(elem: elem, varName: varName, codeStr: &layoutCodeStr)
-                        return (layoutVarName, layoutCodeStr)
+                        layoutVarName = handleMargin(elem: elem, varName: varName, codeStr: &layoutCodeStr)
                     }
-                    return (varName,layoutCodeStr)
+                    if shouldHandleFlex(elem: elem){
+                        handleFlexAttr(flexAttrStr: elem.propertyMap["flex"]!, varName: varName, codeStr: &codeStr)
+                    }
+                    return (layoutVarName,layoutCodeStr)
                 case "DIV","div"://没有子节点的DIV
                     let varName = generateVarName(elem, varType: .DISPALY_NODE_TYPE)
                     var codeAtrr = ""
@@ -349,11 +404,14 @@ class HTMLToTexture {
                     let clsProperty = ClassProperty(varName,declareStr: declareStr, instantiationStr:instanStr)
                     classPropertyArray [varName] = clsProperty //保存Node节点作为类属性
                     var layoutCodeStr = ""
+                    var layoutVarName = varName
                     if shouldHandleMargin(elem: elem){
-                        let layoutVarName = handleMargin(elem: elem, varName: varName, codeStr: &layoutCodeStr)
-                        return (layoutVarName, layoutCodeStr)
+                        layoutVarName = handleMargin(elem: elem, varName: varName, codeStr: &layoutCodeStr)
                     }
-                    return (varName,layoutCodeStr)
+                    if shouldHandleFlex(elem: elem){
+                        handleFlexAttr(flexAttrStr: elem.propertyMap["flex"]!, varName: varName, codeStr: &codeStr)
+                    }
+                    return (layoutVarName,layoutCodeStr)
                 case "IMG","img":
                     var src: String?
                     for attr in (elem.startTagToken?.attributeList)! {
@@ -394,11 +452,11 @@ class HTMLToTexture {
                     instanStr.append(codeAtrr)
                     classPropertyArray[varName] = ClassProperty(varName,declareStr:declareStr,instantiationStr:instanStr);
                     var layoutCodeStr = ""
+                    var layoutVarName = varName
                     if shouldHandleMargin(elem: elem){
-                        let layoutVarName = handleMargin(elem: elem, varName: varName, codeStr: &layoutCodeStr)
-                        return (layoutVarName, layoutCodeStr)
+                        layoutVarName = handleMargin(elem: elem, varName: varName, codeStr: &layoutCodeStr)
                     }
-                    return (varName,layoutCodeStr)
+                    return (layoutVarName,layoutCodeStr)
                 default:
                     print("Not Support HTML Tag \(tagName)")
                     return nil

@@ -105,12 +105,12 @@ class LayoutElement {
                 elem.renderer?.margin_left = value;
             }
         }
-        else if let propertyValue = elem.propertyMap["margin_bottom"]{
+        else if let propertyValue = elem.propertyMap["margin-bottom"]{
             if let value = Double(cutNumberMark(str: String(propertyValue))){
                 elem.renderer?.margin_bottom = value;
             }
         }
-        else if let propertyValue = elem.propertyMap["margin_right"]{
+        else if let propertyValue = elem.propertyMap["margin-right"]{
             if let value = Double(cutNumberMark(str: String(propertyValue))){
                 elem.renderer?.margin_right = value;
             }
@@ -154,12 +154,12 @@ class LayoutElement {
                 elem.renderer?.padding_left = value;
             }
         }
-        else if let propertyValue = elem.propertyMap["padding_bottom"]{
+        else if let propertyValue = elem.propertyMap["padding-bottom"]{
             if let value = Double(cutNumberMark(str: String(propertyValue))){
                 elem.renderer?.padding_bottom = value;
             }
         }
-        else if let propertyValue = elem.propertyMap["padding_right"]{
+        else if let propertyValue = elem.propertyMap["padding-right"]{
             if let value = Double(cutNumberMark(str: String(propertyValue))){
                 elem.renderer?.padding_right = value;
             }
