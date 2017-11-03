@@ -13,41 +13,31 @@ class CSSDefault {
     //https://stackoverflow.com/questions/6867254/browsers-default-css-for-html-elements/6867287#6867287
     class func htnCSSDefault() -> String {
         return """
-        html,
-        address,
-        blockquote,
-        body,
-        dd,
-        div,
-        dl,
-        dt,
-        fieldset,
-        form,
-        frame,
-        frameset,
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6,
-        noframes,
-        ol,
-        p,
-        ul,
-        center,
-        dir,
-        hr,
-        menu,
-        pre {
+        html,address,blockquote,body,dd,div,dl,dt,fieldset,form,frame,frameset,h1,h2,h3,h4,h5,h6,noframes,ol,p,ul,center,dir,hr,menu,pre {
         display: block;
+        }
+        
+        layer,article,aside,footer,header,hgroup,main,nav,section {
+        display: block;
+        }
+        
+        figcaption,figure {
+        display: block;
+        }
+        
+        marquee {
+        inline-block;
+        }
+        
+        q {
+        display: inline;
         }
         
         li {
         display: list-item
         }
         
-        head {
+        head,meta,title,link,style,script {
         display: none
         }
         
@@ -70,16 +60,7 @@ class CSSDefault {
         margin: .83em 0
         }
         
-        h4,
-        p,
-        blockquote,
-        ul,
-        fieldset,
-        form,
-        ol,
-        dl,
-        dir,
-        menu {
+        h4,p,blockquote,ul,fieldset,form,ol,dl,dir,menu {
         margin: 1.12em 0
         }
         
@@ -93,14 +74,7 @@ class CSSDefault {
         margin: 1.67em 0
         }
         
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6,
-        b,
-        strong {
+        h1,h2,h3,h4,h5,h6,b,strong {
         font-weight: bolder
         }
         
@@ -109,10 +83,7 @@ class CSSDefault {
         margin-right: 40px
         }
         
-        button,
-        textarea,
-        input,
-        select {
+        button,textarea,input,select {
         display: inline-block
         }
         
@@ -156,14 +127,6 @@ class CSSDefault {
         list-style-type: decimal
         }
         
-        ol ul,
-        ul ol,
-        ul ul,
-        ol ol {
-        margin-top: 0;
-        margin-bottom: 0
-        }
-        
         u,
         ins {
         text-decoration: underline
@@ -172,7 +135,6 @@ class CSSDefault {
         center {
         text-align: center
         }
-        
         
         """
     }
