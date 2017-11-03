@@ -152,6 +152,7 @@ class HTMLToTexture {
                 instanStr.append("_\(nodeVarName).style.height = ASDimensionMakeWithPoints(\(cutNumberMark(str: attr.value)));\n")
             case "background-color":
                 instanStr.append("_\(nodeVarName).backgroundColor = [UIColor colorWithHexString:@\"\(attr.value)\"];\n")
+                
             default:
                 print("Unknown text CSS atrribute: ---- \(attr.key)---- function :\(#function)")
             }
@@ -200,23 +201,23 @@ class HTMLToTexture {
         if flexAttrArray.count == 1{
             if flexAttrArray[0] == "auto" {
                 codeStr += """
-                \(varName0).style.flexShrink = 1;
                 \(varName0).style.flexGrow = 1;
+                \(varName0).style.flexShrink = 1;
                 \(varName0).style.flexBasis = \(varName0).style.width;\n
                 """
             }
             else if  flexAttrArray[0] == "1"{
                 codeStr += """
-                \(varName0).style.flexShrink = 1;
                 \(varName0).style.flexGrow = 1;
+                \(varName0).style.flexShrink = 1;
                 \(varName0).style.flexBasis = \(varName0).style.width;\n
                 """
             }
         }
         else {
             codeStr += """
-            \(varName0).style.flexShrink = \(flexAttrArray[0]);
-            \(varName0).style.flexGrow = \(flexAttrArray[1]);\n
+            \(varName0).style.flexGrow = \(flexAttrArray[0]);
+            \(varName0).style.flexShrink = \(flexAttrArray[1]);\n
             """
             if flexAttrArray[2] == "auto"{
                 codeStr += "\(varName0).style.flexBasis = \(varName0).style.width;\n";
@@ -238,7 +239,7 @@ class HTMLToTexture {
         var layoutVarName = generateVarName(elem, varType: .LAYOUT_TYPE)
         var flex_direction = "row"
         var justify_content = "flex-start"
-        var align_items = "flex-start"
+        var align_items = "stretch"
         
         if let value = elem.propertyMap["flex-direction"]{
             flex_direction = value
