@@ -185,10 +185,20 @@ class ViewController: NSViewController {
         letter-spacing: 1px
         }
         
+        .test span, .div-1 a {
+        color: #000000
+        }
+        
         
         </style>
         </head>
         <body>
+        <div class="test">
+            <span id="spanid"></span>
+            <div class="div-1"><div class="div-2"><a></a></div></div>
+            <ul><li></li></ul>
+            <a><span>aaa</span></a>
+        </div>
         <div class="stream">
         <div class="post">
         <div class="postUser">

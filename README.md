@@ -201,13 +201,14 @@ enum E: HTNEventType {
 同样在状态的处理过程中也需要一个合理的类结构关系设计来满足，这里也参考了 WebKit 里的设计，如下：
 ![03](https://ming1016.github.io/uploads/html-to-native-htn-development-record/03.png)
 
+
 ## 布局
 布局处理目前 HTN 主要是将样式属性和 DOM 树里的 Element 对应上。具体实现是在 Layout/StyleResolver.swift 里。思路是先将所有 CSSRule 和对应的 CSSSelector 做好映射，接着在递归 DOM 树的过程中与每个 Element 对应上。主要代码实现如下：
 ```swift
 public func resolver(_ doc:Document, styleSheet:CSSStyleSheet) -> Document{
     //样式映射表
-    //TODO: 需要把结构改成 [String:[String:CSSProperty]] 这样能够支持重复 selector 能够合并 Property
-    var matchMap = [String:[String:CSSRule]]()
+    //这种结构能够支持多级 Selector
+    var matchMap = [String:[String:[String:String]]]()
     for rule in styleSheet.ruleList {
         for selector in rule.selectorList {
             guard let matchLast = selector.matchList.last else {
@@ -215,10 +216,17 @@ public func resolver(_ doc:Document, styleSheet:CSSStyleSheet) -> Document{
             }
             var matchDic = matchMap[matchLast]
             if matchDic == nil {
-                matchDic = [String:CSSRule]()
+                matchDic = [String:[String:String]]()
                 matchMap[matchLast] = matchDic
             }
-            matchMap[matchLast]![selector.identifier] = rule
+            
+            //这里可以按照后加入 rulelist 的优先级更高的原则进行覆盖操作
+            if matchMap[matchLast]![selector.identifier] == nil {
+                matchMap[matchLast]![selector.identifier] = [String:String]()
+            }
+            for a in rule.propertyList {
+                matchMap[matchLast]![selector.identifier]![a.key] = a.value
+            }
         }
     }
     for elm in doc.children {
@@ -228,8 +236,7 @@ public func resolver(_ doc:Document, styleSheet:CSSStyleSheet) -> Document{
     return doc
 }
 //递归将样式属性都加上
-func attach(_ element:Element, matchMap:[String:[String:CSSRule]]) {
-    
+func attach(_ element:Element, matchMap:[String:[String:[String:String]]]) {
     guard let token = element.startTagToken else {
         return
     }
@@ -241,10 +248,10 @@ func attach(_ element:Element, matchMap:[String:[String:CSSRule]]) {
     //增加 property 通过处理 token 里的属性列表里的 class 和 id 在 matchMap 里找
     for attr in token.attributeList {
         if attr.name == "class" {
-            addProperty("." + attr.value, matchMap: matchMap, element: element)
+            addProperty("." + attr.value.lowercased(), matchMap: matchMap, element: element)
         }
         if attr.name == "id" {
-            addProperty("#" + attr.value, matchMap: matchMap, element: element)
+            addProperty("#" + attr.value.lowercased(), matchMap: matchMap, element: element)
         }
     }
     
@@ -255,27 +262,96 @@ func attach(_ element:Element, matchMap:[String:[String:CSSRule]]) {
     }
 }
 
-func addProperty(_ key:String, matchMap:[String:[String:CSSRule]], element:Element) {
-    if matchMap[key] != nil {
-        //TODO: 还不支持 selector 里多个标签名组合，后期加上
-        if matchMap[key]![key] != nil {
-            let ruleList = matchMap[key]![key]!
-            //将属性加入 element 的属性列表里
-            for property in ruleList.propertyList {
-                element.propertyMap[property.key] = property.value
+func addProperty(_ key:String, matchMap:[String:[String:[String:String]]], element:Element) {
+    guard let dic = matchMap[key] else {
+        return
+    }
+    for aDic in dic {
+        var selectorArr = aDic.key.components(separatedBy: " ")
+        if selectorArr.count > 1 {
+            //带多个 selector 的情况
+            selectorArr.removeLast()
+            if !recursionSelectorMatch(selectorArr, parentElement: element.parent as! Element) {
+                continue
             }
         }
+        guard let ruleDic = dic[aDic.key] else {
+            continue
+        }
+        //将属性加入 element 的属性列表里
+        for property in ruleDic {
+            element.propertyMap[property.key] = property.value
+        }
     }
+    
+}
+```
+
+这里通过 recursionSelectorMatch 来按照 CSS Selector 从右到左的递归出是否匹配路径，具体实现代码如下：
+```swift
+//递归找出匹配的多路径
+func recursionSelectorMatch(_ selectors:[String], parentElement:Element) -> Bool {
+    var selectorArr = selectors
+    guard var last = selectorArr.last else {
+        //表示全匹配了
+        return true
+    }
+    guard let parent = parentElement.parent else {
+        return false
+    }
+    
+    var isMatch = false
+    
+    if last.hasPrefix(".") {
+        last.characters.removeFirst()
+        //TODO:这里还需要考虑attribute 空格多个 class 名的情况
+        guard let startTagToken = parentElement.startTagToken else {
+            return false
+        }
+        if startTagToken.attributeDic["class"] == last {
+            isMatch = true
+        }
+    } else if last.hasPrefix("#") {
+        last.characters.removeFirst()
+        guard let startTagToken = parentElement.startTagToken else {
+            return false
+        }
+        if startTagToken.attributeDic["id"] == last {
+            isMatch = true
+        }
+    } else {
+        guard let startTagToken = parentElement.startTagToken else {
+            return false
+        }
+        if startTagToken.data == last {
+            isMatch = true
+        }
+    }
+    
+    if isMatch {
+        //匹配到会继续往前去匹配
+        selectorArr.removeLast()
+    }
+    return recursionSelectorMatch(selectorArr, parentElement: parent as! Element)
+    
 }
 ```
 
 ## 转原生
 先前实现了转 Yoga 原生代码，在项目在 https://github.com/ming1016/smck 里，具体转原生的代码实现在：https://github.com/ming1016/smck/blob/master/smck/Plugin/H5ToSwiftByFlexBoxPlugin.swift 。接下来打算将其转换成 [Texture](https://github.com/TextureGroup/Texture) 让效率更高。
 
-## 规划
-* 对样式表更多属性的支持，目前仅处理了 flexbox 相关属性的原生映射，基本属性，默认属性设置，包括 block inline 等都还没有支持。
+## 已完成
+* 解析 HTML 构建 DOM 树，解析 CSS 构建渲染树
 * CSS Selector 的 Tag 路径支持，Tag 和 class，id 的组合选择。
-* 支持转 Texture 原生代码。
+* flexbox 属性，margin 和 padding 映射 Texture 原生代码
+
+## 规划
+* 支持图片标签，支持 CSS background 背景属性
+* html 的 class 属性还不支持空格多个 class 名
+* border-color 的支持
+* text-transform 属性的支持
+* em 转 pt，em 是相对父元素值的乘积值。
+* 支持CSS选择器的 :before 和 :after
 
 * HTN 的 Objective-C 版。
 * 支持转 Objective-C 的原生代码。
@@ -283,3 +359,4 @@ func addProperty(_ key:String, matchMap:[String:[String:CSSRule]], element:Eleme
 * 应用内转换时的缓存的处理，将render树结构体进行缓存的处理
 
 * HTML 内 JS 解析，支持逻辑控制 HTML
+

@@ -82,6 +82,7 @@ public class HTMLTreeBuilder {
             //StartTag
             if tk.type == .StartTag {
                 stackElement.append(_currentElement) //堆栈添加
+                
                 //子关闭标签的情况
                 if tk.selfClosing {
                     _ = stackElement.popLast()
