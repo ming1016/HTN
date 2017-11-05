@@ -25,6 +25,7 @@ class LayoutElement {
             elem.createRenderObject(); //创建RenderObject
             parseMargin(elem)  //解析margin
             parsePadding(elem) //解析padding
+            parseBorder(elem)
             if elem.children.count > 0{
                 for child in elem.children{
                     let e = child as! Element;
@@ -105,12 +106,12 @@ class LayoutElement {
                 elem.renderer?.margin_left = value;
             }
         }
-        else if let propertyValue = elem.propertyMap["margin_bottom"]{
+        else if let propertyValue = elem.propertyMap["margin-bottom"]{
             if let value = Double(cutNumberMark(str: String(propertyValue))){
                 elem.renderer?.margin_bottom = value;
             }
         }
-        else if let propertyValue = elem.propertyMap["margin_right"]{
+        else if let propertyValue = elem.propertyMap["margin-right"]{
             if let value = Double(cutNumberMark(str: String(propertyValue))){
                 elem.renderer?.margin_right = value;
             }
@@ -154,15 +155,26 @@ class LayoutElement {
                 elem.renderer?.padding_left = value;
             }
         }
-        else if let propertyValue = elem.propertyMap["padding_bottom"]{
+        else if let propertyValue = elem.propertyMap["padding-bottom"]{
             if let value = Double(cutNumberMark(str: String(propertyValue))){
                 elem.renderer?.padding_bottom = value;
             }
         }
-        else if let propertyValue = elem.propertyMap["padding_right"]{
+        else if let propertyValue = elem.propertyMap["padding-right"]{
             if let value = Double(cutNumberMark(str: String(propertyValue))){
                 elem.renderer?.padding_right = value;
             }
+        }
+    }
+    
+    private func parseBorder(_ elem: Element) {
+        if let propertyValue = elem.propertyMap["border"]{
+            let valueArr = propertyValue.split(separator: " ").map(String.init)
+            elem.renderer?.borderWidth = Double(cutNumberMark(str: valueArr[0])) ?? 0.0
+            elem.renderer?.borderColor = valueArr[2]
+        }
+        if let propertyValue = elem.propertyMap["border-radius"]{
+            elem.renderer?.borderRadius = Double(cutNumberMark(str: propertyValue)) ?? 0.0
         }
     }
     

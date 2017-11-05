@@ -184,7 +184,6 @@ class ViewController: NSViewController {
         text-transform: uppercase;
         letter-spacing: 1px
         }
-        
         </style>
         </head>
         <body>
@@ -192,7 +191,7 @@ class ViewController: NSViewController {
         <div class="post">
         <div class="postUser">
         <div class="postUser__portrait">
-        <span class="icon"></span>
+         <img class="icon" src="http://www.flexboxpatterns.com/images/dog_1.jpg"></img>
         </div>
         <div class="postUser__name">CJ C.</div>
         </div>
@@ -209,7 +208,7 @@ class ViewController: NSViewController {
         <div class="post">
         <div class="postUser">
         <div class="postUser__portrait">
-        <span class="icon"></span>
+         <img class="icon" src="http://www.flexboxpatterns.com/images/dog_1.jpg"></img>
         </div>
         <div class="postUser__name">Jatesh V.</div>
         </div>
@@ -228,7 +227,7 @@ class ViewController: NSViewController {
         <div class="post">
         <div class="postUser">
         <div class="postUser__portrait">
-        <span class="icon"></span>
+         <img class="icon" src="http://www.flexboxpatterns.com/images/dog_1.jpg"></img>
         </div>
         <div class="postUser__name">Damien S.</div>
         </div>
@@ -246,7 +245,7 @@ class ViewController: NSViewController {
         <div class="post">
         <div class="postUser">
         <div class="postUser__portrait">
-        <span class="icon"></span>
+         <img class="icon" src="http://www.flexboxpatterns.com/images/dog_1.jpg"></img>
         </div>
         <div class="postUser__name">Ziggie G.</div>
         </div>
