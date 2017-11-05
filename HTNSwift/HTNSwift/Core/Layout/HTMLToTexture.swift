@@ -35,7 +35,7 @@ class HTMLToTexture {
         return re
     }
     
-    enum VarType { //暂时支持这三种变量
+    enum VarType { 
         case TEXT_NODE_TYPE //文本
         case IMG_NODE_TYPE  //图片
         case LAYOUT_TYPE    //布局
@@ -152,12 +152,17 @@ class HTMLToTexture {
                 instanStr.append("_\(nodeVarName).style.height = ASDimensionMakeWithPoints(\(cutNumberMark(str: attr.value)));\n")
             case "background-color":
                 instanStr.append("_\(nodeVarName).backgroundColor = [UIColor colorWithHexString:@\"\(attr.value)\"];\n")
-                
+            
             default:
                 print("Unknown text CSS atrribute: ---- \(attr.key)---- function :\(#function)")
             }
         }
-        
+        if let renderObj = elem.renderer{
+            if renderObj.borderWidth > 0{ //只有大于0时候，才进行设置
+                instanStr.append("_\(nodeVarName).borderWidth = \(renderObj.borderWidth);\n")
+                instanStr.append("_\(nodeVarName).borderColor =[UIColor colorWithHexString:@\"\(renderObj.borderColor ?? "#000000")\"].CGColor ;")
+            }
+        }
         var newCodeStr = "";
         let renderObj = elem.renderer
         if (renderObj != nil) && !(renderObj!.padding_top == 0 && renderObj!.padding_left == 0 && renderObj!.padding_bottom == 0 && renderObj!.padding_right == 0){
@@ -238,8 +243,8 @@ class HTMLToTexture {
         
         var layoutVarName = generateVarName(elem, varType: .LAYOUT_TYPE)
         var flex_direction = "row"
-        var justify_content = "flex-start"
-        var align_items = "stretch"
+        var justify_content = "flex-start" //主轴默认值是flex-start
+        var align_items = "stretch" //交叉轴默认值是stretch
         
         if let value = elem.propertyMap["flex-direction"]{
             flex_direction = value

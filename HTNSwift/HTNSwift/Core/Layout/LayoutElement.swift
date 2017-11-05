@@ -25,6 +25,7 @@ class LayoutElement {
             elem.createRenderObject(); //创建RenderObject
             parseMargin(elem)  //解析margin
             parsePadding(elem) //解析padding
+            parseBorder(elem)
             if elem.children.count > 0{
                 for child in elem.children{
                     let e = child as! Element;
@@ -163,6 +164,14 @@ class LayoutElement {
             if let value = Double(cutNumberMark(str: String(propertyValue))){
                 elem.renderer?.padding_right = value;
             }
+        }
+    }
+    
+    private func parseBorder(_ elem: Element) {
+        if let propertyValue = elem.propertyMap["border"]{
+            let valueArr = propertyValue.split(separator: " ").map(String.init)
+            elem.renderer?.borderWidth = Double(cutNumberMark(str: valueArr[0])) ?? 0.0
+            elem.renderer?.borderColor = valueArr[2]
         }
     }
     

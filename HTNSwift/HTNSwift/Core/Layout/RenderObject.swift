@@ -32,8 +32,9 @@ public class RenderObject {
     public var margin_bottom : Double = 0
     public var margin_right : Double = 0
     
-    public var backgroundColor : CGColor? //背景颜色
-    public var borderColor :CGColor? //边框颜色
+    public var backgroundColor : String? //背景颜色
+    public var borderColor :String? //边框颜色
+    public var borderWidth :Double = 0 //边框宽度
     
     init() {
         width=0
