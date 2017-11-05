@@ -184,26 +184,14 @@ class ViewController: NSViewController {
         text-transform: uppercase;
         letter-spacing: 1px
         }
-        
-        .test span, .div-1 a {
-        color: #000000
-        }
-        
-        
         </style>
         </head>
         <body>
-        <div class="test">
-            <span id="spanid"></span>
-            <div class="div-1"><div class="div-2"><a></a></div></div>
-            <ul><li></li></ul>
-            <a><span>aaa</span></a>
-        </div>
         <div class="stream">
         <div class="post">
         <div class="postUser">
         <div class="postUser__portrait">
-        <span class="icon"></span>
+         <img class="icon" src="http://www.flexboxpatterns.com/images/dog_1.jpg"></img>
         </div>
         <div class="postUser__name">CJ C.</div>
         </div>
@@ -220,7 +208,7 @@ class ViewController: NSViewController {
         <div class="post">
         <div class="postUser">
         <div class="postUser__portrait">
-        <span class="icon"></span>
+         <img class="icon" src="http://www.flexboxpatterns.com/images/dog_1.jpg"></img>
         </div>
         <div class="postUser__name">Jatesh V.</div>
         </div>
@@ -239,7 +227,7 @@ class ViewController: NSViewController {
         <div class="post">
         <div class="postUser">
         <div class="postUser__portrait">
-        <span class="icon"></span>
+         <img class="icon" src="http://www.flexboxpatterns.com/images/dog_1.jpg"></img>
         </div>
         <div class="postUser__name">Damien S.</div>
         </div>
@@ -257,7 +245,7 @@ class ViewController: NSViewController {
         <div class="post">
         <div class="postUser">
         <div class="postUser__portrait">
-        <span class="icon"></span>
+         <img class="icon" src="http://www.flexboxpatterns.com/images/dog_1.jpg"></img>
         </div>
         <div class="postUser__name">Ziggie G.</div>
         </div>

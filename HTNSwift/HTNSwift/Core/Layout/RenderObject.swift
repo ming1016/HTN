@@ -35,6 +35,7 @@ public class RenderObject {
     public var backgroundColor : String? //背景颜色
     public var borderColor :String? //边框颜色
     public var borderWidth :Double = 0 //边框宽度
+    public var borderRadius :Double = 0 //边框圆角
     
     init() {
         width=0

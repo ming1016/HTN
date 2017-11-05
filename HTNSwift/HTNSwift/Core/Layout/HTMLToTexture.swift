@@ -110,6 +110,13 @@ class HTMLToTexture {
         "stretch" : "ASStackLayoutAlignItemsStretch"
     ]
     
+    //文本相关
+    static let textAlignment = [
+        "left":"NSTextAlignmentLeft", //default
+        "center":"NSTextAlignmentCenter",
+        "right":"NSTextAlignmentRight"
+    ]
+    
     func shouldHandleMargin(elem: Element) -> Bool {
         guard let renderObj = elem.renderer else {
             return false
@@ -160,7 +167,10 @@ class HTMLToTexture {
         if let renderObj = elem.renderer{
             if renderObj.borderWidth > 0{ //只有大于0时候，才进行设置
                 instanStr.append("_\(nodeVarName).borderWidth = \(renderObj.borderWidth);\n")
-                instanStr.append("_\(nodeVarName).borderColor =[UIColor colorWithHexString:@\"\(renderObj.borderColor ?? "#000000")\"].CGColor ;")
+                instanStr.append("_\(nodeVarName).borderColor =[UIColor colorWithHexString:@\"\(renderObj.borderColor ?? "#000000")\"].CGColor;\n")
+            }
+            if renderObj.borderRadius > 0{
+                instanStr.append("_\(nodeVarName).cornerRadius = \(renderObj.borderRadius);\n")
             }
         }
         var newCodeStr = "";
@@ -171,7 +181,7 @@ class HTMLToTexture {
             @strongify(self);
             \(codeStr)
             
-            return [ASInsetLayoutSpec insetLayoutSpecWithInsets:UIEdgeInsetsMake(\(renderObj!.margin_top), \(renderObj!.margin_left), \(renderObj!.margin_bottom), \(renderObj!.margin_right))
+            return [ASInsetLayoutSpec insetLayoutSpecWithInsets:UIEdgeInsetsMake(\(renderObj!.padding_top), \(renderObj!.padding_left), \(renderObj!.padding_bottom), \(renderObj!.padding_right))
             child:\(classPropertyArray.keys.contains(varName) ? "self."+varName : varName)];
             };\n
             """
@@ -299,9 +309,11 @@ class HTMLToTexture {
         ASStackLayoutSpec * \(layoutVarName) = [ASStackLayoutSpec stackLayoutSpecWithDirection:\(HTMLToTexture.flexDirectionMap[flex_direction]!) spacing:0 justifyContent: \(HTMLToTexture.justifyContentMap[justify_content]!) alignItems: \(HTMLToTexture.alignItemMap[align_items]!) children:\(childArray)];
         
         """
+        layoutVarName = handlePadding(elem: elem, varName: layoutVarName, codeStr: &str)
         if shouldHandleMargin(elem: elem){
             layoutVarName = handleMargin(elem: elem, varName: layoutVarName, codeStr: &str)
         }
+        
         if shouldHandleFlex(elem: elem){
             handleFlexAttr(flexAttrStr: elem.propertyMap["flex"]!, varName: layoutVarName, codeStr: &str)
         }
@@ -339,7 +351,7 @@ class HTMLToTexture {
                     let layoutVarName = "\(varName)_\(result.varName)"
                     codeStr += """
                     \(result.codeStr)
-                    ASStackLayoutSpec * \(layoutVarName) = [ASStackLayoutSpec stackLayoutSpecWithDirection:\(HTMLToTexture.flexDirectionMap["column"]!) spacing:0.f  justifyContent: \(HTMLToTexture.justifyContentMap["flex-start"]!) alignItems: \(HTMLToTexture.alignItemMap["flex-start"]!) children:@[\(childArray)]];
+                    ASStackLayoutSpec * \(layoutVarName) = [ASStackLayoutSpec stackLayoutSpecWithDirection:\(HTMLToTexture.flexDirectionMap["column"]!) spacing:0.f  justifyContent: \(HTMLToTexture.justifyContentMap["flex-start"]!) alignItems: \(HTMLToTexture.alignItemMap["stretch"]!) children:@[\(childArray)]];
                     """
                     varName = layoutVarName
                 }
@@ -419,12 +431,6 @@ class HTMLToTexture {
                     }
                     return (layoutVarName,layoutCodeStr)
                 case "IMG","img":
-                    var src: String?
-                    for attr in (elem.startTagToken?.attributeList)! {
-                        if(attr.name == "attr"){
-                            src = attr.value
-                        }
-                    }
                     let varName = generateVarName(elem, varType: .IMG_NODE_TYPE)
                     var codeAtrr = ""
                     for attr in elem.propertyMap{
@@ -443,17 +449,21 @@ class HTMLToTexture {
                     }
                     var declareStr = ""
                     var instanStr = ""
-                    if let imgLink = src {
-                        if(imgLink.hasPrefix("http://") || imgLink.hasPrefix("https://")){ //网络图片
-                            declareStr = "@property (nonatomic, strong) ASImageNode *\(varName);\n"
+                    if let imgLink = elem.startTagToken?.attributeDic[" src"] {
+                        if imgLink.hasPrefix("http://") || imgLink.hasPrefix("https://"){ //网络图片
+                            declareStr = "@property (nonatomic, strong) ASNetworkImageNode *\(varName);\n"
                             codeAtrr.append("_\(varName).URL = [NSURL URLWithString:@\"\(imgLink)\"];\n")
                             instanStr.append("_\(varName)=[[ASNetworkImageNode alloc] init];\n")
                         }
                         else{
-                            declareStr = "@property (nonatomic, strong) ASNetworkImageNode *\(varName);\n"
+                            declareStr = "@property (nonatomic, strong) ASImageNode *\(varName);\n"
                             codeAtrr.append("_\(varName).image = [UIImage imageNamed:@\"\(imgLink)\"];\n")
                             instanStr.append("_\(varName) = [[ASImageNode alloc] init];\n")
                         }
+                    }
+                    else{ //设置一个空的占位图片
+                        declareStr = "@property (nonatomic, strong) ASNetworkImageNode *\(varName);\n"
+                        instanStr.append("_\(varName) = [[ASImageNode alloc] init];\n")
                     }
                     instanStr.append(codeAtrr)
                     classPropertyArray[varName] = ClassProperty(varName,declareStr:declareStr,instantiationStr:instanStr);
@@ -474,12 +484,20 @@ class HTMLToTexture {
             let parentNode = elem.parent as! Element
             let nodeVarName = generateVarName(elem, varType: .TEXT_NODE_TYPE)
             var textAttr = ""
+            var textStyleStr = ""
             for attr in parentNode.propertyMap{
                 switch attr.key {
                 case "font-size":
                     textAttr.append(",NSFontAttributeName : [UIFont systemFontOfSize:\(cutNumberMark(str:attr.value))]")
                 case "color" :
                     textAttr.append(",NSForegroundColorAttributeName : [UIColor colorWithHexString:@\"\(attr.value)\"]")
+                case "text-align":
+                    textStyleStr = """
+                      NSMutableParagraphStyle * paragraphStyle_\(HTMLToTexture.index) = [[NSMutableParagraphStyle alloc] init];
+                      paragraphStyle_\(HTMLToTexture.index).alignment = \(HTMLToTexture.textAlignment[attr.value] ?? HTMLToTexture.textAlignment["left"]!);\n
+                    """
+                   textAttr.append(",NSParagraphStyleAttributeName: paragraphStyle_\(HTMLToTexture.index)")
+                  HTMLToTexture.index += 1
                 default:
                     print("unknown text css atrribute: CHAR ---- \(attr.key) ---- Function: \(#function)")
                 }
@@ -491,6 +509,7 @@ class HTMLToTexture {
             let instanStr = """
             \(result.codeStr)
             _\(nodeVarName) = [[ASTextNode alloc] init];
+            \(textStyleStr)
             _\(nodeVarName).attributedText = [[NSAttributedString alloc] initWithString:\(result.varName)  attributes:@{ \(textAttr)}];
             """
             

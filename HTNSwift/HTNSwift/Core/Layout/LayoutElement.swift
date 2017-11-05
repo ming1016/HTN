@@ -173,6 +173,9 @@ class LayoutElement {
             elem.renderer?.borderWidth = Double(cutNumberMark(str: valueArr[0])) ?? 0.0
             elem.renderer?.borderColor = valueArr[2]
         }
+        if let propertyValue = elem.propertyMap["border-radius"]{
+            elem.renderer?.borderRadius = Double(cutNumberMark(str: propertyValue)) ?? 0.0
+        }
     }
     
     func cutNumberMark(str:String) -> String {
