@@ -185,20 +185,9 @@ class ViewController: NSViewController {
         letter-spacing: 1px
         }
         
-        .test span, .div-1 a {
-        color: #000000
-        }
-        
-        
         </style>
         </head>
         <body>
-        <div class="test">
-            <span id="spanid"></span>
-            <div class="div-1"><div class="div-2"><a></a></div></div>
-            <ul><li></li></ul>
-            <a><span>aaa</span></a>
-        </div>
         <div class="stream">
         <div class="post">
         <div class="postUser">
@@ -280,11 +269,10 @@ class ViewController: NSViewController {
         _ = treeBuilder.parse()
         let cssStyle = CSSParser(treeBuilder.doc.allStyle()).parseSheet()
         let document = StyleResolver().resolver(treeBuilder.doc, styleSheet: cssStyle)
-        document.des() //打印包含样式信息的 DOM 树
+//        document.des() //打印包含样式信息的 DOM 树
 //        print("\(tks)\(cssStyle)\(document)")
         
         //转 Textrue
-
         let layoutElement = LayoutElement().createRenderer(doc: document)
         _ = HTMLToTexture(nodeName:"Flexbox").converter(layoutElement);
         
@@ -299,14 +287,12 @@ for (var i = 0; i < 100; ++i)
 """
         let jsTokenizer = JSTokenizer(jsStr)
         let tks = jsTokenizer.parse()
-        
+        for str in tks {
+//            print("\(str.data)")
+        }
         let jsTreeBuilder = JSTreeBuilder(jsStr)
         jsTreeBuilder.parser()
         
-        print("\(tks)")
-        for str in tks {
-            print("\(str.data)")
-        }
     }
 
 }

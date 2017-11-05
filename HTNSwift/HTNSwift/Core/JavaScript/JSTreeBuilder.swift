@@ -11,6 +11,7 @@ import Foundation
 public class JSTreeBuilder {
     var tokenizer: JSTokenizer
     public var currentToken: JSToken?
+    public var rootNode: JSNode
     
     private var _lastNode: JSNode       //上一个节点
     private var _currentNode: JSNode    //当前节点
@@ -18,6 +19,7 @@ public class JSTreeBuilder {
     
     init(_ input: String) {
         tokenizer = JSTokenizer(input)
+        rootNode = JSNode()
         _lastNode = JSNode()
         _currentNode = JSNode()
     }
@@ -28,13 +30,18 @@ public class JSTreeBuilder {
         var stackNode = [JSNode]()
         let stateMachine = HTNStateMachine<S,E>(S.UnknownState)
         
-        stateMachine.listen(E.VarEvent, transit: S.UnknownState, to: S.StartJScriptVarDeclarationState) { (t) in
+        //碰到 var 需要创建新节点
+        stateMachine.listen(E.VarEvent, transit: S.UnknownState, to: S.StartVarState) { (t) in
+            stackNode.append(self._currentNode)
             self._currentNode = JSNode.JScriptVarStatementNode()
-            if self._currentNode is JSNode.JScriptVarStatementNode {
-                
-            }
+            self.parentAppendChild()
+        }
+        stateMachine.listen(E.CharEvent, transit: S.StartVarState, to: S.StartVarIdentifierState) { (t) in
+            
         }
         
+        
+        _currentParent = rootNode
         for tk in tks {
             //
             if tk.type == .KeyWords {
@@ -43,19 +50,44 @@ public class JSTreeBuilder {
                     _ = stateMachine.trigger(E.VarEvent)
                 }
             }
+            if tk.type == .Char {
+                _ = stateMachine.trigger(E.CharEvent)
+            }
         }
+    }
+    
+    //help
+    func parentAppendChild() {
+        _currentNode.parent = _currentParent
+        _currentParent?.children.append(_currentNode)
     }
     
     enum S: HTNStateType {
         case UnknownState
-        case StartJScriptVarDeclarationState
+        case StartRoundBracketLeftState
         
+        case StartVarState
+        case StartVarIdentifierState
+        
+        case StartFunctionState
+        case InFunctionBodyState
+        case StartEqualState
+        case StartForState
     }
     enum E: HTNEventType {
-        //开始新 Node 的事件
-        case VarEvent
-//        case
+        //char
+        case CharEvent        // char 类型
+        //可能会开始新 Node 的事件
+        case RoundBracketLeftEvent // (
+        case VarEvent         // var
+        case FunctionEvent    // function
+        case EqualEvent       // =
+        case ForEvent         // for
+        case WhileEvent       // while
+        case IfEvent          // if
+        case TryEvent         // try
+        case ReturnEvent      // return
+        case typeofEvent      // typeof
+        
     }
-    
-    
 }

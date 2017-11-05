@@ -338,7 +338,7 @@ func recursionSelectorMatch(_ selectors:[String], parentElement:Element) -> Bool
 ```
 
 ## 转原生
-先前实现了转 Yoga 原生代码，在项目在 https://github.com/ming1016/smck 里，具体转原生的代码实现在：https://github.com/ming1016/smck/blob/master/smck/Plugin/H5ToSwiftByFlexBoxPlugin.swift 。接下来打算将其转换成 [Texture](https://github.com/TextureGroup/Texture) 让效率更高。
+已完成一部分简单布局属性转换 Texture 原生代码。具体
 
 ## 已完成
 * 解析 HTML 构建 DOM 树，解析 CSS 构建渲染树

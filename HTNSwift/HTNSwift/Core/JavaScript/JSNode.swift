@@ -9,7 +9,7 @@
 import Foundation
 
 //参考 EcmaScript 的 BNF http://tomcopeland.blogs.com/EcmaScript.html
-class JSNode : Node {
+public class JSNode : Node {
     
     
     class ExpressionNode: JSNode {
@@ -337,11 +337,13 @@ class JSNode : Node {
         //"var" 开头 "," 分割，";" 结束或者换行结束
         var jscriptVarDeclarationList = [JScriptVarDeclarationNode]()
     }
+    //已用
     class JScriptVarDeclarationNode: JSNode {
         //JScriptVarDeclaration ::= Identifier ":" <IDENTIFIER_NAME> ( Initialiser )?
         var identifier = ""
         var identifierName = ""
         var initialiser: InitialiserNode?
+        var assignmentExpression: AssignmentExpressionNode? //新添，"=" 后的表达式
     }
     class InitialiserNode: JSNode {
         //"=" 后面的表达式
