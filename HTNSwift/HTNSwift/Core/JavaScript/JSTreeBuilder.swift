@@ -10,12 +10,13 @@ import Foundation
 
 public class JSTreeBuilder {
     var tokenizer: JSTokenizer
-    public var currentToken: JSToken?
     public var rootNode: JSNode
     
+    private var _currentToken = JSToken() //当前的 token
     private var _lastNode: JSNode       //上一个节点
     private var _currentNode: JSNode    //当前节点
     private var _currentParent: JSNode? // 当前父节点
+    
     
     init(_ input: String) {
         tokenizer = JSTokenizer(input)
@@ -30,20 +31,27 @@ public class JSTreeBuilder {
         var stackNode = [JSNode]()
         let stateMachine = HTNStateMachine<S,E>(S.UnknownState)
         
+        _currentParent = rootNode
+        
         //碰到 var 需要创建新节点
         stateMachine.listen(E.VarEvent, transit: S.UnknownState, to: S.StartVarState) { (t) in
+            self._currentNode = JSNode()
+            self._currentNode.type = .VariableDeclaration
             stackNode.append(self._currentNode)
-            self._currentNode = JSNode.JScriptVarStatementNode()
             self.parentAppendChild()
         }
         stateMachine.listen(E.CharEvent, transit: S.StartVarState, to: S.StartVarIdentifierState) { (t) in
-            
+            self._currentNode = JSNode()
+            self._currentNode.type = .Identifier
+            self._currentNode.data = self._currentToken.data
+//            stackNode.append(self._c)
         }
         
         
         _currentParent = rootNode
         for tk in tks {
             //
+            _currentToken = tk
             if tk.type == .KeyWords {
                 //开始 JScriptVarDeclarationNode
                 if tk.data == "var" {
@@ -60,6 +68,7 @@ public class JSTreeBuilder {
     func parentAppendChild() {
         _currentNode.parent = _currentParent
         _currentParent?.children.append(_currentNode)
+        _currentParent = _currentNode
     }
     
     enum S: HTNStateType {

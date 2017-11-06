@@ -80,7 +80,7 @@ public class HTMLTokenizer {
         }
         //AttributeNameState
         stateMachine.listen(E.Equal, transit: [S.AttributeNameState,S.AfterAttributeValueQuotedState], to: S.BeforeAttributeValueState) { (t) in
-            self._bufferToken.currentAttribute.name = self._bufferStr.lowercased()
+            self._bufferToken.currentAttribute.name = self._bufferStr.lowercased().trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
             self.advanceIndexAndResetCurrentStr()
         }
         //BeforeAttributeValueState

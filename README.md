@@ -2,6 +2,37 @@
 ## 前言
 本文主要是记录 HTN 项目开发的过程。关于这个项目先前在 Swift 开发者大会上我曾经演示过，不过当时项目结构不完善，不易扩展，也没有按照标准来。所以这段时间，我研究了下 W3C 的标准和 WebKit 的一些实现，对于这段时间的研究也写了篇文章[深入剖析 WebKit](http://www.starming.com/2017/10/11/deeply-analyse-webkit/)。重构了下这个项目，我可以先说下已经完成的部分，最后列下后面的规划。项目已经放到了 Github 上：[https://github.com/ming1016/HTN](https://github.com/ming1016/HTN) 后面可以对着代码看。
 
+## 项目使用介绍
+通过解析 html 生成 DOM 树，解析 CSS，生成渲染树，计算布局，最终生成原生 Textrue 代码。下面代码可以看到完整的过程的各个方法。
+```swift
+let treeBuilder = HTMLTreeBuilder(htmlStr) //htmlStr 就是 需要转的 html 代码
+_ = treeBuilder.parse() //解析 html 生成 DOM 树
+let cssStyle = CSSParser(treeBuilder.doc.allStyle()).parseSheet() //解析 CSS
+let document = StyleResolver().resolver(treeBuilder.doc, styleSheet: cssStyle) //生成渲染树
+
+//转 Textrue
+let layoutElement = LayoutElement().createRenderer(doc: document) //计算布局
+_ = HTMLToTexture(nodeName:"Flexbox").converter(layoutElement); //生成原生 Textrue 代码
+```
+
+比如有下面的 html
+
+![04](https://ming1016.github.io/uploads/html-to-native-htn-development-record/04.png)
+
+在浏览器里显示是这样
+
+![06](https://ming1016.github.io/uploads/html-to-native-htn-development-record/06.png)
+
+通过 HTN 生成的原生代码
+
+![05](https://ming1016.github.io/uploads/html-to-native-htn-development-record/05.png)
+
+在 iPhone X 模拟器的效果如下
+
+![07](https://ming1016.github.io/uploads/html-to-native-htn-development-record/07.png)
+
+下面详细介绍下具体的实现关键点
+
 ## HTML
 这部分最关键的部分是在 HTML/HTMLTokenizer.swift 里。首先会根据 W3C 里的 Tokenization 的标准 [https://dev.w3.org/html5/spec-preview/tokenization.html](https://dev.w3.org/html5/spec-preview/tokenization.html) 来定义一个状态的枚举，如下，可以目前完成这些状态的情况
 ```swift
@@ -348,7 +379,6 @@ func recursionSelectorMatch(_ selectors:[String], parentElement:Element) -> Bool
 ## 规划
 * 支持图片标签，支持 CSS background 背景属性
 * html 的 class 属性还不支持空格多个 class 名
-* border-color 的支持
 * text-transform 属性的支持
 * em 转 pt，em 是相对父元素值的乘积值。
 * 支持CSS选择器的 :before 和 :after

@@ -10,8 +10,17 @@ import Foundation
 
 //参考 EcmaScript 的 BNF http://tomcopeland.blogs.com/EcmaScript.html
 public class JSNode : Node {
+    public var data = ""
+    public var type = nodeType.Unknown
     
     
+    public enum nodeType {
+        case Unknown
+        case VariableDeclaration
+        case Identifier
+    }
+    
+    /*-------------------暂时不用下面的-------------------*/
     class ExpressionNode: JSNode {
         var assignmentExpressionList = [AssignmentExpressionNode]()
     }
