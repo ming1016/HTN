@@ -44,7 +44,7 @@ public class JSTreeBuilder {
             self._currentNode = JSNode()
             self._currentNode.type = .Identifier
             self._currentNode.data = self._currentToken.data
-//            stackNode.append(self._c)
+            stackNode.append(self._currentNode)
         }
         
         
