@@ -449,7 +449,7 @@ class HTMLToTexture {
                     }
                     var declareStr = ""
                     var instanStr = ""
-                    if let imgLink = elem.startTagToken?.attributeDic[" src"] {
+                    if let imgLink = elem.startTagToken?.attributeDic["src"] {
                         if imgLink.hasPrefix("http://") || imgLink.hasPrefix("https://"){ //网络图片
                             declareStr = "@property (nonatomic, strong) ASNetworkImageNode *\(varName);\n"
                             codeAtrr.append("_\(varName).URL = [NSURL URLWithString:@\"\(imgLink)\"];\n")
