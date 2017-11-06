@@ -47,7 +47,6 @@ public class JSTreeBuilder {
             stackNode.append(self._currentNode)
         }
         
-        
         _currentParent = rootNode
         for tk in tks {
             //
