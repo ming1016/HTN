@@ -12,7 +12,7 @@ class ViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        var htmlStr = """
+        let htmlStr = """
         <!DOCTYPE html>
         <html>
         <head>
@@ -205,9 +205,9 @@ for (var i = 0; i < 100; ++i)
 """
         let jsTokenizer = JSTokenizer(jsStr)
         let tks = jsTokenizer.parse()
-        for str in tks {
+//        for str in tks {
 //            print("\(str.data)")
-        }
+//        }
         let jsTreeBuilder = JSTreeBuilder(jsStr)
         jsTreeBuilder.parser()
         
