@@ -205,14 +205,11 @@ function updateBtn() {
     txt.textContent = 'The machine is stopped.';
   }
 }
-var dog = { name : 'Spot', breed : 'Dalmatian' };
-button.onclick = function() {
+function a() {
   var name = prompt('What is your name?');
   alert('Hello ' + name + ', nice to see you!');
 }
-var myNameArray = ['Chris', function(){var a = "d"}, 'Jim'];
-Math.floor(Math.random()) + 1
-d;
+c = a;
 """
 //        let jsTokenizer = JSTokenizer(jsStr)
 //        let tks = jsTokenizer.parse()

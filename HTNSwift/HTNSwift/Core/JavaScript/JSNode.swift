@@ -28,6 +28,9 @@ public class JSNode : Node {
         case Colon               // :
         case Literal             //字符串
         case Return              // return
+        case If                  // if
+        case Else                // else
+        case CombinedKeywords    // 各种组合关键字
         
         case RoundBracket        //()
         case Brace               //{}

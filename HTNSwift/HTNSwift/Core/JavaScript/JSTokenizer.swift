@@ -45,9 +45,8 @@ public class JSTokenizer {
             self.addToken()
             self.advanceIndexAndResetCurrentBuffer()
         }
-        
         let singleCharKeywordArray = [",",".",":",";","?","(",")","[","]","{","}","|","^","&","<",">","+","-","*","/","%","~","=","\"","'","!","\n"]
-        let multiCharKeywordArray = ["instance","in","delete","void","typeof","var","new","function","do","while","for","in","continue","break","import","return","with","switch","case","default","throw","try","finally","catch"];
+        let multiCharKeywordArray = ["instance","in","delete","void","typeof","var","new","function","do","while","for","in","continue","break","import","return","with","switch","case","default","throw","try","finally","catch","if","else"];
         
         while let aChar = currentChar {
             let aStr = aChar.description
@@ -58,7 +57,6 @@ public class JSTokenizer {
                 } else {
                     _ = stateMachine.trigger(E.SignleKeywordEvent)
                 }
-                
                 //添加 keyword
                 _bufferToken.data = aStr
                 _bufferToken.type = .KeyWords

@@ -18,6 +18,7 @@ public class JSTreeBuilder {
     private var _currentNode: JSNode    //当前节点
     private var _currentParent: JSNode? // 当前父节点
     private var _stackNode = [JSNode]()
+    private let _combinedKeywordArray = ["*=","/=","%=","+=","-=","<=",">=","!=","<<=",">>=",">>>=","&=","^=","|=","=="]
     
     init(_ input: String) {
         tokenizer = JSTokenizer(input)
@@ -27,7 +28,7 @@ public class JSTreeBuilder {
     }
     
     func parser() {
-//        let combinedKeywordArray = ["*=","/=","%=","+=","-=","<<=",">>=",">>>=","&=","^=","|="]
+        
         let tks = tokenizer.parse()
         let stateMachine = HTNStateMachine<S,E>(S.UnknownState)
         
@@ -134,7 +135,24 @@ public class JSTreeBuilder {
             self.parentAppendChild()
             self.popStackNode()
         }
-        //处理
+        //处理 if else
+        stateMachine.listen(E.IfEvent, transit: beginState, to: S.StartExpressionState) { (t) in
+            self._currentNode = JSNode(type: .If)
+            self.parentAppendChild()
+            self.popStackNode()
+        }
+        stateMachine.listen(E.ElseEvent, transit: [S.UnknownState,S.StartExpressionState], to: S.StartExpressionState) { (t) in
+            self._currentNode = JSNode(type: .Else)
+            self.parentAppendChild()
+            self.popStackNode()
+        }
+        //处理组合关键字
+        stateMachine.listen(E.CombinedKeywordsEvent, transit: S.StartExpressionState, to: S.StartExpressionState) { (t) in
+            self._currentNode = JSNode(type: .CombinedKeywords)
+            self._currentNode.data = self._currentToken.data
+            self.parentAppendChild()
+            self.popStackNode()
+        }
         
         //处理大括号 []
         stateMachine.listen(E.BracketLeftEvent, transit: sameExpressionState, to: S.StartBracketState) { (t) in
@@ -180,9 +198,11 @@ public class JSTreeBuilder {
             self.parentAppendChild()
         }
         
-        
         //处理结束，针对不同的情况这些结束标识符需要做不同的处理
         stateMachine.listen(E.EndNodeEvent, transit: S.StartExpressionState, to: S.UnknownState) { (t) in
+            if self._lastToken.data == "}" {
+                return
+            }
             self.popStackNode()
             //处理 Var 表达式
             if self._currentParent?.type == .VariableDeclarator {
@@ -210,9 +230,30 @@ public class JSTreeBuilder {
         }
         
         _currentParent = rootNode
+        var index = 0
+        var jumpCount = 0
+        let maxCount = tks.count - 1
         for tk in tks {
             _currentToken = tk
             if tk.type == .KeyWords {
+                //jumpCount 来跳过组合的 keyword
+                if jumpCount > 0 {
+                    jumpCount -= 1
+                    index += 1
+                    continue
+                }
+                
+                //判断是否是组合keyword
+                let reStr = recursionNextKeyword(currentStr: tk.data, currentIndex: index, tokens: tks, maxCount: maxCount)
+                if reStr != "" {
+                    jumpCount = reStr.count - 1
+                    _currentToken.data = reStr
+                    _ = stateMachine.trigger(E.CombinedKeywordsEvent)
+                    _lastToken = tk
+                    index += 1
+                    continue
+                }
+                
                 _ = stateMachine.trigger(E.KeyWordEvent)
                 //开始 JScriptVarDeclarationNode
                 if tk.data == "var" {
@@ -265,11 +306,18 @@ public class JSTreeBuilder {
                 if tk.data == "return" {
                     _ = stateMachine.trigger(E.ReturnEvent)
                 }
+                if tk.data == "if" {
+                    _ = stateMachine.trigger(E.IfEvent)
+                }
+                if tk.data == "else" {
+                    _ = stateMachine.trigger(E.ElseEvent)
+                }
             }
             if tk.type == .Char {
                 _ = stateMachine.trigger(E.CharEvent)
             }
             _lastToken = tk
+            index += 1
         }
     }
     
@@ -283,6 +331,36 @@ public class JSTreeBuilder {
     func popStackNode() {
         _ = _stackNode.popLast()
         _currentParent = _stackNode.last
+    }
+    //递归查找组合关键字
+    func recursionNextKeyword(currentStr:String, currentIndex:Int, tokens:[JSToken], maxCount:Int) -> String {
+        if currentIndex + 1 > maxCount {
+            return ""
+        }
+        let nextToken = tokens[currentIndex + 1]
+        if nextToken.type == .KeyWords {
+            var str = currentStr
+            str += nextToken.data
+            
+            if _combinedKeywordArray.contains(str) {
+                //处理严格等于和严格不等于的情况
+                if str == "==" || str == "!="{
+                    if currentIndex + 2 > maxCount {
+                        
+                    } else {
+                        let nextnextToken = tokens[currentIndex + 2]
+                        if nextnextToken.data == "="{
+                            return str + nextnextToken.data
+                        }
+                        
+                    }
+                }
+                return str
+            } else {
+                return recursionNextKeyword(currentStr: str, currentIndex: currentIndex + 1, tokens: tokens, maxCount: maxCount)
+            }
+        }
+        return ""
     }
     
     enum S: HTNStateType {
@@ -319,9 +397,12 @@ public class JSTreeBuilder {
         case ForEvent            // for
         case WhileEvent          // while
         case IfEvent             // if
+        case ElseEvent           // else
         case TryEvent            // try
         case ReturnEvent         // return
         case TypeofEvent         // typeof
+        
+        case CombinedKeywordsEvent // 组合关键字
         
         //可能结束一个 Node 的事件
         case EndNodeEvent   // ; 或者 \n
