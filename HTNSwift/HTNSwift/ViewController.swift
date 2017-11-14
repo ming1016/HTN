@@ -196,7 +196,16 @@ class ViewController: NSViewController {
         
         //TODO: 支持 JS Parser 成 AST
         let jsStr = """
-randomNumber = Math.floor(Math.random()) + 1;
+function updateBtn() {
+  if (btn.textContent === 'Start machine') {
+    btn.textContent = 'Stop machine';
+    txt.textContent = 'The machine has started!';
+  } else {
+    btn.textContent = 'Start machine';
+    txt.textContent = 'The machine is stopped.';
+  }
+}
+var dog = { name : 'Spot', breed : 'Dalmatian' };
 button.onclick = function() {
   var name = prompt('What is your name?');
   alert('Hello ' + name + ', nice to see you!');

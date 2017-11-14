@@ -119,10 +119,23 @@ public class JSTreeBuilder {
                 self.popStackNode() //VariableStatement
                 self.popStackNode() //Brace
                 self.popStackNode() //FunctionExpression
-                self.popStackNode() 
+                self.popStackNode()
             }
-            
         }
+        //处理字典 var dog = { name : 'Spot', breed : 'Dalmatian' };
+        stateMachine.listen(E.ColonEvent, transit: S.StartExpressionState, to: S.StartExpressionState) { (t) in
+            self._currentNode = JSNode(type: .Colon)
+            self.parentAppendChild()
+            self.popStackNode()
+        }
+        //处理 return
+        stateMachine.listen(E.ReturnEvent, transit: beginState, to: S.StartExpressionState) { (t) in
+            self._currentNode = JSNode(type: .Return)
+            self.parentAppendChild()
+            self.popStackNode()
+        }
+        //处理
+        
         //处理大括号 []
         stateMachine.listen(E.BracketLeftEvent, transit: sameExpressionState, to: S.StartBracketState) { (t) in
             self._currentNode = JSNode(type: .Bracket)
@@ -134,6 +147,19 @@ public class JSTreeBuilder {
         
         //-------------有左表达式的
         stateMachine.listen(E.CharEvent, transit: beginState, to: S.StartExpressionState) { (t) in
+            //在字典里的情况
+            if let pparent = self._currentParent?.parent {
+                let jsPparent = pparent as! JSNode
+                if jsPparent.type == .Expression {
+                    self._currentNode = JSNode(type: .Identifier)
+                    self._currentNode.data = self._currentToken.data
+                    self.parentAppendChild()
+                    self.popStackNode()
+                    return
+                }
+            }
+            
+            //在function 里的情况
             self._currentNode = JSNode(type: .LeftHandSideExpression)
             self.parentAppendChild()
             self._currentNode = JSNode(type: .Identifier)
@@ -169,7 +195,7 @@ public class JSTreeBuilder {
             }
         }
         stateMachine.listen(E.CommaEvent, transit: S.StartExpressionState, to: S.StartVarState) { (t) in
-            if self._currentParent?.type == .RoundBracket || self._currentParent?.type == .Bracket {
+            if self._currentParent?.type == .RoundBracket || self._currentParent?.type == .Bracket || self._currentParent?.type == .Brace {
                 self._currentNode = JSNode(type: .CommaSplit)
                 self.parentAppendChild()
                 stateMachine.changeCurrentState(S.StartExpressionState)
@@ -201,6 +227,9 @@ public class JSTreeBuilder {
                 if tk.data == "," {
                     _ = stateMachine.trigger(E.CommaEvent)
                 }
+                if tk.data == ":" {
+                    _ = stateMachine.trigger(E.ColonEvent)
+                }
                 if tk.data == ";" || tk.data == "\n" {
                     _ = stateMachine.trigger(E.EndNodeEvent)
                 }
@@ -226,12 +255,15 @@ public class JSTreeBuilder {
                     _ = stateMachine.trigger(E.BraceRightEvent)
                 }
                 //操作符
-                if tk.data == "+" || tk.data == "-" || tk.data == "*" || tk.data == "/" {
+                if tk.data == "+" || tk.data == "-" || tk.data == "*" || tk.data == "/" || tk.data == "%" {
                     _ = stateMachine.trigger(E.OperatorEvent)
                 }
                 //function
                 if tk.data == "function" {
                     _ = stateMachine.trigger(E.FunctionEvent)
+                }
+                if tk.data == "return" {
+                    _ = stateMachine.trigger(E.ReturnEvent)
                 }
             }
             if tk.type == .Char {
@@ -274,6 +306,7 @@ public class JSTreeBuilder {
         case VarEvent         // var
         case DotEvent         // .
         case CommaEvent       // ,
+        case ColonEvent       // :
         case QuotationMarkEvent  // " '
         case OperatorEvent       // + - * / 操作符
         case RoundBracketLeftEvent  // (

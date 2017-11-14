@@ -24,8 +24,10 @@ public class JSNode : Node {
         case Expression          //等号右侧的表达式
         case Identifier          //对象或变量
         case Operator            //+ - * /
-        case Dot
+        case Dot                 // .
+        case Colon               // :
         case Literal             //字符串
+        case Return              // return
         
         case RoundBracket        //()
         case Brace               //{}
