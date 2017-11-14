@@ -377,16 +377,22 @@ func recursionSelectorMatch(_ selectors:[String], parentElement:Element) -> Bool
 * flexbox 属性，margin 和 padding 映射 Texture 原生代码
 
 ## 规划
+* 支持 Table Cell 复用
+* 支持 float 属性和 layer tree 的概念
 * 支持图片标签，支持 CSS background 背景属性
 * html 的 class 属性还不支持空格多个 class 名
 * text-transform 属性的支持
 * em 转 pt，em 是相对父元素值的乘积值。
 * 支持CSS选择器的 :before 和 :after
 
+* --OC 部分--
+
 * HTN 的 Objective-C 版。
 * 支持转 Objective-C 的原生代码。
 * 解析转换器内嵌在应用程序内部，支持服务器下发 h5 代码转换。
 * 应用内转换时的缓存的处理，将render树结构体进行缓存的处理
+
+* --js 部分--
 
 * HTML 内 JS 解析，支持逻辑控制 HTML
 

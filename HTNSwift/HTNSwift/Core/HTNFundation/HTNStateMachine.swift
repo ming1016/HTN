@@ -66,9 +66,13 @@ class HTNStateMachine<S: HTNStateType, E: HTNEventType> {
         guard let operation = routes[currentState]?[event] else {
             return false
         }
-        operation.triggerCallback(operation.transition)
         lastState = currentState
         currentState = operation.transition.toState
+        operation.triggerCallback(operation.transition)
         return true
+    }
+    //适应相同动作在相同的当前状态下转成不同的toState
+    func changeCurrentState(_ state: S) {
+        currentState = state
     }
 }

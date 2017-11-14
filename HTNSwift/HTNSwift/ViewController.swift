@@ -191,25 +191,28 @@ class ViewController: NSViewController {
 //        print("\(tks)\(cssStyle)\(document)")
         
         //转 Textrue
-        let layoutElement = LayoutElement().createRenderer(doc: document)
-        _ = HTMLToTexture(nodeName:"Flexbox").converter(layoutElement);
+//        let layoutElement = LayoutElement().createRenderer(doc: document)
+//        _ = HTMLToTexture(nodeName:"Flexbox").converter(layoutElement);
         
         //TODO: 支持 JS Parser 成 AST
         let jsStr = """
-var scale = 1.2;
-function foo(o) {
-    return scale * Math.sqrt(o.x * o.x + o.y * o.y);
+randomNumber = Math.floor(Math.random()) + 1;
+button.onclick = function() {
+  var name = prompt('What is your name?');
+  alert('Hello ' + name + ', nice to see you!');
 }
-for (var i = 0; i < 100; ++i)
-    print(foo({x:1.5, y:2.5}));
+var myNameArray = ['Chris', function(){var a = "d"}, 'Jim'];
+Math.floor(Math.random()) + 1
+d;
 """
-        let jsTokenizer = JSTokenizer(jsStr)
-        let tks = jsTokenizer.parse()
+//        let jsTokenizer = JSTokenizer(jsStr)
+//        let tks = jsTokenizer.parse()
 //        for str in tks {
-//            print("\(str.data)")
+//             print("\(str.data)")
 //        }
         let jsTreeBuilder = JSTreeBuilder(jsStr)
         jsTreeBuilder.parser()
+        jsTreeBuilder.rootNode.des()
         
     }
 

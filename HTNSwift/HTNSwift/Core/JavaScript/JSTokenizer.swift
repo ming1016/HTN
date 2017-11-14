@@ -22,7 +22,7 @@ public class JSTokenizer {
         _bufferToken = JSToken()
         _tks = [JSToken]()
     }
-    
+    //TODO: 解决最后一个 char 如果不是关键字会被忽略掉
     public func parse() -> [JSToken] {
         let newStr = dislodgeAnnotaion(content: _input)
         _input = newStr
@@ -126,6 +126,8 @@ public class JSTokenizer {
     //
     enum S: HTNStateType {
         case Data
+        case StartQuotation
+        
     }
     enum E: HTNEventType {
         case SignleKeywordEvent
