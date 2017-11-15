@@ -34,6 +34,10 @@ public class JSNode : Node {
         case In                  // in
         case Break               // break
         case Continue            // continue
+        case New                 // new
+        case Switch              // switch
+        case Case                // case
+        case Default             // default
         
         case CombinedKeywords    // 各种组合关键字
         

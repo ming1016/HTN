@@ -196,10 +196,28 @@ class ViewController: NSViewController {
         
         //TODO: 支持 JS Parser 成 AST
         let jsStr = """
-while (i < cats.length) {
-	a = b
+switch (expr) {
+  case 'Oranges':
+    console.log('Oranges are $0.59 a pound.');
+    break;
+  case 'Apples':
+    console.log('Apples are $0.32 a pound.');
+    break;
+  case 'Bananas':
+    console.log('Bananas are $0.48 a pound.');
+    break;
+  case 'Cherries':
+    console.log('Cherries are $3.00 a pound.');
+    break;
+  case 'Mangoes':
+  case 'Papayas':
+    console.log('Mangoes and papayas are $2.79 a pound.');
+    break;
+  default:
+    console.log('Sorry, we are out of ' + expr + '.');
 }
-
+salva.name;
+salva.greeting();
 a = b;
 """
 //        let jsTokenizer = JSTokenizer(jsStr)

@@ -124,7 +124,7 @@ public class JSTreeBuilder {
         }
         stateMachine.listen(E.BraceRightEvent, transit: [S.StartExpressionState,S.StartBraceState,S.UnknownState], to: S.StartExpressionState) { (t) in
             self.popStackNode()
-            if self._currentParent?.type == .FunctionExpression || self._currentParent?.type == .ForExpression || self._currentParent?.type == .Expression{
+            if self._currentParent?.type == .FunctionExpression || self._currentParent?.type == .ForExpression || self._currentParent?.type == .Expression || self._currentParent?.type == .LeftHandSideExpression {
                 self.popStackNode()
             }
             //var myNameArray = ['Chris', function(){var a = "d"}, 'Jim'];
@@ -144,7 +144,7 @@ public class JSTreeBuilder {
             self.popStackNode()
         }
         //处理 return
-        stateMachine.listen(E.ReturnEvent, transit: beginState, to: S.StartExpressionState) { (t) in
+        stateMachine.listen(E.ReturnEvent, transit: beginState, to: S.UnknownState) { (t) in
             self._currentNode = JSNode(type: .Return)
             self.parentAppendChild()
             self.popStackNode()
@@ -198,14 +198,38 @@ public class JSTreeBuilder {
             self.parentAppendChild()
             self.popStackNode()
         }
-        stateMachine.listen(E.BreakEvent, transit: beginState, to: S.StartExpressionState) { (t) in
+        stateMachine.listen(E.BreakEvent, transit: beginState, to: S.UnknownState) { (t) in
             self._currentNode = JSNode(type: .Break)
             self.parentAppendChild()
+            self.popStackNode()
         }
-        stateMachine.listen(E.ContinueEvent, transit: beginState, to: S.StartExpressionState) { (t) in
+        stateMachine.listen(E.ContinueEvent, transit: beginState, to: S.UnknownState) { (t) in
             self._currentNode = JSNode(type: .Continue)
             self.parentAppendChild()
+            self.popStackNode()
         }
+        stateMachine.listen(E.NewEvent, transit: S.StartExpressionState, to: S.StartExpressionState) { (t) in
+            self._currentNode = JSNode(type: .New)
+            self.parentAppendChild()
+            self.popStackNode()
+        }
+        //处理 switch case
+        stateMachine.listen(E.SwitchEvent, transit: beginState, to: S.StartExpressionState) { (t) in
+            self._currentNode = JSNode(type: .Switch)
+            self.parentAppendChild()
+            self.popStackNode()
+        }
+        stateMachine.listen(E.CaseEvent, transit: beginState, to: S.StartExpressionState) { (t) in
+            self._currentNode = JSNode(type: .Case)
+            self.parentAppendChild()
+            self.popStackNode()
+        }
+        stateMachine.listen(E.DefaultEvent, transit: beginState, to: S.StartExpressionState) { (t) in
+            self._currentNode = JSNode(type: .Default)
+            self.parentAppendChild()
+            self.popStackNode()
+        }
+        
         //处理大括号 []
         stateMachine.listen(E.BracketLeftEvent, transit: sameExpressionState, to: S.StartBracketState) { (t) in
             self._currentNode = JSNode(type: .Bracket)
@@ -252,11 +276,12 @@ public class JSTreeBuilder {
         
         //处理结束，针对不同的情况这些结束标识符需要做不同的处理
         stateMachine.listen(E.EndNodeEvent, transit: S.StartExpressionState, to: S.UnknownState) { (t) in
-            if self._lastToken.data == "}"{
-                if self._currentParent?.type == .Expression {
+            if self._lastToken.data == "}" || self._lastToken.data == ":"{
+                if self._currentParent?.type == .Expression || self._currentParent?.type == .VariableDeclarator{
                     self.popStackNode()
                     self.popStackNode()
                 }
+                
                 return
             }
             if self._lastToken.data == "," {
@@ -400,6 +425,20 @@ public class JSTreeBuilder {
                 if tk.data == "while" {
                     _ = stateMachine.trigger(E.WhileEvent)
                 }
+                //new
+                if tk.data == "new" {
+                    _ = stateMachine.trigger(E.NewEvent)
+                }
+                //switch case
+                if tk.data == "switch" {
+                    _ = stateMachine.trigger(E.SwitchEvent)
+                }
+                if tk.data == "case" {
+                    _ = stateMachine.trigger(E.CaseEvent)
+                }
+                if tk.data == "default" {
+                    _ = stateMachine.trigger(E.DefaultEvent)
+                }
             }
             if tk.type == .Char {
                 _ = stateMachine.trigger(E.CharEvent)
@@ -440,7 +479,6 @@ public class JSTreeBuilder {
                         if nextnextToken.data == "="{
                             return str + nextnextToken.data
                         }
-                        
                     }
                 }
                 return str
@@ -494,6 +532,10 @@ public class JSTreeBuilder {
         case TypeofEvent         // typeof
         case BreakEvent          // break
         case ContinueEvent       // continue
+        case NewEvent            // new
+        case SwitchEvent         // switch
+        case CaseEvent           // case
+        case DefaultEvent        // default
         
         case CombinedKeywordsEvent // 组合关键字
         
