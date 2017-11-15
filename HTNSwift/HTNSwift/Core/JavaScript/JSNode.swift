@@ -24,12 +24,15 @@ public class JSNode : Node {
         case Expression          //等号右侧的表达式
         case Identifier          //对象或变量
         case Operator            //+ - * /
+        case RelationOperator    // > <
         case Dot                 // .
         case Colon               // :
         case Literal             //字符串
         case Return              // return
         case If                  // if
         case Else                // else
+        case In                  // in
+        
         case CombinedKeywords    // 各种组合关键字
         
         case RoundBracket        //()
@@ -43,6 +46,7 @@ public class JSNode : Node {
         case ArrayExpression     //
         case LeftHandSideExpression
         case FunctionExpression
+        case ForExpression
     }
     
     init(type:NodeType) {

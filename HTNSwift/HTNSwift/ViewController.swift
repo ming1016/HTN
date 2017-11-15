@@ -196,25 +196,19 @@ class ViewController: NSViewController {
         
         //TODO: 支持 JS Parser 成 AST
         let jsStr = """
-function updateBtn() {
-  if (btn.textContent === 'Start machine') {
-    btn.textContent = 'Stop machine';
-    txt.textContent = 'The machine has started!';
-  } else {
-    btn.textContent = 'Start machine';
-    txt.textContent = 'The machine is stopped.';
+var a = {a.b:'sadf'}
+ctx.arc(random(WIDTH).a.a, random(HEIGHT), random(50), 0, 2 * Math.PI);
+for (const prop in obj) {
+  if (obj.hasOwnProperty(prop)) {
+    console.log('obj.${prop} ain ${obj[prop]}');
   }
 }
-function a() {
-  var name = prompt('What is your name?');
-  alert('Hello ' + name + ', nice to see you!');
-}
-c = a;
+a = b;
 """
 //        let jsTokenizer = JSTokenizer(jsStr)
 //        let tks = jsTokenizer.parse()
 //        for str in tks {
-//             print("\(str.data)")
+//             print("[\(str.type)]\(str.data)")
 //        }
         let jsTreeBuilder = JSTreeBuilder(jsStr)
         jsTreeBuilder.parser()

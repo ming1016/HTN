@@ -36,7 +36,7 @@ public class JSTreeBuilder {
         _stackNode.append(rootNode)
         
         let sameExpressionState = [S.StartExpressionState,S.StartRoundBracketState,S.StartBracketState,S.StartBraceState]
-        let beginState = [S.UnknownState,S.StartBraceState]
+        let beginState = [S.UnknownState,S.StartBraceState,S.StartRoundBracketState]
         
         //--------碰到 var 需要创建新节点
         stateMachine.listen(E.VarEvent, transit: beginState, to: S.StartVarState) { (t) in
@@ -77,7 +77,12 @@ public class JSTreeBuilder {
             if self._currentToken.data == "\"" || self._currentToken.data == "'" {
                 return
             }
-            self._currentNode.data += self._currentToken.data
+            if self._currentToken.data == "in" {
+                self._currentNode.data += " in "
+            } else {
+                self._currentNode.data += self._currentToken.data
+            }
+            
         }
         stateMachine.listen(E.CharEvent, transit: S.StartQuotationMarkState, to: S.StartQuotationMarkState) { (t) in
             self._currentNode.data += self._currentToken.data
@@ -103,6 +108,9 @@ public class JSTreeBuilder {
         
         stateMachine.listen(E.RoundBracketRightEvent, transit: [S.StartExpressionState,S.StartRoundBracketState,S.UnknownState], to: S.StartExpressionState) { (t) in
             self.popStackNode()
+            if self._currentParent?.type == .RoundBracket {
+                self.popStackNode()
+            }
         }
         //处理中括号 {}
         stateMachine.listen(E.BraceLeftEvent, transit: sameExpressionState, to: S.StartBraceState) { (t) in
@@ -111,16 +119,17 @@ public class JSTreeBuilder {
         }
         stateMachine.listen(E.BraceRightEvent, transit: [S.StartExpressionState,S.StartBraceState,S.UnknownState], to: S.StartExpressionState) { (t) in
             self.popStackNode()
-            
-            if self._currentParent?.type == .FunctionExpression {
+            if self._currentParent?.type == .FunctionExpression || self._currentParent?.type == .ForExpression || self._currentParent?.type == .Expression{
                 self.popStackNode()
             }
             //var myNameArray = ['Chris', function(){var a = "d"}, 'Jim'];
             if self._currentParent?.type == .VariableDeclarator {
                 self.popStackNode() //VariableStatement
-                self.popStackNode() //Brace
-                self.popStackNode() //FunctionExpression
-                self.popStackNode()
+                self.popStackNode() //Brace 或者到顶了，比如 var a = {a.b:'sadf'}
+                if self._currentParent?.type != .Root {
+                    self.popStackNode() //FunctionExpression
+                    self.popStackNode()
+                }
             }
         }
         //处理字典 var dog = { name : 'Spot', breed : 'Dalmatian' };
@@ -136,7 +145,9 @@ public class JSTreeBuilder {
             self.popStackNode()
         }
         //处理 if else
-        stateMachine.listen(E.IfEvent, transit: beginState, to: S.StartExpressionState) { (t) in
+        var ifCurrentStates = beginState
+        ifCurrentStates.append(S.StartExpressionState)
+        stateMachine.listen(E.IfEvent, transit: ifCurrentStates, to: S.StartExpressionState) { (t) in
             self._currentNode = JSNode(type: .If)
             self.parentAppendChild()
             self.popStackNode()
@@ -153,7 +164,28 @@ public class JSTreeBuilder {
             self.parentAppendChild()
             self.popStackNode()
         }
-        
+        //处理 < > RelationOperator
+        stateMachine.listen(E.RelationOperatorEvent, transit: S.StartExpressionState, to: S.StartExpressionState) { (t) in
+            self._currentNode = JSNode(type: .RelationOperator)
+            self._currentNode.data = self._currentToken.data
+            self.parentAppendChild()
+            self.popStackNode()
+        }
+        //处理 for
+        stateMachine.listen(E.ForEvent, transit: beginState, to: S.StartExpressionState) { (t) in
+            self._currentNode = JSNode(type: .ForExpression)
+            self.parentAppendChild()
+        }
+        stateMachine.listen(E.InEvent, transit: S.StartVarIdentifierState, to: S.StartExpressionState) { (t) in
+            self.popStackNode() //VariableDeclarator
+            if self._currentParent?.type == .VariableDeclarator {
+                self.popStackNode() //VariableStatement
+                self.popStackNode() //RoundBracket
+            }
+            self._currentNode = JSNode(type: .In)
+            self.parentAppendChild()
+            self.popStackNode()
+        }
         //处理大括号 []
         stateMachine.listen(E.BracketLeftEvent, transit: sameExpressionState, to: S.StartBracketState) { (t) in
             self._currentNode = JSNode(type: .Bracket)
@@ -200,7 +232,15 @@ public class JSTreeBuilder {
         
         //处理结束，针对不同的情况这些结束标识符需要做不同的处理
         stateMachine.listen(E.EndNodeEvent, transit: S.StartExpressionState, to: S.UnknownState) { (t) in
-            if self._lastToken.data == "}" {
+            if self._lastToken.data == "}"{
+                if self._currentParent?.type == .Expression {
+                    self.popStackNode()
+                    self.popStackNode()
+                }
+                return
+            }
+            if self._lastToken.data == "," {
+                stateMachine.changeCurrentState(S.StartExpressionState)
                 return
             }
             self.popStackNode()
@@ -215,6 +255,9 @@ public class JSTreeBuilder {
             }
         }
         stateMachine.listen(E.CommaEvent, transit: S.StartExpressionState, to: S.StartVarState) { (t) in
+            if self._currentParent?.type == .LeftHandSideExpression {
+                self.popStackNode()
+            }
             if self._currentParent?.type == .RoundBracket || self._currentParent?.type == .Bracket || self._currentParent?.type == .Brace {
                 self._currentNode = JSNode(type: .CommaSplit)
                 self.parentAppendChild()
@@ -231,7 +274,7 @@ public class JSTreeBuilder {
         
         _currentParent = rootNode
         var index = 0
-        var jumpCount = 0
+        var jumpCount = 0 //组合跳跃
         let maxCount = tks.count - 1
         for tk in tks {
             _currentToken = tk
@@ -256,7 +299,7 @@ public class JSTreeBuilder {
                 
                 _ = stateMachine.trigger(E.KeyWordEvent)
                 //开始 JScriptVarDeclarationNode
-                if tk.data == "var" {
+                if tk.data == "var" || tk.data == "const"{
                     _ = stateMachine.trigger(E.VarEvent)
                 }
                 if tk.data == "=" {
@@ -306,11 +349,23 @@ public class JSTreeBuilder {
                 if tk.data == "return" {
                     _ = stateMachine.trigger(E.ReturnEvent)
                 }
+                //if else
                 if tk.data == "if" {
                     _ = stateMachine.trigger(E.IfEvent)
                 }
                 if tk.data == "else" {
                     _ = stateMachine.trigger(E.ElseEvent)
+                }
+                //单个关键字比较符号
+                if tk.data == ">" || tk.data == "<"{
+                    _ = stateMachine.trigger(E.RelationOperatorEvent)
+                }
+                //for
+                if tk.data == "for" {
+                    _ = stateMachine.trigger(E.ForEvent)
+                }
+                if tk.data == "in" {
+                    _ = stateMachine.trigger(E.InEvent)
                 }
             }
             if tk.type == .Char {
@@ -386,7 +441,8 @@ public class JSTreeBuilder {
         case CommaEvent       // ,
         case ColonEvent       // :
         case QuotationMarkEvent  // " '
-        case OperatorEvent       // + - * / 操作符
+        case OperatorEvent       // + - * / % 操作符
+        case RelationOperatorEvent    // > <
         case RoundBracketLeftEvent  // (
         case RoundBracketRightEvent // )
         case BracketLeftEvent    // [
@@ -395,6 +451,7 @@ public class JSTreeBuilder {
         case BraceRightEvent     // }
         case FunctionEvent       // function
         case ForEvent            // for
+        case InEvent             // in
         case WhileEvent          // while
         case IfEvent             // if
         case ElseEvent           // else
@@ -405,7 +462,7 @@ public class JSTreeBuilder {
         case CombinedKeywordsEvent // 组合关键字
         
         //可能结束一个 Node 的事件
-        case EndNodeEvent   // ; 或者 \n
+        case EndNodeEvent     // ; 或者 \n
         case EqualEvent       // =
         
     }

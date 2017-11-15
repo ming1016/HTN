@@ -46,7 +46,7 @@ public class JSTokenizer {
             self.advanceIndexAndResetCurrentBuffer()
         }
         let singleCharKeywordArray = [",",".",":",";","?","(",")","[","]","{","}","|","^","&","<",">","+","-","*","/","%","~","=","\"","'","!","\n"]
-        let multiCharKeywordArray = ["instance","in","delete","void","typeof","var","new","function","do","while","for","in","continue","break","import","return","with","switch","case","default","throw","try","finally","catch","if","else"];
+        let multiCharKeywordArray = ["instance","in","delete","void","typeof","var","new","function","do","while","for","in","continue","break","import","return","with","switch","case","default","throw","try","finally","catch","if","else","const"];
         
         while let aChar = currentChar {
             let aStr = aChar.description
@@ -68,6 +68,22 @@ public class JSTokenizer {
             }
             
             if aStr == " " {
+                //处理 for in 里的 in 关键字的情况
+                if _bufferStr.hasSuffix(" in ") {
+                    self._bufferToken.data = _bufferStr.dropLast(4).description
+                    self._bufferToken.type = .Char
+                    _tks.append(_bufferToken)
+                    _bufferToken = JSToken()
+                    
+                    self._bufferToken.data = "in"
+                    self._bufferToken.type = .KeyWords
+                    _tks.append(_bufferToken)
+                    _bufferToken = JSToken()
+                    
+                    self.advanceIndexAndResetCurrentBuffer()
+                    continue
+                }
+                //处理多字符关键字情况
                 if multiCharKeywordArray.contains(_bufferStr.lowercased().trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)) {
                     _ = stateMachine.trigger(E.MultiKeywordEvent)
                     continue
@@ -76,7 +92,6 @@ public class JSTokenizer {
             
             self.advanceIndex()
         }
-        
         return _tks
     }
     
@@ -206,3 +221,6 @@ public class JSTokenizer {
 //        case catchEvent    // catch
     }
 }
+
+
+
