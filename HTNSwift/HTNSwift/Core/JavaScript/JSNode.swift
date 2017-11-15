@@ -32,6 +32,8 @@ public class JSNode : Node {
         case If                  // if
         case Else                // else
         case In                  // in
+        case Break               // break
+        case Continue            // continue
         
         case CombinedKeywords    // 各种组合关键字
         
@@ -47,6 +49,8 @@ public class JSNode : Node {
         case LeftHandSideExpression
         case FunctionExpression
         case ForExpression
+        case DoWhileExpression   // do while
+        case WhileExpression     // while only
     }
     
     init(type:NodeType) {

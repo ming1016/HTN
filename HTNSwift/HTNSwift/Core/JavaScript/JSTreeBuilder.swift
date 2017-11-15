@@ -37,6 +37,7 @@ public class JSTreeBuilder {
         
         let sameExpressionState = [S.StartExpressionState,S.StartRoundBracketState,S.StartBracketState,S.StartBraceState]
         let beginState = [S.UnknownState,S.StartBraceState,S.StartRoundBracketState]
+        let combineBeginMiddleState = [S.UnknownState,S.StartBraceState,S.StartRoundBracketState,S.StartExpressionState]
         
         //--------碰到 var 需要创建新节点
         stateMachine.listen(E.VarEvent, transit: beginState, to: S.StartVarState) { (t) in
@@ -110,6 +111,10 @@ public class JSTreeBuilder {
             self.popStackNode()
             if self._currentParent?.type == .RoundBracket {
                 self.popStackNode()
+                //处理 do while 的结束
+                if self._currentParent?.type == .WhileExpression {
+                    self.popStackNode()
+                }
             }
         }
         //处理中括号 {}
@@ -145,9 +150,7 @@ public class JSTreeBuilder {
             self.popStackNode()
         }
         //处理 if else
-        var ifCurrentStates = beginState
-        ifCurrentStates.append(S.StartExpressionState)
-        stateMachine.listen(E.IfEvent, transit: ifCurrentStates, to: S.StartExpressionState) { (t) in
+        stateMachine.listen(E.IfEvent, transit: combineBeginMiddleState, to: S.StartExpressionState) { (t) in
             self._currentNode = JSNode(type: .If)
             self.parentAppendChild()
             self.popStackNode()
@@ -171,6 +174,15 @@ public class JSTreeBuilder {
             self.parentAppendChild()
             self.popStackNode()
         }
+        //处理 do while
+        stateMachine.listen(E.WhileEvent, transit: combineBeginMiddleState, to: S.StartExpressionState) { (t) in
+            self._currentNode = JSNode(type: .WhileExpression)
+            self.parentAppendChild()
+        }
+        stateMachine.listen(E.DoEvent, transit: beginState, to: S.StartExpressionState) { (t) in
+            self._currentNode = JSNode(type: .DoWhileExpression)
+            self.parentAppendChild()
+        }
         //处理 for
         stateMachine.listen(E.ForEvent, transit: beginState, to: S.StartExpressionState) { (t) in
             self._currentNode = JSNode(type: .ForExpression)
@@ -185,6 +197,14 @@ public class JSTreeBuilder {
             self._currentNode = JSNode(type: .In)
             self.parentAppendChild()
             self.popStackNode()
+        }
+        stateMachine.listen(E.BreakEvent, transit: beginState, to: S.StartExpressionState) { (t) in
+            self._currentNode = JSNode(type: .Break)
+            self.parentAppendChild()
+        }
+        stateMachine.listen(E.ContinueEvent, transit: beginState, to: S.StartExpressionState) { (t) in
+            self._currentNode = JSNode(type: .Continue)
+            self.parentAppendChild()
         }
         //处理大括号 []
         stateMachine.listen(E.BracketLeftEvent, transit: sameExpressionState, to: S.StartBracketState) { (t) in
@@ -367,6 +387,19 @@ public class JSTreeBuilder {
                 if tk.data == "in" {
                     _ = stateMachine.trigger(E.InEvent)
                 }
+                if tk.data == "break" {
+                    _ = stateMachine.trigger(E.BreakEvent)
+                }
+                if tk.data == "continue" {
+                    _ = stateMachine.trigger(E.ContinueEvent)
+                }
+                //do while
+                if tk.data == "do" {
+                    _ = stateMachine.trigger(E.DoEvent)
+                }
+                if tk.data == "while" {
+                    _ = stateMachine.trigger(E.WhileEvent)
+                }
             }
             if tk.type == .Char {
                 _ = stateMachine.trigger(E.CharEvent)
@@ -452,12 +485,15 @@ public class JSTreeBuilder {
         case FunctionEvent       // function
         case ForEvent            // for
         case InEvent             // in
+        case DoEvent             // do
         case WhileEvent          // while
         case IfEvent             // if
         case ElseEvent           // else
         case TryEvent            // try
         case ReturnEvent         // return
         case TypeofEvent         // typeof
+        case BreakEvent          // break
+        case ContinueEvent       // continue
         
         case CombinedKeywordsEvent // 组合关键字
         

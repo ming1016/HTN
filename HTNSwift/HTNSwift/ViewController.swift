@@ -196,13 +196,10 @@ class ViewController: NSViewController {
         
         //TODO: 支持 JS Parser 成 AST
         let jsStr = """
-var a = {a.b:'sadf'}
-ctx.arc(random(WIDTH).a.a, random(HEIGHT), random(50), 0, 2 * Math.PI);
-for (const prop in obj) {
-  if (obj.hasOwnProperty(prop)) {
-    console.log('obj.${prop} ain ${obj[prop]}');
-  }
+while (i < cats.length) {
+	a = b
 }
+
 a = b;
 """
 //        let jsTokenizer = JSTokenizer(jsStr)
