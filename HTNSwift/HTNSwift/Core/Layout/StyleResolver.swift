@@ -104,7 +104,7 @@ public class StyleResolver {
         var isMatch = false
         
         if last.hasPrefix(".") {
-            last.characters.removeFirst()
+            last.removeFirst()
             //TODO:这里还需要考虑attribute 空格多个 class 名的情况
             guard let startTagToken = parentElement.startTagToken else {
                 return false
@@ -113,7 +113,7 @@ public class StyleResolver {
                 isMatch = true
             }
         } else if last.hasPrefix("#") {
-            last.characters.removeFirst()
+            last.removeFirst()
             guard let startTagToken = parentElement.startTagToken else {
                 return false
             }

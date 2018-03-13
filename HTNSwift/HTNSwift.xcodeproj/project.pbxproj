@@ -23,6 +23,7 @@
 		0A7CCDAA1FA6D75B0032EBB2 /* JSTokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7CCDA91FA6D75B0032EBB2 /* JSTokenizer.swift */; };
 		0A7CCDAC1FA6D8370032EBB2 /* JSToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7CCDAB1FA6D8370032EBB2 /* JSToken.swift */; };
 		0A7CCDAE1FA715ED0032EBB2 /* JSTreeBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7CCDAD1FA715ED0032EBB2 /* JSTreeBuilder.swift */; };
+		0A8433122057AF9D0052B31B /* JSONToFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8433112057AF9D0052B31B /* JSONToFrame.swift */; };
 		0A852D031F932C3D00B61F95 /* CSSParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A852D021F932C3D00B61F95 /* CSSParser.swift */; };
 		0A852D051F932D0700B61F95 /* CSSStyleSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A852D041F932D0700B61F95 /* CSSStyleSheet.swift */; };
 		0A852D071F932F7600B61F95 /* CSSRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A852D061F932F7600B61F95 /* CSSRule.swift */; };
@@ -56,6 +57,7 @@
 		0A7CCDA91FA6D75B0032EBB2 /* JSTokenizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSTokenizer.swift; sourceTree = "<group>"; };
 		0A7CCDAB1FA6D8370032EBB2 /* JSToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSToken.swift; sourceTree = "<group>"; };
 		0A7CCDAD1FA715ED0032EBB2 /* JSTreeBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSTreeBuilder.swift; sourceTree = "<group>"; };
+		0A8433112057AF9D0052B31B /* JSONToFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONToFrame.swift; sourceTree = "<group>"; };
 		0A852D021F932C3D00B61F95 /* CSSParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSSParser.swift; sourceTree = "<group>"; };
 		0A852D041F932D0700B61F95 /* CSSStyleSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSSStyleSheet.swift; sourceTree = "<group>"; };
 		0A852D061F932F7600B61F95 /* CSSRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSSRule.swift; sourceTree = "<group>"; };
@@ -165,6 +167,7 @@
 				0A852D111F939FAF00B61F95 /* StyleResolver.swift */,
 				3F7816381FA07AA400456F0E /* LayoutElement.swift */,
 				3F29BFE81FA1944600062CD7 /* HTMLToTexture.swift */,
+				0A8433112057AF9D0052B31B /* JSONToFrame.swift */,
 			);
 			path = Layout;
 			sourceTree = "<group>";
@@ -275,6 +278,7 @@
 				3F29BFE91FA1944600062CD7 /* HTMLToTexture.swift in Sources */,
 				0A8BE3121FA082EB00906BC9 /* JSNode.swift in Sources */,
 				0A852D0B1F932F9800B61F95 /* CSSDeclaration.swift in Sources */,
+				0A8433122057AF9D0052B31B /* JSONToFrame.swift in Sources */,
 				0A64CBBD1F8E2007003ACB5F /* HTMLTokenizer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

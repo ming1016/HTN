@@ -25,7 +25,7 @@ public class CSSParser {
         var newStr = ""
         let annotationBlockPattern = "/\\*[\\s\\S]*?\\*/" //匹配/*...*/这样的注释
         let regexBlock = try! NSRegularExpression(pattern: annotationBlockPattern, options: NSRegularExpression.Options(rawValue:0))
-        newStr = regexBlock.stringByReplacingMatches(in: input, options: NSRegularExpression.MatchingOptions(rawValue:0), range: NSMakeRange(0, input.characters.count), withTemplate: "")
+        newStr = regexBlock.stringByReplacingMatches(in: input, options: NSRegularExpression.MatchingOptions(rawValue:0), range: NSMakeRange(0, input.count), withTemplate: "")
         //默认样式
         //TODO: 考虑后面需要考虑样式属性需要支持优先级，这里的处理还需要考虑记录更多信息支持后面根据类型判断优先级
         let defaultCSSString = CSSDefault.htnCSSDefault()
@@ -104,7 +104,7 @@ public class CSSParser {
         _bufferStr += bufferStr
     }
     func advanceIndex() {
-        _input.characters.formIndex(after: &_index)
+        _input.formIndex(after: &_index)
     }
     func advanceIndexAndResetCurrentStr() {
         _bufferStr = ""

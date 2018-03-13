@@ -22,7 +22,7 @@ public class JSTreeBuilder {
     
     init(_ input: String) {
         tokenizer = JSTokenizer(input)
-        rootNode = JSNode(type: .Root)
+        rootNode = JSNode(type: .Program)
         _lastNode = JSNode(type: .Unknown)
         _currentNode = JSNode(type: .Unknown)
     }
@@ -131,7 +131,7 @@ public class JSTreeBuilder {
             if self._currentParent?.type == .VariableDeclarator {
                 self.popStackNode() //VariableStatement
                 self.popStackNode() //Brace 或者到顶了，比如 var a = {a.b:'sadf'}
-                if self._currentParent?.type != .Root {
+                if self._currentParent?.type != .Program {
                     self.popStackNode() //FunctionExpression
                     self.popStackNode()
                 }

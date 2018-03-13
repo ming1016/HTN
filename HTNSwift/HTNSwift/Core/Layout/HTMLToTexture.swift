@@ -580,6 +580,7 @@ class HTMLToTexture {
         """
         let HFilePath:String = NSHomeDirectory() + "/Documents/\(nodeClassName).h"
         let MFilePath:String = NSHomeDirectory() + "/Documents/\(nodeClassName).m"
+        print("\(MFilePath)")
         try! objcSourceCodeH.write(toFile: HFilePath, atomically: true, encoding: String.Encoding.utf8)
         try! objcSourceCodeM.write(toFile: MFilePath, atomically: true, encoding: String.Encoding.utf8)
     }

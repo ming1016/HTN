@@ -141,17 +141,17 @@
         _imageNode_3=[[ASNetworkImageNode alloc] init];
         _imageNode_3.style.height = ASDimensionMakeWithPoints(70);
         _imageNode_3.style.width = ASDimensionMakeWithPoints(70);
-        _imageNode_3.URL = [NSURL URLWithString:@"http://www.flexboxpatterns.com/images/dog_1.jpg"];
+        _imageNode_3.URL = [NSURL URLWithString:@"https://v2ex.assets.uxengine.net/avatar/00c9/7615/25431_normal.png?m=1462359511"];
         
         _imageNode_20=[[ASNetworkImageNode alloc] init];
         _imageNode_20.style.height = ASDimensionMakeWithPoints(70);
         _imageNode_20.style.width = ASDimensionMakeWithPoints(70);
-        _imageNode_20.URL = [NSURL URLWithString:@"http://www.flexboxpatterns.com/images/dog_1.jpg"];
+        _imageNode_20.URL = [NSURL URLWithString:@"https://v2ex.assets.uxengine.net/avatar/c9a1/812d/114282_normal.png?m=1509362466"];
         
         _imageNode_37=[[ASNetworkImageNode alloc] init];
         _imageNode_37.style.height = ASDimensionMakeWithPoints(70);
         _imageNode_37.style.width = ASDimensionMakeWithPoints(70);
-        _imageNode_37.URL = [NSURL URLWithString:@"http://www.flexboxpatterns.com/images/dog_1.jpg"];
+        _imageNode_37.URL = [NSURL URLWithString:@"https://v2ex.assets.uxengine.net/avatar/d49a/cbb4/167368_normal.png?m=1499849270"];
         
         NSMutableString *str_24= [[NSMutableString alloc] init];
         [str_24 appendString:@"Damien S."];
@@ -217,6 +217,7 @@
         
         NSMutableString *str_45= [[NSMutableString alloc] init];
         [str_45 appendString:@"Flexboxpatterns.com is the most amazing flexbox resource I've ever used! It's changed my"];
+        [str_45 appendString:@"life forever and now everybody tells me that *I'M* amazing, too! Use flexboxpatterns.com!Flexboxpatterns.com is the most amazing flexbox resource I've ever used! It's changed my"];
         [str_45 appendString:@"life forever and now everybody tells me that *I'M* amazing, too! Use flexboxpatterns.com!"];
         [str_45 appendString:@"Love flexboxpatterns.com!"];
         
@@ -230,7 +231,7 @@
         _imageNode_54=[[ASNetworkImageNode alloc] init];
         _imageNode_54.style.height = ASDimensionMakeWithPoints(70);
         _imageNode_54.style.width = ASDimensionMakeWithPoints(70);
-        _imageNode_54.URL = [NSURL URLWithString:@"http://www.flexboxpatterns.com/images/dog_1.jpg"];
+        _imageNode_54.URL = [NSURL URLWithString:@"https://v2ex.assets.uxengine.net/avatar/24f2/51cb/114655_normal.png?m=1492759291"];
         
         _div_17_node=[[ASDisplayNode alloc] init];
         _div_17_node.automaticallyManagesSubnodes = YES;
@@ -493,4 +494,5 @@
 }
 
 @end
+
 

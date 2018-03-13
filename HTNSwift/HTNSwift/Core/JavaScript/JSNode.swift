@@ -18,7 +18,7 @@ public class JSNode : Node {
     
     public enum NodeType:String {
         case Unknown
-        case Root
+        case Program
         case VariableStatement   // var
         case VariableDeclarator  //
         case Expression          //等号右侧的表达式
