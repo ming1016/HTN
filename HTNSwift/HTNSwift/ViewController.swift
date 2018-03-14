@@ -41,7 +41,7 @@ class ViewController: NSViewController {
         let jsTreeBuilder = JSTreeBuilder(inputTv.string)
         jsTreeBuilder.parser()
 //        jsTreeBuilder.rootNode.des()
-        JSONToFrame().dealWithJSNodes(nodes: jsTreeBuilder.rootNode.children)
+        JavaScriptTest().dealWithJSNodes(nodes: jsTreeBuilder.rootNode.children)
     }
     //递归所有子节点
     fileprivate func htmlToTexture() {
