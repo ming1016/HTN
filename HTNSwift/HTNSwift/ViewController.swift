@@ -8,6 +8,13 @@
 
 import Cocoa
 
+
+
+struct Data {
+    let a: String
+}
+
+
 class ViewController: NSViewController {
     
     @IBOutlet var inputTv: NSTextView!
@@ -41,8 +48,17 @@ class ViewController: NSViewController {
         let jsTreeBuilder = JSTreeBuilder(inputTv.string)
         jsTreeBuilder.parser()
 //        jsTreeBuilder.rootNode.des()
-        JavaScriptTest().dealWithJSNodes(nodes: jsTreeBuilder.rootNode.children)
+//        JavaScriptTest().recursionNode(node: jsTreeBuilder.rootNode, level: 0)
+        
+        
+        let jsonModel = H5EditorDatasource().dataFromJson(id: "cdjy4sqej0")
+        let reStr = H5EditorToFrame<H5EditorObjc>(m:H5EditorObjc()).convert(h5editor: jsonModel)
+        print(reStr)
+        
     }
+    
+    
+    
     //递归所有子节点
     fileprivate func htmlToTexture() {
         let treeBuilder = HTMLTreeBuilder(inputTv.string)

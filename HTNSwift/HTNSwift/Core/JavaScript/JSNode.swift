@@ -12,10 +12,17 @@ import Foundation
 public class JSNode : Node {
     public var type = NodeType.Unknown
     public var data = ""
+    public var semanticType = SemanticType.Default
+    public var nodeDictionary = [String:JSNode]()
+    public var nodeArray = [JSNode]()
     
     public var stackNode: [JSNode]?
     
-    
+    public enum SemanticType:String {
+        case Default
+        case Dictionary
+        case Array
+    }
     public enum NodeType:String {
         case Unknown
         case Program
