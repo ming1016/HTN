@@ -12,6 +12,7 @@ import Foundation
 protocol HTNMultilingualismSpecification {
     var pageId: String {get set}                        //页面 id
     var id: String {get set}                            //动态 id
+    func validIdStr(id: String) -> String               //对 id 字符串的合法化
     func viewPtToStrStruct(vpt:ViewPt) -> ViewStrStruct //视图属性转视图结构
     func viewTypeClassStr(vt:ViewType) -> String        //视图类型类名的映射
     func ptEqualToStr(pe:PtEqual) -> String             //属性表达式
@@ -88,8 +89,8 @@ struct InterfaceFile {
 /*--------------------------------*/
 //Objective-C
 struct H5EditorObjc: HTNMultilingualismSpecification {
-    var id = ""
-    var pageId = ""
+    var id = "" { didSet { id = validIdStr(id: id) } }
+    var pageId = "" { didSet { pageId = validIdStr(id: pageId) } }
     
     func viewPtToStrStruct(vpt:ViewPt) -> ViewStrStruct {
         var getter = ""
@@ -265,7 +266,9 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
         @end
         """
     }
-
+    func validIdStr(id: String) -> String {
+        return "h" + id;
+    }
 }
 
 ////Swift

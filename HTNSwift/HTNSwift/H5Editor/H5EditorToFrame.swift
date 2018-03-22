@@ -15,7 +15,7 @@ class H5EditorToFrame<M:HTNMultilingualismSpecification> {
     }
     
     func convert(h5editor:H5Editor) -> String {
-        m.pageId = "h" + h5editor.data.pages[0].id
+        m.pageId = h5editor.data.pages[0].id
         //全部 widget
         let allWidgets = h5editor.data.pages[0].widgets;
         //流式布局 widget
@@ -39,14 +39,13 @@ class H5EditorToFrame<M:HTNMultilingualismSpecification> {
         var i = 0
         for widget in flowWidgets {
             let wd = widgetStructConvertToStr(widget: widget)
-            let id = validIdStr(w: widget)
-            m.id = id
+            m.id = widget.id
             wgPropertyStr += wd.propertyStr
             wgInitStr += wd.initStr
             wgGetterStr += wd.getterStr
             var pe = PtEqual()
             pe.left = .top
-            pe.rightId = validIdStr(w: lastWidget)
+            pe.rightId = m.validIdStr(id: lastWidget.id)
             pe.rightType = .pt
             pe.right = .bottom
             var topStr = m.ptEqualToStr(pe: pe)
@@ -106,7 +105,7 @@ class H5EditorToFrame<M:HTNMultilingualismSpecification> {
             layoutType = .flow
         }
         var vp = ViewPt()
-        vp.id = validIdStr(w: widget)
+        vp.id = m.validIdStr(id: widget.id)
         vp.viewType = uiType
         vp.layoutType = layoutType
         vp.text = widget.data.content ?? ""
@@ -121,7 +120,7 @@ class H5EditorToFrame<M:HTNMultilingualismSpecification> {
     fileprivate func scaleValueStr(v:Float) -> String {
         return "(HTNSCREENWIDTH * \(v))/375"
     }
-    fileprivate func validIdStr(w:H5Editor.Data.Page.Widget) -> String {
-        return "h\(w.id)"
-    }
+//    fileprivate func validIdStr(w:H5Editor.Data.Page.Widget) -> String {
+//        return "h\(w.id)"
+//    }
 }
