@@ -8,7 +8,7 @@
 
 import Foundation
 
-class H5EditorToFrame<M:H5EditorMultilingualismSpecification> {
+class H5EditorToFrame<M:HTNMultilingualismSpecification> {
     var m:M //多语言的支持
     init(m:M) {
         self.m = m
@@ -50,6 +50,7 @@ class H5EditorToFrame<M:H5EditorMultilingualismSpecification> {
             pe.rightType = .pt
             pe.right = .bottom
             var topStr = m.ptEqualToStr(pe: pe)
+            //第一个顶在最上面
             if i == 0 {
                 var topPe = PtEqual()
                 topPe.left = .top
@@ -88,45 +89,34 @@ class H5EditorToFrame<M:H5EditorMultilingualismSpecification> {
         let getterStr: String
     }
     
-    fileprivate func widgetStructConvertToStr(widget:H5Editor.Data.Page.Widget) -> WidgetStr {
-        var uiType = ""
-        var getterBody = ""
-        let id = validIdStr(w: widget)
+    fileprivate func widgetStructConvertToStr(widget:H5Editor.Data.Page.Widget) -> ViewStrStruct {
+        var uiType = ViewType.label
         switch widget.type {
         case "RichText","NormalText":
-            uiType = "UILabel"
-            getterBody = """
-            _\(id) = [[UILabel alloc] init];
-            _\(id).text = @"\(widget.data.content ?? "")";
-            _\(id).font = [UIFont systemFontOfSize:\(widget.data.fontSize ?? 12)];
-            _\(id).textColor = [UIColor one_colorWithHexString:@"333333"];
-            _\(id).width = \(scaleValueStr(v: widget.width));
-            _\(id).height = \(scaleValueStr(v: widget.height));
-            """
+            uiType = .label
         case "Image":
-            uiType = "UIImageView"
+            uiType = .image
         case "Button":
-            uiType = "UIButton"
+            uiType = .button
         default:
-            uiType = "UIView"
+            uiType = .label
         }
-        let propertyStr = "@property (nonatomic, strong) \(uiType) *\(id);\n"
+        var layoutType = LayoutType.normal
+        if widget.layout == "flow" {
+            layoutType = .flow
+        }
+        var vp = ViewPt()
+        vp.id = validIdStr(w: widget)
+        vp.viewType = uiType
+        vp.layoutType = layoutType
+        vp.text = widget.data.content ?? ""
+        vp.fontSize = widget.data.fontSize ?? 12
+        vp.textColor = widget.data.color ?? "333333"
+        vp.width = widget.width
+        vp.height = widget.height
+        let reStruct = m.viewPtToStrStruct(vpt: vp)
         
-        let getterStr = """
-        - (\(uiType) *)\(validIdStr(w: widget)) {
-        if(!_\(validIdStr(w: widget))){
-        \(getterBody)
-        }
-        return _\(validIdStr(w: widget));
-        }\n
-        """
-        let initStr = ""
-        if widget.type == "normal" {
-            
-        }
-        
-        let reStr = WidgetStr(propertyStr: propertyStr, initStr: initStr, getterStr: getterStr)
-        return reStr
+        return reStruct
     }
     fileprivate func scaleValueStr(v:Float) -> String {
         return "(HTNSCREENWIDTH * \(v))/375"

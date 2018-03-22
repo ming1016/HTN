@@ -22,7 +22,7 @@
 		0A7017DA2061F7F60052570F /* H5EditorStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7017D92061F7F60052570F /* H5EditorStruct.swift */; };
 		0A7017DC2061F8910052570F /* H5EditorDatasource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7017DB2061F8910052570F /* H5EditorDatasource.swift */; };
 		0A7017DE2061FB010052570F /* H5EditorToFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7017DD2061FB010052570F /* H5EditorToFrame.swift */; };
-		0A7017E0206205C00052570F /* H5EditorMultilingualism.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7017DF206205C00052570F /* H5EditorMultilingualism.swift */; };
+		0A7017E0206205C00052570F /* HTNMultilingualism.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7017DF206205C00052570F /* HTNMultilingualism.swift */; };
 		0A710FF01FAAF97200B55DA9 /* CSSDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A710FEF1FAAF97200B55DA9 /* CSSDefault.swift */; };
 		0A7CCDAA1FA6D75B0032EBB2 /* JSTokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7CCDA91FA6D75B0032EBB2 /* JSTokenizer.swift */; };
 		0A7CCDAC1FA6D8370032EBB2 /* JSToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7CCDAB1FA6D8370032EBB2 /* JSToken.swift */; };
@@ -60,7 +60,7 @@
 		0A7017D92061F7F60052570F /* H5EditorStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = H5EditorStruct.swift; sourceTree = "<group>"; };
 		0A7017DB2061F8910052570F /* H5EditorDatasource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = H5EditorDatasource.swift; sourceTree = "<group>"; };
 		0A7017DD2061FB010052570F /* H5EditorToFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = H5EditorToFrame.swift; sourceTree = "<group>"; };
-		0A7017DF206205C00052570F /* H5EditorMultilingualism.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = H5EditorMultilingualism.swift; sourceTree = "<group>"; };
+		0A7017DF206205C00052570F /* HTNMultilingualism.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTNMultilingualism.swift; sourceTree = "<group>"; };
 		0A710FEF1FAAF97200B55DA9 /* CSSDefault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSSDefault.swift; sourceTree = "<group>"; };
 		0A7CCDA91FA6D75B0032EBB2 /* JSTokenizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSTokenizer.swift; sourceTree = "<group>"; };
 		0A7CCDAB1FA6D8370032EBB2 /* JSToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSToken.swift; sourceTree = "<group>"; };
@@ -151,6 +151,7 @@
 			children = (
 				0A64CBCA1F8E4CFE003ACB5F /* Node.swift */,
 				0A64CBD41F8F0726003ACB5F /* HTNStateMachine.swift */,
+				0A7017DF206205C00052570F /* HTNMultilingualism.swift */,
 			);
 			path = HTNFundation;
 			sourceTree = "<group>";
@@ -160,7 +161,6 @@
 			children = (
 				0A7017D92061F7F60052570F /* H5EditorStruct.swift */,
 				0A7017DB2061F8910052570F /* H5EditorDatasource.swift */,
-				0A7017DF206205C00052570F /* H5EditorMultilingualism.swift */,
 				0A7017DD2061FB010052570F /* H5EditorToFrame.swift */,
 			);
 			path = H5Editor;
@@ -276,7 +276,7 @@
 			files = (
 				0A852D031F932C3D00B61F95 /* CSSParser.swift in Sources */,
 				0A852D091F932F8500B61F95 /* CSSSelector.swift in Sources */,
-				0A7017E0206205C00052570F /* H5EditorMultilingualism.swift in Sources */,
+				0A7017E0206205C00052570F /* HTNMultilingualism.swift in Sources */,
 				3F7816391FA07AA400456F0E /* LayoutElement.swift in Sources */,
 				0A64CBC71F8E4A84003ACB5F /* HTMLToken.swift in Sources */,
 				0A7017DE2061FB010052570F /* H5EditorToFrame.swift in Sources */,
