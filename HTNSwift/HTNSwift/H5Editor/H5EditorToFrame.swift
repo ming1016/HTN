@@ -37,47 +37,39 @@ class H5EditorToFrame<M:HTNMultilingualismSpecification> {
         //流式布局
         var lastWidget = flowWidgets[0]
         var i = 0
+        //遍历 flow 的所有 widget
         for widget in flowWidgets {
             let wd = widgetStructConvertToStr(widget: widget)
             m.id = widget.id
             wgPropertyStr += wd.propertyStr
             wgInitStr += wd.initStr
             wgGetterStr += wd.getterStr
-            var pe = PtEqual()
-            pe.left = .top
-            pe.rightId = m.validIdStr(id: lastWidget.id)
-            pe.rightType = .pt
-            pe.right = .bottom
-            var topStr = m.ptEqualToStr(pe: pe)
-            //第一个顶在最上面
-            if i == 0 {
-                var topPe = PtEqual()
-                topPe.left = .top
-                topPe.rightType = .float
-                topPe.rightFloat = 0;
-                topStr = m.ptEqualToStr(pe: topPe)
+            
+            var fl = HTNMt.Flowly()
+            fl.id = m.id
+            fl.lastId = m.validIdStr(id: lastWidget.id)
+            
+            //padding 的处理
+            if widget.padding.count > 0 {
+                let paddingArr = widget.padding.split(separator: " ")
+                if paddingArr.count == 4 {
+                    fl.padding = HTNMt.Padding(top: Float(paddingArr[0])!, left: Float(paddingArr[1])!, bottom: Float(paddingArr[2])!, right: Float(paddingArr[3])!)
+                }
             }
-            var leftPe = PtEqual()
-            leftPe.left = .left
-            leftPe.rightType = .float
-            leftPe.rightFloat = 0
-            let leftStr = m.ptEqualToStr(pe: leftPe)
-            wgInitStr += """
-            \(topStr)
-            \(leftStr)
-            \(m.selfAddSubViewStr(vId: m.id))\n
-            """
+            
+            fl.isFirst = i == 0
+            wgInitStr += m.flowViewLayout(fl: fl)
             lastWidget = widget
             i += 1
         }
         //最终对文件的拼装
-        var imp = ImpFile()
+        var imp = HTNMt.ImpFile()
         imp.properties = wgPropertyStr
         imp.initContent = wgInitStr
         imp.getters = wgGetterStr
         
         let nativeMStr = m.impFile(impf: imp)
-        let nativeHStr = m.interfaceFile(intf: InterfaceFile())
+        let nativeHStr = m.interfaceFile(intf: HTNMt.InterfaceFile())
         print(nativeHStr)
         return nativeMStr
     }
@@ -88,8 +80,8 @@ class H5EditorToFrame<M:HTNMultilingualismSpecification> {
         let getterStr: String
     }
     
-    fileprivate func widgetStructConvertToStr(widget:H5Editor.Data.Page.Widget) -> ViewStrStruct {
-        var uiType = ViewType.label
+    fileprivate func widgetStructConvertToStr(widget:H5Editor.Data.Page.Widget) -> HTNMt.ViewStrStruct {
+        var uiType = HTNMt.ViewType.label
         switch widget.type {
         case "RichText","NormalText":
             uiType = .label
@@ -100,11 +92,12 @@ class H5EditorToFrame<M:HTNMultilingualismSpecification> {
         default:
             uiType = .label
         }
-        var layoutType = LayoutType.normal
+        var layoutType = HTNMt.LayoutType.normal
         if widget.layout == "flow" {
             layoutType = .flow
         }
-        var vp = ViewPt()
+        //h5editor 结构体和 htn 多语言结构体的转换
+        var vp = HTNMt.ViewPt()
         vp.id = m.validIdStr(id: widget.id)
         vp.viewType = uiType
         vp.layoutType = layoutType

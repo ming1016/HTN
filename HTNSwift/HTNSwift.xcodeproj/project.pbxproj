@@ -24,6 +24,7 @@
 		0A7017DE2061FB010052570F /* H5EditorToFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7017DD2061FB010052570F /* H5EditorToFrame.swift */; };
 		0A7017E0206205C00052570F /* HTNMultilingualism.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7017DF206205C00052570F /* HTNMultilingualism.swift */; };
 		0A710FF01FAAF97200B55DA9 /* CSSDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A710FEF1FAAF97200B55DA9 /* CSSDefault.swift */; };
+		0A711BF02064B3D600D29D4D /* H5EditorObjc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A711BEF2064B3D600D29D4D /* H5EditorObjc.swift */; };
 		0A7CCDAA1FA6D75B0032EBB2 /* JSTokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7CCDA91FA6D75B0032EBB2 /* JSTokenizer.swift */; };
 		0A7CCDAC1FA6D8370032EBB2 /* JSToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7CCDAB1FA6D8370032EBB2 /* JSToken.swift */; };
 		0A7CCDAE1FA715ED0032EBB2 /* JSTreeBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7CCDAD1FA715ED0032EBB2 /* JSTreeBuilder.swift */; };
@@ -62,6 +63,7 @@
 		0A7017DD2061FB010052570F /* H5EditorToFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = H5EditorToFrame.swift; sourceTree = "<group>"; };
 		0A7017DF206205C00052570F /* HTNMultilingualism.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTNMultilingualism.swift; sourceTree = "<group>"; };
 		0A710FEF1FAAF97200B55DA9 /* CSSDefault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSSDefault.swift; sourceTree = "<group>"; };
+		0A711BEF2064B3D600D29D4D /* H5EditorObjc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = H5EditorObjc.swift; sourceTree = "<group>"; };
 		0A7CCDA91FA6D75B0032EBB2 /* JSTokenizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSTokenizer.swift; sourceTree = "<group>"; };
 		0A7CCDAB1FA6D8370032EBB2 /* JSToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSToken.swift; sourceTree = "<group>"; };
 		0A7CCDAD1FA715ED0032EBB2 /* JSTreeBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSTreeBuilder.swift; sourceTree = "<group>"; };
@@ -162,6 +164,7 @@
 				0A7017D92061F7F60052570F /* H5EditorStruct.swift */,
 				0A7017DB2061F8910052570F /* H5EditorDatasource.swift */,
 				0A7017DD2061FB010052570F /* H5EditorToFrame.swift */,
+				0A711BEF2064B3D600D29D4D /* H5EditorObjc.swift */,
 			);
 			path = H5Editor;
 			sourceTree = "<group>";
@@ -293,6 +296,7 @@
 				0A710FF01FAAF97200B55DA9 /* CSSDefault.swift in Sources */,
 				0A7CCDAC1FA6D8370032EBB2 /* JSToken.swift in Sources */,
 				0A64CBAE1F8E1FB9003ACB5F /* ViewController.swift in Sources */,
+				0A711BF02064B3D600D29D4D /* H5EditorObjc.swift in Sources */,
 				0A7CCDAA1FA6D75B0032EBB2 /* JSTokenizer.swift in Sources */,
 				0A7017DC2061F8910052570F /* H5EditorDatasource.swift in Sources */,
 				0A64CBCF1F8E4F80003ACB5F /* Attribute.swift in Sources */,
