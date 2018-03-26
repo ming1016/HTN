@@ -106,19 +106,30 @@ struct HTNMt {
         typealias MutiClosure = ((_ pe: PtEqual) -> String)
         var pe:PtEqual = PtEqual()
         var accumulatorLine:MutiClosure = {_ in return ""}
-        
-        func config(_ closure:(_ pc: PtEqualC) -> Void) -> PtEqualC{
+        //设置 PtEqual 结构体
+        func cf(_ closure:(_ pc: PtEqualC) -> Void) -> PtEqualC{
             closure(self)
             return self
         }
-        func configMuti(_ closure:@escaping MutiClosure) -> PtEqualC {
+        //累计设置的 PtEqual 字符串
+        func cfMuti(_ closure:@escaping MutiClosure) -> PtEqualC {
             self.accumulatorLine = closure
             return self
         }
+        //执行累加动作
         func add() {
             self.pe.mutiEqualStr += accumulatorLine(self.pe) + self.pe.mutiEqualLineMark
         }
-        func end() {} //结束时无返回，表示全部结束设置
+        func mutiStr() -> String {
+            return self.pe.mutiEqualStr
+        }
+        //重置 PtEqual
+        func resetPe() -> PtEqualC {
+            self.pe = PtEqual()
+            return self
+        }
+        //结束时无返回，表示全部结束设置
+        func end() {}
         func left(_ wp:WgPt) -> PtEqualC {
             self.pe.left = wp
             return self

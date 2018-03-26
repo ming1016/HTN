@@ -93,6 +93,25 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
         //[self addSubview:hxgrtr3x785view];
         lyStr += addSubViewStr(host: "self", sub: cId) + "\n"
         
+        
+        lyStr = ""
+        lyStr += newEqualStr(vType: .view, id: cId) + "\n"
+        let mutiClosure = { (pe) -> String in
+            return self.ptEqualToStr(pe: pe)
+        }
+        lyStr += HTNMt.PtEqualC().cfMuti(mutiClosure).cf({ (p) in
+            p.left(.top).leftId(cId).end()
+            if fl.isFirst {
+                p.rightType(.float).rightFloat(0).add()
+            } else {
+                p.rightId(fl.lastId + "view").rightType(.pt).right(.bottom).add()
+            }
+        }).resetPe().cf({ (p) in
+            
+        }).mutiStr()
+        
+        
+        
         return lyStr
     }
     
@@ -109,65 +128,27 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
         property = "@property (nonatomic, strong) \(vClassStr) *\(vpt.id);\n"
         switch vpt.viewType {
         case .label:
-            var pe = HTNMt.PtEqual()
-            pe.leftId = vpt.id
-            pe.leftIdPrefix = "_"
-            pe.left = .none
-            pe.rightType = .new
-            pe.rightString = vClassStr
-            getter += ptEqualToStr(pe: pe) + "\n"
-            
-            pe.left = .text
-            pe.rightType = .text
-            pe.rightText = vpt.text
-            getter += ptEqualToStr(pe: pe) + "\n"
-            
-            pe.left = .lineBreakMode
-            pe.rightType = .string
-            pe.rightString = "NSLineBreakByWordWrapping"
-            getter += ptEqualToStr(pe: pe) + "\n"
-            
-            pe.left = .numberOfLines
-            pe.rightType = .int
-            pe.rightFloat = 0;
-            getter += ptEqualToStr(pe: pe) + "\n"
-            
-            pe.left = .font
-            pe.rightType = .font
-            pe.rightFloat = vpt.fontSize
-            getter += ptEqualToStr(pe: pe) + "\n"
-            
-            //处理没有这个数据就不设置这个属性
-            if vpt.textColor.count > 0 {
-                pe.left = .textColor
-                pe.rightType = .color
-                pe.rightString = vpt.textColor
-                getter += ptEqualToStr(pe: pe) + "\n"
-            }
-            
-            pe.left = .width
-            pe.rightType = .float
-            pe.rightFloat = vpt.width
-            getter += ptEqualToStr(pe: pe) + "\n"
-            
-            pe.left = .height
-            pe.rightType = .float
-            pe.rightFloat = vpt.height
-            getter += ptEqualToStr(pe: pe) + "\n"
-            
-            getter = ""
-            getter = HTNMt.PtEqualC().configMuti({ (pe) -> String in
+            getter = HTNMt.PtEqualC().cfMuti({ (pe) -> String in
                 return self.ptEqualToStr(pe: pe)
-            }).config({ (pc) in
+            }).cf({ (pc) in
                 pc.leftId(vpt.id).leftIdPrefix("_").left(.none).rightType(.new).rightString(vClassStr).add()
-            }).config({ (pc) in
+            }).cf({ (pc) in
                 pc.left(.text).rightType(.text).rightText(vpt.text).add()
-            }).config({ (pc) in
+            }).cf({ (pc) in
                 pc.left(.lineBreakMode).rightType(.string).rightString("NSLineBreakByWordWrapping").add()
-            }).config({ (pc) in
-//                pc.left(.numberOfLines)
-            }).pe.mutiEqualStr
-            print(getter)
+            }).cf({ (pc) in
+                pc.left(.numberOfLines).rightType(.int).rightFloat(0).add()
+            }).cf({ (pc) in
+                pc.left(.font).rightType(.font).rightFloat(vpt.fontSize).add()
+            }).cf({ (pc) in
+                if vpt.textColor.count > 0 {
+                    pc.left(.textColor).rightType(.color).rightString(vpt.textColor).add()
+                }
+            }).cf({ (pc) in
+                pc.left(.width).rightType(.float).rightFloat(vpt.width).add()
+            }).cf({ (pc) in
+                pc.left(.height).rightType(.float).rightFloat(vpt.height).add()
+            }).mutiStr()
         case .button:
             getter = ""
         case .image:
