@@ -137,10 +137,13 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
             pe.rightFloat = vpt.fontSize
             getter += ptEqualToStr(pe: pe) + "\n"
             
-            pe.left = .textColor
-            pe.rightType = .color
-            pe.rightString = vpt.textColor
-            getter += ptEqualToStr(pe: pe) + "\n"
+            //处理没有这个数据就不设置这个属性
+            if vpt.textColor.count > 0 {
+                pe.left = .textColor
+                pe.rightType = .color
+                pe.rightString = vpt.textColor
+                getter += ptEqualToStr(pe: pe) + "\n"
+            }
             
             pe.left = .width
             pe.rightType = .float
@@ -152,6 +155,19 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
             pe.rightFloat = vpt.height
             getter += ptEqualToStr(pe: pe) + "\n"
             
+            getter = ""
+            getter = HTNMt.PtEqualC().configMuti({ (pe) -> String in
+                return self.ptEqualToStr(pe: pe)
+            }).config({ (pc) in
+                pc.leftId(vpt.id).leftIdPrefix("_").left(.none).rightType(.new).rightString(vClassStr).add()
+            }).config({ (pc) in
+                pc.left(.text).rightType(.text).rightText(vpt.text).add()
+            }).config({ (pc) in
+                pc.left(.lineBreakMode).rightType(.string).rightString("NSLineBreakByWordWrapping").add()
+            }).config({ (pc) in
+//                pc.left(.numberOfLines)
+            }).pe.mutiEqualStr
+            print(getter)
         case .button:
             getter = ""
         case .image:
@@ -240,14 +256,18 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
         case .pt:
             rightStr = idProperty(pt: pe.right, idPar: pe.rightId, prefix: pe.rightIdPrefix)
         case .float:
-            rightStr = "\(pe.rightFloat)"
+            rightStr = "\(scale(pe.rightFloat))"
         case .int:
-            rightStr = "\(pe.rightInt)"
+            rightStr = "\(scale(Float(pe.rightInt)))"
         case .string:
             rightStr = "\(pe.rightString)"
         case .color:
+            var hexStr = ""
+            if pe.rightColor.hasPrefix("#") {
+                hexStr = pe.rightColor[1..<pe.rightColor.count - 1]
+            }
             rightStr = """
-            [UIColor one_colorWithHexString:@"333333"]
+            [UIColor one_colorWithHexString:@"\(hexStr)"]
             """
         case .new:
             rightStr = "[[\(pe.rightString) alloc] init]"
@@ -256,7 +276,7 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
             [[NSAttributedString alloc] initWithData:[@"\(pe.rightText)" dataUsingEncoding:NSUTF8StringEncoding] options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType, NSCharacterEncodingDocumentAttribute: @(NSUTF8StringEncoding)} documentAttributes:nil error:nil]
             """
         case .font:
-            rightStr = "[UIFont systemFontOfSize:\(pe.rightFloat)]"
+            rightStr = "[UIFont systemFontOfSize:\(pe.rightFloat/2)]"
         }
         
         var equalStr = " = "
@@ -305,5 +325,9 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
     }
     func validIdStr(id: String) -> String {
         return "h" + id;
+    }
+    
+    func scale(_ v: Float) -> String {
+        return "(HTNSCREENWIDTH * \(v))/375"
     }
 }

@@ -102,17 +102,15 @@ class H5EditorToFrame<M:HTNMultilingualismSpecification> {
         vp.viewType = uiType
         vp.layoutType = layoutType
         vp.text = widget.data.content ?? ""
-        vp.fontSize = widget.data.fontSize ?? 12
-        vp.textColor = widget.data.color ?? "333333"
+        vp.fontSize = widget.data.fontSize ?? 32
+        vp.textColor = widget.data.color ?? ""
         vp.width = widget.width
         vp.height = widget.height
         let reStruct = m.viewPtToStrStruct(vpt: vp)
         
         return reStruct
     }
-    fileprivate func scaleValueStr(v:Float) -> String {
-        return "(HTNSCREENWIDTH * \(v))/375"
-    }
+    
 //    fileprivate func validIdStr(w:H5Editor.Data.Page.Widget) -> String {
 //        return "h\(w.id)"
 //    }

@@ -32,9 +32,9 @@ struct H5EditorDatasource {
             "bgImageRepeat": "none",
             "widgets": [
             {
-                "id": "xgrtr3x785",
-                "name": "文本-3",
-                "type": "RichText",
+                "id": "emlku5dlde",
+                "name": "单行文本-1",
+                "type": "NormalText",
                 "location": "page",
                 "align": "free",
                 "alignLeftMargin": 0,
@@ -42,8 +42,8 @@ struct H5EditorDatasource {
                 "alignTopMargin": 0,
                 "alignBottomMargin": 0,
                 "width": 375,
-                "height": 48,
-                "top": 0,
+                "height": 38,
+                "top": 205,
                 "left": 0,
                 "rotate": 0,
                 "bgColor": "rgba(255,255,255,0)",
@@ -54,7 +54,15 @@ struct H5EditorDatasource {
                 "visible": true,
                 "data":
                 {
-                    "content": "流式1"
+                    "content": "就是单行的",
+                    "color": "#333",
+                    "fontSize": 32,
+                    "fontFamily": "PingFangSC",
+                    "fontWeight": "Medium",
+                    "verticalAlign": "middle",
+                    "horizontalAlign": "center",
+                    "lineHeight": 60,
+                    "letterSpacing": 0
                 },
                 "animations": [],
                 "triggers": [],
@@ -85,9 +93,64 @@ struct H5EditorDatasource {
                 "hasLayers": false,
                 "defaultLayerCount": 0,
                 "maxLayerCount": 0,
+                "padding": "0 0 0 0"
+            },
+            {
+                "id": "xgrtr3x785",
+                "name": "文本-3",
+                "type": "RichText",
+                "location": "page",
+                "align": "free",
+                "alignLeftMargin": 0,
+                "alignRightMargin": 0,
+                "alignTopMargin": 0,
+                "alignBottomMargin": 0,
+                "width": 375,
+                "height": 48,
+                "top": 0,
+                "left": 0,
+                "rotate": 0,
+                "bgColor": "rgba(255,255,255,0)",
+                "bgImage": "",
+                "bgImagePosition": "center-center",
+                "bgImageRepeat": "none",
+                "borderRadius": 0,
+                "visible": true,
+                "data":
+                {
+                    "content": "<p><span>流式1</span></p>"
+                },
+                "animations": [],
+                "triggers": [],
+                "isSelected": false,
+                "layout": "flow",
+                "pageWidth": 375,
+                "pageHeight": 603,
+                "opacity": 100,
+                "hasBorder": false,
+                "borderStyle": "solid",
+                "borderWidth": 1,
+                "borderColor": "rgba(0, 0, 0, 1)",
+                "borderDirections": [
+                    "top",
+                    "right",
+                    "bottom",
+                    "left"
+                ],
+                "condition":
+                {},
+                "variableMap":
+                {},
+                "needAttach": false,
+                "attach": "",
+                "locked": false,
+                "readonly": false,
+                "layers": [],
+                "hasLayers": false,
+                "defaultLayerCount": 0,
+                "maxLayerCount": 0,
                 "padding": "8 16 8 16"
-            }
-,
+            },
             {
                 "id": "4fw4rfejxv",
                 "name": "文本-4",
@@ -111,7 +174,7 @@ struct H5EditorDatasource {
                 "visible": true,
                 "data":
                 {
-                    "content": "流式2"
+                    "content": "<p>流式2</p>"
                 },
                 "animations": [],
                 "triggers": [],
@@ -156,8 +219,8 @@ struct H5EditorDatasource {
                 "alignBottomMargin": 0,
                 "width": 375,
                 "height": 48,
-                "top": 85,
-                "left": 0,
+                "top": 140,
+                "left": 40,
                 "rotate": 0,
                 "bgColor": "rgba(255,255,255,0)",
                 "bgImage": "",
@@ -167,12 +230,12 @@ struct H5EditorDatasource {
                 "visible": true,
                 "data":
                 {
-                    "content": "普通2"
+                    "content": "<p>普通2</p>"
                 },
                 "animations": [],
                 "triggers": [],
                 "isSelected": false,
-                "layout": "normal",
+                "layout": "flow",
                 "pageWidth": 375,
                 "pageHeight": 603,
                 "opacity": 100,
@@ -212,8 +275,8 @@ struct H5EditorDatasource {
                 "alignBottomMargin": 0,
                 "width": 375,
                 "height": 48,
-                "top": 100,
-                "left": 0,
+                "top": 145,
+                "left": 15,
                 "rotate": 0,
                 "bgColor": "rgba(163,120,95,0)",
                 "bgImage": "",
@@ -223,7 +286,7 @@ struct H5EditorDatasource {
                 "visible": true,
                 "data":
                 {
-                    "content": "普通1"
+                    "content": "<p>普通1</p>"
                 },
                 "animations": [],
                 "triggers": [],
@@ -255,8 +318,7 @@ struct H5EditorDatasource {
                 "defaultLayerCount": 0,
                 "maxLayerCount": 0,
                 "padding": "8 16 8 16"
-            }
-],
+            }],
             "isSelected": true,
             "width": 375,
             "height": 603,
@@ -268,7 +330,7 @@ struct H5EditorDatasource {
         }],
         "createTime": "2018-03-13T01:40:08.916Z",
         "lastModifyTime": "2018-03-13T01:40:10.972Z",
-        "publishTime": "2018-03-20T06:57:58.059Z",
+        "publishTime": "2018-03-26T07:49:09.141Z",
         "layout": "normal",
         "carouselDirection": "vertical",
         "dataUrl": "",
@@ -279,11 +341,11 @@ struct H5EditorDatasource {
         "variableMap":
         {},
         "type": "combine",
-        "lastModifiedDate": "2018-03-20T06:57:57.948Z",
+        "lastModifiedDate": "2018-03-26T07:49:08.576Z",
         "config":
         {},
         "editable": true,
-        "logId": "5ab0b0f5261a8d160ac3222d"
+        "logId": "5ab8a5f41843679c813b768a"
     }
 }
 """
