@@ -35,8 +35,8 @@ struct HTNMt {
     struct Flowly {
         var id = ""
         var lastId = ""
-        var padding = Padding()
         var isFirst = false
+        var viewPt = ViewPt()
     }
     struct Padding {
         var top:Float = 0
@@ -54,29 +54,48 @@ struct HTNMt {
     //视图属性数据结构
     struct ViewPt {
         var id = ""
-        var viewType = ViewType.label
-        var layoutType = LayoutType.normal
+        var viewType:ViewType = .label
+        var layoutType:LayoutType = .normal
         var isNormal = false
         var text = ""
         var fontSize:Float = 32
         var textColor = ""
+        var top:Float = 0
+        var left:Float = 0
         var width:Float = 0
         var height:Float = 0
+        var padding = Padding()
+        var verticalAlign:VerticalAlign = .padding
+        var horizontalAlign:HorizontalAlign = .padding
+        var imageUrl  = ""  //图片链接
+    }
+    enum VerticalAlign {
+        case padding
+        case middle
+        case top
+        case bottom
+    }
+    enum HorizontalAlign {
+        case padding
+        case center
+        case left
+        case right
     }
     
     struct ViewStrStruct {
         let propertyStr: String
         let initStr: String
         let getterStr: String
+        var viewPt: ViewPt
     }
     
     //属性类型定义
     enum WgPt {
         case none
         case new
-        case top,bottom,left,right                           //位置相关属性
+        case top,bottom,left,right,center                    //位置相关属性
         case text,font,textColor,lineBreakMode,numberOfLines //label 相关属性
-        case width,height                                    //通用属性
+        case width,height,tag                                //通用属性
     }
     enum PtEqualRightType {
         case pt,float,int,string,color,text,new,font
@@ -98,88 +117,116 @@ struct HTNMt {
         var rightSuffix = ""
         
         var equalType = EqualType.normal
-        
-        var mutiEqualStr = ""         //累加的字符串
-        var mutiEqualLineMark = "\n"  //换行标识
     }
     class PtEqualC {
         typealias MutiClosure = ((_ pe: PtEqual) -> String)
+        typealias FilterClosure = (() -> Bool)
         var pe:PtEqual = PtEqual()
-        var accumulatorLine:MutiClosure = {_ in return ""}
+        var accumulatorLineClosure:MutiClosure = {_ in return ""}
+        var filterBl = true
+        var mutiEqualStr = ""         //累加的字符串
+        var mutiEqualLineMark = "\n"  //换行标识
         //设置 PtEqual 结构体
-        func cf(_ closure:(_ pc: PtEqualC) -> Void) -> PtEqualC{
-            closure(self)
+        func once(_ closure:(_ pc: PtEqualC) -> Void) -> PtEqualC{
+            if filterBl {
+                closure(self)
+            }
+            _ = resetPe()
+            _ = resetFilter()
             return self
         }
         //累计设置的 PtEqual 字符串
-        func cfMuti(_ closure:@escaping MutiClosure) -> PtEqualC {
-            self.accumulatorLine = closure
+        func accumulatorLine(_ closure:@escaping MutiClosure) -> PtEqualC {
+            self.accumulatorLineClosure = closure
             return self
         }
         //执行累加动作
         func add() {
-            self.pe.mutiEqualStr += accumulatorLine(self.pe) + self.pe.mutiEqualLineMark
+            if filterBl {
+                self.mutiEqualStr += accumulatorLineClosure(self.pe) + self.mutiEqualLineMark
+            }
+            _ = resetFilter()
         }
-        func mutiStr() -> String {
-            return self.pe.mutiEqualStr
+        //累加自定义的字符串
+        func add(_ str:String) {
+            if filterBl {
+                self.mutiEqualStr += str + self.mutiEqualLineMark
+            }
+            _ = resetFilter()
+        }
+        //过滤条件
+        func filter(_ closure: FilterClosure) -> PtEqualC {
+            filterBl = closure()
+            return self
         }
         //重置 PtEqual
         func resetPe() -> PtEqualC {
             self.pe = PtEqual()
             return self
         }
+        //重置 filter
+        func resetFilter() -> PtEqualC {
+            filterBl = true
+            return self
+        }
         //结束时无返回，表示全部结束设置
-        func end() {}
+        func end() {
+            _ = resetFilter()
+        }
         func left(_ wp:WgPt) -> PtEqualC {
-            self.pe.left = wp
+            filterBl ? self.pe.left = wp : ()
             return self
         }
         func leftId(_ str:String) -> PtEqualC {
-            self.pe.leftId = str
+            filterBl ? self.pe.leftId = str : ()
             return self
         }
         func leftIdPrefix(_ str:String) -> PtEqualC {
-            self.pe.leftIdPrefix = str
+            filterBl ? self.pe.leftIdPrefix = str : ()
             return self
         }
         func rightType(_ t:PtEqualRightType) -> PtEqualC {
-            self.pe.rightType = t
+            filterBl ? self.pe.rightType = t : ()
             return self
         }
         func rightId(_ str:String) -> PtEqualC {
-            self.pe.rightId = str
+            filterBl ? self.pe.rightId = str : ()
             return self
         }
         func rightIdPrefix(_ str:String) -> PtEqualC {
-            self.pe.rightIdPrefix = str
+            filterBl ? self.pe.rightIdPrefix = str : ()
             return self
         }
         func right(_ wp:WgPt) -> PtEqualC {
-            self.pe.right = wp
+            filterBl ? self.pe.right = wp : ()
             return self
         }
         func rightFloat(_ f:Float) -> PtEqualC {
-            self.pe.rightFloat = f
+            filterBl ? self.pe.rightFloat = f : ()
             return self
         }
         func rightInt(_ i:Int) -> PtEqualC {
-            self.pe.rightInt = i
+            filterBl ? self.pe.rightInt = i : ()
             return self
         }
         func rightColor(_ str:String) -> PtEqualC {
-            self.pe.rightColor = str
+            filterBl ? self.pe.rightColor = str : ()
             return self
         }
         func rightText(_ str:String) -> PtEqualC {
-            self.pe.rightText = str
+            filterBl ? self.pe.rightText = str : ()
             return self
         }
         func rightString(_ str:String) -> PtEqualC {
-            self.pe.rightString = str
+            filterBl ? self.pe.rightString = str : ()
             return self
         }
         func rightSuffix(_ str:String) -> PtEqualC {
-            self.pe.rightSuffix = str
+            filterBl ? self.pe.rightSuffix = str : ()
+            return self
+        }
+        func equalType(_ et:EqualType) -> PtEqualC {
+            filterBl ? self.pe.equalType = et : ()
             return self
         }
         

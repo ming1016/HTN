@@ -89,6 +89,7 @@ struct H5Editor : Codable {
                 let padding: String            //内边距
                 let children: [Widget]?
                 struct WidgetData: Codable {
+                    //label
                     let content: String?
                     let color: String?
                     let fontSize: Float?
@@ -98,7 +99,15 @@ struct H5Editor : Codable {
                     let horizontalAlign: String?
                     let lineHeight: Float?
                     let letterSpacing: Float?
+                    //image
                     let url: String?
+                    let usePicSet: Bool?
+                    let size: Size?
+                    
+                    struct Size: Codable {
+                        let height: Float
+                        let width: Float
+                    }
                 }
                 struct Animation: Codable {
                     

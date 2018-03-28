@@ -32,6 +32,68 @@ struct H5EditorDatasource {
             "bgImageRepeat": "none",
             "widgets": [
             {
+                "id": "1tfjoi6ktr",
+                "name": "图片-1",
+                "type": "Image",
+                "location": "page",
+                "align": "free",
+                "alignLeftMargin": 0,
+                "alignRightMargin": 0,
+                "alignTopMargin": 0,
+                "alignBottomMargin": 0,
+                "width": 278,
+                "height": 273,
+                "top": 240,
+                "left": 35,
+                "rotate": 0,
+                "bgColor": "rgba(255,255,255,0)",
+                "bgImage": "",
+                "bgImagePosition": "center-center",
+                "bgImageRepeat": "none",
+                "borderRadius": 0,
+                "visible": true,
+                "data":
+                {
+                    "url": "https://static.didialift.com/pinche/gift/resource/bd02101d8e198f34a1999f0c12e451cc-favorite.png",
+                    "usePicSet": false,
+                    "size":
+                    {
+                        "height": 496,
+                        "width": 505
+                    }
+                },
+                "animations": [],
+                "triggers": [],
+                "isSelected": true,
+                "layout": "normal",
+                "pageWidth": 375,
+                "pageHeight": 603,
+                "opacity": 100,
+                "hasBorder": false,
+                "borderStyle": "solid",
+                "borderWidth": 1,
+                "borderColor": "rgba(0, 0, 0, 1)",
+                "borderDirections": [
+                    "top",
+                    "right",
+                    "bottom",
+                    "left"
+                ],
+                "condition":
+                {},
+                "variableMap":
+                {},
+                "needAttach": false,
+                "attach": "",
+                "locked": false,
+                "readonly": false,
+                "layers": [],
+                "hasLayers": false,
+                "defaultLayerCount": 0,
+                "maxLayerCount": 0,
+                "padding": "0 0 0 0"
+            },
+            {
                 "id": "emlku5dlde",
                 "name": "单行文本-1",
                 "type": "NormalText",
@@ -55,7 +117,7 @@ struct H5EditorDatasource {
                 "data":
                 {
                     "content": "就是单行的",
-                    "color": "#333",
+                    "color": "rgba(22.95,142.8,234.6,1)",
                     "fontSize": 32,
                     "fontFamily": "PingFangSC",
                     "fontWeight": "Medium",
@@ -275,8 +337,8 @@ struct H5EditorDatasource {
                 "alignBottomMargin": 0,
                 "width": 375,
                 "height": 48,
-                "top": 145,
-                "left": 15,
+                "top": 65,
+                "left": 95,
                 "rotate": 0,
                 "bgColor": "rgba(163,120,95,0)",
                 "bgImage": "",

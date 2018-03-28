@@ -13,149 +13,180 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
     var pageId = "" { didSet { pageId = validIdStr(id: pageId) } }
     
     func flowViewLayout(fl:HTNMt.Flowly) -> String {
-        //UIView *hxgrtr3x785view = [UIView new];
-        let cId = id + "view"
+        let cId = id + "Container"
         var lyStr = ""
+        //UIView *myViewContainer = [UIView new];
         lyStr += newEqualStr(vType: .view, id: cId) + "\n"
         
-        //h4fw4rfejxvview.top = hxgrtr3x785view.bottom;
-        var p = HTNMt.PtEqual()
-        p.left = .top
-        p.leftId = cId
-        p.rightId = fl.lastId + "view"
-        p.rightType = .pt
-        p.right = .bottom
-        lyStr += ptEqualToStr(pe: p) + "\n"
-        
-        //处理第一个的情况
-        //hxgrtr3x785view.top = 0.0;
-        if fl.isFirst {
-            p = HTNMt.PtEqual()
-            p.leftId = cId
-            p.left = .top
-            p.rightType = .float
-            p.rightFloat = 0
-            lyStr += ptEqualToStr(pe: p) + "\n"
-        }
-        
-        //hxgrtr3x785view.left = 0.0;
-        p = HTNMt.PtEqual()
-        p.leftId = cId
-        p.left = .left
-        p.rightType = .float
-        p.rightFloat = 0
-        lyStr += ptEqualToStr(pe: p) + "\n"
-        
-        //hxgrtr3x785view.width = self.hxgrtr3x785.width;
-        p = HTNMt.PtEqual()
-        p.leftId = cId
-        p.left = .width
-        p.rightType = .pt
-        p.rightIdPrefix = "self."
-        p.rightId = id
-        p.right = .width
-        lyStr += ptEqualToStr(pe: p) + "\n"
-        
-        //hxgrtr3x785view.height = self.hxgrtr3x785.height;
-        p.left = .height
-        p.right = .height
-        lyStr += ptEqualToStr(pe: p) + "\n"
-        
-        //self.hxgrtr3x785.width -= 16 * 2;
-        p = HTNMt.PtEqual()
-        p.left = .width
-        p.leftId = id
-        p.leftIdPrefix = "self."
-        p.rightType = .float
-        p.rightFloat = fl.padding.left * 2
-        p.equalType = .decrease
-        lyStr += ptEqualToStr(pe: p) + "\n"
-        
-        //self.hxgrtr3x785.height -= 8 * 2;
-        p.left = .height
-        p.rightFloat = fl.padding.top * 2
-        lyStr += ptEqualToStr(pe: p) + "\n"
-        
-        //self.hxgrtr3x785.top = hxgrtr3x785view.top + 8;
-        p.equalType = .normal
-        p.left = .top
-        p.rightType = .float
-        p.rightFloat = fl.padding.top
-        lyStr += ptEqualToStr(pe: p) + "\n"
-        
-        //self.hxgrtr3x785.left = hxgrtr3x785view.left + 16;
-        p.left = .left
-        p.rightFloat = fl.padding.left
-        lyStr += ptEqualToStr(pe: p) + "\n"
-        
-        //[hxgrtr3x785view addSubview:self.hxgrtr3x785];
-        lyStr += addSubViewStr(host: cId, sub: "self.\(id)") + "\n"
-        //[self addSubview:hxgrtr3x785view];
-        lyStr += addSubViewStr(host: "self", sub: cId) + "\n"
-        
-        
-        lyStr = ""
-        lyStr += newEqualStr(vType: .view, id: cId) + "\n"
-        let mutiClosure = { (pe) -> String in
+        //属性拼装
+        lyStr += HTNMt.PtEqualC().accumulatorLine({ (pe) -> String in
             return self.ptEqualToStr(pe: pe)
-        }
-        lyStr += HTNMt.PtEqualC().cfMuti(mutiClosure).cf({ (p) in
+        }).once({ (p) in
             p.left(.top).leftId(cId).end()
             if fl.isFirst {
+                //myViewContainer.top = 0.0;
                 p.rightType(.float).rightFloat(0).add()
             } else {
-                p.rightId(fl.lastId + "view").rightType(.pt).right(.bottom).add()
+                //myViewContainer.top = lastView.bottom;
+                p.rightId(fl.lastId + "Container").rightType(.pt).right(.bottom).add()
             }
-        }).resetPe().cf({ (p) in
+        }).once({ (p) in
+            //myViewContainer.left = 0.0;
+            p.leftId(cId).left(.left).rightType(.float).rightFloat(0).add()
+        }).once({ (p) in
+            //myViewContainer.width = self.myView.width;
+            p.leftId(cId).left(.width).rightType(.pt).rightIdPrefix("self.").rightId(id).right(.width).add()
             
-        }).mutiStr()
+            //myViewContainer.height = self.myView.height;
+            p.left(.height).right(.height).add()
+        }).once({ (p) in
+            //self.myView.width -= 16 * 2;
+            p.left(.width).leftId(id).leftIdPrefix("self.").rightType(.float).rightFloat(fl.viewPt.padding.left * 2).equalType(.decrease).add()
+            
+            //self.myView.height -= 8 * 2;
+            p.left(.height).rightFloat(fl.viewPt.padding.top * 2).add()
+            
+            //self.myView.top = 8;
+            p.equalType(.normal).left(.top).rightType(.float).rightFloat(fl.viewPt.padding.top).add()
+            
+            //属性 verticalAlign 或 horizontalAlign 是 padding 和其它排列时的区别处理
+            if fl.viewPt.horizontalAlign == .padding {
+                //self.myView.left = 16;
+                p.left(.left).rightFloat(fl.viewPt.padding.left).add()
+            } else {
+                //[self.myView sizeToFit];
+                p.add(sizeToFit(elm: "self.\(id)"))
+                p.left(.height).rightType(.pt).rightId(cId).right(.height).add()
+                switch fl.viewPt.horizontalAlign {
+                case .center:
+                    p.left(HTNMt.WgPt.center).right(.center).add()
+                case .left:
+                    p.left(.left).right(.left).add()
+                case .right:
+                    p.left(.right).right(.right).add()
+                default:
+                    ()
+                }
+            }
+            
+            
+        }).mutiEqualStr
         
-        
+        //[myViewContainer addSubview:self.myView];
+        lyStr += addSubViewStr(host: cId, sub: "self.\(id)") + "\n"
+        //[self addSubview:myViewContainer];
+        lyStr += addSubViewStr(host: "self", sub: cId) + "\n"
         
         return lyStr
-    }
-    
-    func newEqualStr(vType: HTNMt.ViewType, id: String) -> String {
-        let vClass = viewTypeClassStr(vt: vType)
-        return "\(vClass) *\(id) = [[\(vClass) alloc] init];"
     }
     
     func viewPtToStrStruct(vpt:HTNMt.ViewPt) -> HTNMt.ViewStrStruct {
         var getter = ""
         var initContent = ""
         var property = ""
-        let vClassStr = viewTypeClassStr(vt: .label)
+        let vClassStr = viewTypeClassStr(vt: vpt.viewType)
         property = "@property (nonatomic, strong) \(vClassStr) *\(vpt.id);\n"
         switch vpt.viewType {
         case .label:
-            getter = HTNMt.PtEqualC().cfMuti({ (pe) -> String in
+            getter += HTNMt.PtEqualC().accumulatorLine({ (pe) -> String in
                 return self.ptEqualToStr(pe: pe)
-            }).cf({ (pc) in
-                pc.leftId(vpt.id).leftIdPrefix("_").left(.none).rightType(.new).rightString(vClassStr).add()
-            }).cf({ (pc) in
-                pc.left(.text).rightType(.text).rightText(vpt.text).add()
-            }).cf({ (pc) in
-                pc.left(.lineBreakMode).rightType(.string).rightString("NSLineBreakByWordWrapping").add()
-            }).cf({ (pc) in
-                pc.left(.numberOfLines).rightType(.int).rightFloat(0).add()
-            }).cf({ (pc) in
-                pc.left(.font).rightType(.font).rightFloat(vpt.fontSize).add()
-            }).cf({ (pc) in
-                if vpt.textColor.count > 0 {
-                    pc.left(.textColor).rightType(.color).rightString(vpt.textColor).add()
-                }
-            }).cf({ (pc) in
-                pc.left(.width).rightType(.float).rightFloat(vpt.width).add()
-            }).cf({ (pc) in
-                pc.left(.height).rightType(.float).rightFloat(vpt.height).add()
-            }).mutiStr()
+            }).once({ (p) in
+                //_myView = [[UILabel alloc] init];
+                p.leftId(vpt.id).leftIdPrefix("_").left(.none).rightType(.new).rightString(vClassStr).add()
+                
+                //_myView.attributedText = [[NSAttributedString alloc] initWithData:[@"<p><span>流式1</span></p>" dataUsingEncoding:NSUTF8StringEncoding] options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType, NSCharacterEncodingDocumentAttribute: @(NSUTF8StringEncoding)} documentAttributes:nil error:nil];
+                p.left(.text).rightType(.text).rightText(vpt.text).add()
+                
+                //_myView.lineBreakMode = NSLineBreakByWordWrapping;
+                p.left(.lineBreakMode).rightType(.string).rightString("NSLineBreakByWordWrapping").add()
+                
+                //_myView.numberOfLines = (HTNSCREENWIDTH * 0.0)/375;
+                p.left(.numberOfLines).rightType(.int).rightInt(0).add()
+                
+                //_myView.font = [UIFont systemFontOfSize:16.0];
+                p.left(.font).rightType(.font).rightFloat(vpt.fontSize).add()
+                
+                //textColor
+                p.filter({ () -> Bool in
+                    return vpt.textColor.count > 0
+                }).left(.textColor).rightType(.color).rightColor(vpt.textColor).add()
+                
+            }).filter({ () -> Bool in
+                return vpt.isNormal
+            }).once({ (p) in
+                let cId = vpt.id + "Container"
+                //UIView *myViewContainer = [[UIView alloc] init];
+                p.add(newEqualStr(vType: .view, id: cId))
+                
+                //myViewContainer.width = _hllfxu51uie.width;
+                p.leftId(cId)
+                    .left(.width)
+                    .rightId(vpt.id)
+                    .rightIdPrefix("_")
+                    .rightType(.pt)
+                    .right(.width)
+                    .add()
+                
+                //myViewContainer.height = _hllfxu51uie.height;
+                p.left(.height).right(.height).add()
+                
+                //myViewContainer.top = (HTNSCREENWIDTH * 65.0)/375;
+                p.left(.top).rightType(.float).rightFloat(vpt.top).add()
+                
+                //myViewContainer.left = (HTNSCREENWIDTH * 95.0)/375;
+                p.left(.left).rightFloat(vpt.left).add()
+                
+                //_myView.width -= (HTNSCREENWIDTH * 32.0)/375;
+                p.leftIdPrefix("_")
+                    .leftId(vpt.id)
+                    .left(.width)
+                    .equalType(.decrease)
+                    .rightType(.float)
+                    .rightFloat(vpt.padding.left * 2)
+                    .add()
+                
+                //_myView.height -= (HTNSCREENWIDTH * 16.0)/375;
+                p.left(.height).rightFloat(vpt.padding.top * 2).add()
+                
+                //_myView.top = (HTNSCREENWIDTH * 8.0)/375;
+                p.left(.top).equalType(.normal).rightFloat(vpt.padding.top).add()
+                
+                //_myView.left = (HTNSCREENWIDTH * 16.0)/375;
+                p.left(.left).rightFloat(vpt.padding.left).add()
+                
+                p.add(addSubViewStr(host: cId, sub: "_" + vpt.id))
+                p.add(addSubViewStr(host: "self", sub: cId))
+                
+            }).mutiEqualStr
         case .button:
-            getter = ""
+            getter += ""
         case .image:
-            getter = ""
+            getter += HTNMt.PtEqualC().accumulatorLine({ (pe) -> String in
+                return self.ptEqualToStr(pe: pe)
+            }).once({ (p) in
+                //
+            }).filter({ () -> Bool in
+                return vpt.isNormal
+            }).once({ (p) in
+                p.leftId(vpt.id).leftIdPrefix("_").left(.none).rightType(.new).rightString(vClassStr).add()
+                p.add(sdSetImageUrl(view: "_" + vpt.id, url: vpt.imageUrl))
+                p.add(addSubViewStr(host: "self", sub: "_" + vpt.id))
+            }).mutiEqualStr
         case .view:
-            getter = ""
+            getter += ""
         }
+        
+        //各个类型通用的属性设置
+        getter += HTNMt.PtEqualC().accumulatorLine({ (pe) -> String in
+            return self.ptEqualToStr(pe: pe)
+        }).once({ (p) in
+            p.leftId(vpt.id).leftIdPrefix("_").end()
+            //_myView.width = (HTNSCREENWIDTH * 375.0)/375;
+            p.left(.width).rightType(.float).rightFloat(vpt.width).add()
+            
+            //_myView.height = (HTNSCREENWIDTH * 48.0)/375;
+            p.left(.height).rightType(.float).rightFloat(vpt.height).add()
+        }).mutiEqualStr
         
         getter = """
         - (\(vClassStr) *)\(vpt.id) {
@@ -169,10 +200,15 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
         //处理 init content
         if vpt.layoutType == .normal  {
             //处理绝对定位
-            initContent = "some thing need to do ..."
+            initContent += HTNMt.PtEqualC().accumulatorLine({ (pe) -> String in
+                return self.ptEqualToStr(pe: pe)
+            }).once({ (p) in
+                //self.myView.tag = 1;
+                p.leftIdPrefix("self.").left(.tag).leftId(vpt.id).rightType(.int).rightInt(1).add()
+            }).mutiEqualStr
         }
         
-        return HTNMt.ViewStrStruct(propertyStr: property, initStr: initContent, getterStr: getter)
+        return HTNMt.ViewStrStruct(propertyStr: property, initStr: initContent, getterStr: getter, viewPt: vpt)
     }
     func addSubViewStr(host: String,sub: String) -> String {
         return "[\(host) addSubview:\(sub)];"
@@ -189,6 +225,10 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
             return "UIImageView"
         }
     }
+    func newEqualStr(vType: HTNMt.ViewType, id: String) -> String {
+        let vClass = viewTypeClassStr(vt: vType)
+        return "\(vClass) *\(id) = [[\(vClass) alloc] init];"
+    }
     func idProperty(pt: HTNMt.WgPt, idPar: String, prefix: String) -> String {
         var idStr = "\(self.id)"
         if idPar.count > 0 {
@@ -204,6 +244,8 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
             ptStr = "right"
         case .top:
             ptStr = "top"
+        case .center:
+            ptStr = "center"
         case .font:
             ptStr = "font"
         case .text:
@@ -214,6 +256,8 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
             ptStr = "width"
         case .height:
             ptStr = "height"
+        case .tag:
+            ptStr = "tag"
         case .lineBreakMode:
             ptStr = "lineBreakMode"
         case .numberOfLines:
@@ -239,17 +283,23 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
         case .float:
             rightStr = "\(scale(pe.rightFloat))"
         case .int:
-            rightStr = "\(scale(Float(pe.rightInt)))"
+            rightStr = "\(pe.rightInt)"
         case .string:
             rightStr = "\(pe.rightString)"
         case .color:
-            var hexStr = ""
             if pe.rightColor.hasPrefix("#") {
-                hexStr = pe.rightColor[1..<pe.rightColor.count - 1]
+                let hexStr = pe.rightColor[1..<pe.rightColor.count]
+                rightStr = """
+                [UIColor one_colorWithHexString:@"\(hexStr)"]
+                """
             }
-            rightStr = """
-            [UIColor one_colorWithHexString:@"\(hexStr)"]
-            """
+            //rgba(255,255,255,0)
+            if pe.rightColor.hasPrefix("rgba") {
+                let rgbaArr = pe.rightColor[5..<pe.rightColor.count - 1].components(separatedBy: ",")
+                rightStr = """
+                [UIColor colorWithRed:\(rgbaArr[0])/255.0 green:\(rgbaArr[1])/255.0 blue:\(rgbaArr[2])/255.0 alpha:\(rgbaArr[3])]
+                """
+            }
         case .new:
             rightStr = "[[\(pe.rightString) alloc] init]"
         case .text:
@@ -258,6 +308,7 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
             """
         case .font:
             rightStr = "[UIFont systemFontOfSize:\(pe.rightFloat/2)]"
+        
         }
         
         var equalStr = " = "
@@ -277,6 +328,7 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
         #import <UIKit/UIKit.h>
         #import "\(pageId).h"
         #import "HTNUI.h"
+        #import <SDWebImage/UIImageView+WebCache.h>
         
         @interface \(pageId)()
         \(impf.properties)
@@ -310,5 +362,15 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
     
     func scale(_ v: Float) -> String {
         return "(HTNSCREENWIDTH * \(v))/375"
+    }
+    
+    //协议外的一些方法
+    fileprivate func sizeToFit(elm:String) -> String {
+        return "[\(elm) sizeToFit];"
+    }
+    fileprivate func sdSetImageUrl(view:String, url:String) -> String {
+        return """
+        [\(view) sd_setImageWithURL:[NSURL URLWithString:@"\(url)"]];
+        """
     }
 }
