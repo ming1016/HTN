@@ -18,5 +18,9 @@ extension String {
         let idx2 = index(startIndex, offsetBy: range.upperBound)
         return String(self[idx1..<idx2])
     }
-//    var count: Int { return self.count }
+    
+    //转义
+    func escape() -> String {
+        return self.replacingOccurrences(of: "\"", with: "\\\"")
+    }
 }

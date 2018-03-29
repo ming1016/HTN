@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A3FEE950A80657F8669BF45 /* Pods_HTNSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73D55FC39CF7C270DFD0E9C5 /* Pods_HTNSwift.framework */; };
 		0A64CBAC1F8E1FB9003ACB5F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A64CBAB1F8E1FB9003ACB5F /* AppDelegate.swift */; };
 		0A64CBAE1F8E1FB9003ACB5F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A64CBAD1F8E1FB9003ACB5F /* ViewController.swift */; };
 		0A64CBB01F8E1FB9003ACB5F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0A64CBAF1F8E1FB9003ACB5F /* Assets.xcassets */; };
@@ -81,6 +82,9 @@
 		0ABE0D052068F908006174D6 /* StringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
 		3F29BFE81FA1944600062CD7 /* HTMLToTexture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTMLToTexture.swift; sourceTree = "<group>"; };
 		3F7816381FA07AA400456F0E /* LayoutElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutElement.swift; sourceTree = "<group>"; };
+		73D55FC39CF7C270DFD0E9C5 /* Pods_HTNSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HTNSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8AA229691E6FB57710066061 /* Pods-HTNSwift.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HTNSwift.debug.xcconfig"; path = "Pods/Target Support Files/Pods-HTNSwift/Pods-HTNSwift.debug.xcconfig"; sourceTree = "<group>"; };
+		D4B033EB16B9A0EF87E21FC5 /* Pods-HTNSwift.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HTNSwift.release.xcconfig"; path = "Pods/Target Support Files/Pods-HTNSwift/Pods-HTNSwift.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,6 +92,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A3FEE950A80657F8669BF45 /* Pods_HTNSwift.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -99,6 +104,8 @@
 			children = (
 				0A64CBAA1F8E1FB9003ACB5F /* HTNSwift */,
 				0A64CBA91F8E1FB9003ACB5F /* Products */,
+				E56381B4ECEE09A26F28DD40 /* Pods */,
+				21D82019BFD8DFE24DD3BB4B /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -209,6 +216,23 @@
 			path = JavaScript;
 			sourceTree = "<group>";
 		};
+		21D82019BFD8DFE24DD3BB4B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				73D55FC39CF7C270DFD0E9C5 /* Pods_HTNSwift.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E56381B4ECEE09A26F28DD40 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				8AA229691E6FB57710066061 /* Pods-HTNSwift.debug.xcconfig */,
+				D4B033EB16B9A0EF87E21FC5 /* Pods-HTNSwift.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -216,9 +240,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0A64CBB81F8E1FB9003ACB5F /* Build configuration list for PBXNativeTarget "HTNSwift" */;
 			buildPhases = (
+				D77F0F69E48BC47A30CF2D57 /* [CP] Check Pods Manifest.lock */,
 				0A64CBA41F8E1FB9003ACB5F /* Sources */,
 				0A64CBA51F8E1FB9003ACB5F /* Frameworks */,
 				0A64CBA61F8E1FB9003ACB5F /* Resources */,
+				01C87D4F90C7015C123ABAFE /* [CP] Embed Pods Frameworks */,
+				40D1C6415A785CB8558238C8 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -279,6 +306,60 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		01C87D4F90C7015C123ABAFE /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-HTNSwift/Pods-HTNSwift-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-HTNSwift/Pods-HTNSwift-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		40D1C6415A785CB8558238C8 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-HTNSwift/Pods-HTNSwift-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D77F0F69E48BC47A30CF2D57 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-HTNSwift-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		0A64CBA41F8E1FB9003ACB5F /* Sources */ = {
@@ -442,6 +523,7 @@
 		};
 		0A64CBB91F8E1FB9003ACB5F /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8AA229691E6FB57710066061 /* Pods-HTNSwift.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -456,6 +538,7 @@
 		};
 		0A64CBBA1F8E1FB9003ACB5F /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D4B033EB16B9A0EF87E21FC5 /* Pods-HTNSwift.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;

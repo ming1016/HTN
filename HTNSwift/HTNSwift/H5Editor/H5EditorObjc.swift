@@ -164,13 +164,22 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
             getter += HTNMt.PtEqualC().accumulatorLine({ (pe) -> String in
                 return self.ptEqualToStr(pe: pe)
             }).once({ (p) in
-                //
+                //_myView = [[UIImageView alloc] init];
+                p.leftId(vpt.id).leftIdPrefix("_").left(.none).rightType(.new).rightString(vClassStr).add()
+                
+                //[_myView sd_setImageWithURL:[NSURL URLWithString:@"https://static.starming.com/resource/121203c9-favorite.png"]];
+                p.add(sdSetImageUrl(view: "_" + vpt.id, url: vpt.imageUrl))
+                
+                //[self addSubview:_myView];
+                p.add(addSubViewStr(host: "self", sub: "_" + vpt.id))
             }).filter({ () -> Bool in
                 return vpt.isNormal
             }).once({ (p) in
-                p.leftId(vpt.id).leftIdPrefix("_").left(.none).rightType(.new).rightString(vClassStr).add()
-                p.add(sdSetImageUrl(view: "_" + vpt.id, url: vpt.imageUrl))
-                p.add(addSubViewStr(host: "self", sub: "_" + vpt.id))
+                //_myView.top = (HTNSCREENWIDTH * 240.0)/375;
+                p.leftId(vpt.id).leftIdPrefix("_").left(.top).rightType(.float).rightFloat(vpt.top).add()
+                
+                //_myView.left = (HTNSCREENWIDTH * 35.0)/375;
+                p.left(.left).rightFloat(vpt.left).add()
             }).mutiEqualStr
         case .view:
             getter += ""
@@ -245,7 +254,7 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
         case .top:
             ptStr = "top"
         case .center:
-            ptStr = "center"
+            ptStr = "centerX"
         case .font:
             ptStr = "font"
         case .text:
@@ -304,7 +313,7 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
             rightStr = "[[\(pe.rightString) alloc] init]"
         case .text:
             rightStr = """
-            [[NSAttributedString alloc] initWithData:[@"\(pe.rightText)" dataUsingEncoding:NSUTF8StringEncoding] options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType, NSCharacterEncodingDocumentAttribute: @(NSUTF8StringEncoding)} documentAttributes:nil error:nil]
+            [[NSAttributedString alloc] initWithData:[@"\(pe.rightText.escape())" dataUsingEncoding:NSUTF8StringEncoding] options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType, NSCharacterEncodingDocumentAttribute: @(NSUTF8StringEncoding)} documentAttributes:nil error:nil]
             """
         case .font:
             rightStr = "[UIFont systemFontOfSize:\(pe.rightFloat/2)]"
@@ -373,4 +382,5 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
         [\(view) sd_setImageWithURL:[NSURL URLWithString:@"\(url)"]];
         """
     }
+    
 }

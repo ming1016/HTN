@@ -65,7 +65,7 @@ struct H5EditorDatasource {
                 "animations": [],
                 "triggers": [],
                 "isSelected": true,
-                "layout": "normal",
+                "layout": "flow",
                 "pageWidth": 375,
                 "pageHeight": 603,
                 "opacity": 100,
@@ -413,8 +413,10 @@ struct H5EditorDatasource {
 """
         let jsonStringClear = jsonString.replacingOccurrences(of: "\n", with: "")
         let jsonData = jsonStringClear.data(using: .utf8)!
+        
         let decoder = JSONDecoder()
         let jsonModel = try! decoder.decode(H5Editor.self, from: jsonData)
         return jsonModel
     }
+
 }
