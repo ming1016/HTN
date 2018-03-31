@@ -119,8 +119,8 @@ struct HTNMt {
         var equalType = EqualType.normal
     }
     class PtEqualC {
-        typealias MutiClosure = ((_ pe: PtEqual) -> String)
-        typealias FilterClosure = (() -> Bool)
+        typealias MutiClosure = (_ pe: PtEqual) -> String
+        typealias FilterClosure = () -> Bool
         var pe:PtEqual = PtEqual()
         var accumulatorLineClosure:MutiClosure = {_ in return ""}
         var filterBl = true

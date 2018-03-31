@@ -38,6 +38,7 @@
 		0A852D0D1F93776B00B61F95 /* CSSProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A852D0C1F93776B00B61F95 /* CSSProperty.swift */; };
 		0A852D101F939CA500B61F95 /* RenderObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A852D0F1F939CA500B61F95 /* RenderObject.swift */; };
 		0A852D121F939FAF00B61F95 /* StyleResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A852D111F939FAF00B61F95 /* StyleResolver.swift */; };
+		0A8B142C206CEE85008CE9F1 /* SMNetWorking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8B142B206CEE85008CE9F1 /* SMNetWorking.swift */; };
 		0A8BE3121FA082EB00906BC9 /* JSNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8BE3111FA082EB00906BC9 /* JSNode.swift */; };
 		0ABE0D062068F908006174D6 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ABE0D052068F908006174D6 /* StringExtension.swift */; };
 		3F29BFE91FA1944600062CD7 /* HTMLToTexture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F29BFE81FA1944600062CD7 /* HTMLToTexture.swift */; };
@@ -78,6 +79,7 @@
 		0A852D0C1F93776B00B61F95 /* CSSProperty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSSProperty.swift; sourceTree = "<group>"; };
 		0A852D0F1F939CA500B61F95 /* RenderObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderObject.swift; sourceTree = "<group>"; };
 		0A852D111F939FAF00B61F95 /* StyleResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleResolver.swift; sourceTree = "<group>"; };
+		0A8B142B206CEE85008CE9F1 /* SMNetWorking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SMNetWorking.swift; sourceTree = "<group>"; };
 		0A8BE3111FA082EB00906BC9 /* JSNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSNode.swift; sourceTree = "<group>"; };
 		0ABE0D052068F908006174D6 /* StringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
 		3F29BFE81FA1944600062CD7 /* HTMLToTexture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTMLToTexture.swift; sourceTree = "<group>"; };
@@ -164,6 +166,7 @@
 				0A64CBD41F8F0726003ACB5F /* HTNStateMachine.swift */,
 				0A7017DF206205C00052570F /* HTNMultilingualism.swift */,
 				0ABE0D052068F908006174D6 /* StringExtension.swift */,
+				0A8B142B206CEE85008CE9F1 /* SMNetWorking.swift */,
 			);
 			path = HTNFundation;
 			sourceTree = "<group>";
@@ -374,6 +377,7 @@
 				0A64CBC71F8E4A84003ACB5F /* HTMLToken.swift in Sources */,
 				0A7017DE2061FB010052570F /* H5EditorToFrame.swift in Sources */,
 				0A64CBD51F8F0726003ACB5F /* HTNStateMachine.swift in Sources */,
+				0A8B142C206CEE85008CE9F1 /* SMNetWorking.swift in Sources */,
 				0A7CCDAE1FA715ED0032EBB2 /* JSTreeBuilder.swift in Sources */,
 				0A64CBC91F8E4BFA003ACB5F /* Element.swift in Sources */,
 				0A64CBCB1F8E4CFE003ACB5F /* Node.swift in Sources */,

@@ -45,29 +45,13 @@ class ViewController: NSViewController {
         
     }
     fileprivate func javascriptTest() {
-//        let jsTreeBuilder = JSTreeBuilder(inputTv.string)
-//        jsTreeBuilder.parser()
-//        jsTreeBuilder.rootNode.des()
-//        JavaScriptTest().recursionNode(node: jsTreeBuilder.rootNode, level: 0)
+
         
-        
-//        let jsonModel = H5EditorDatasource().dataFromJson(id: "cdjy4sqej0")
-//        let reStr = H5EditorToFrame<H5EditorObjc>(m:H5EditorObjc()).convert(h5editor: jsonModel)
-//        print(reStr)
-        
-        let se = URLSession.shared;
-        let url = NSURL.init(string: "http://h5editor.didialift.com/project/preview?id=5aa72bf823e2380c378563ea&debug=data")!
-        let request:URLRequest = NSURLRequest.init(url: url as URL) as URLRequest
-        let task = se.dataTask(with: request) { (data, res, error) in
-            if(error == nil){
-                //解析服务器返回的数据
-                let decoder = JSONDecoder()
-                let jsonModel = try! decoder.decode(H5Editor.self, from: data!)
-                let reStr = H5EditorToFrame<H5EditorObjc>(m:H5EditorObjc()).convert(h5editor: jsonModel)
-                print(reStr)
-            }
+        SMNetWorking<H5Editor>().requestJSON("http://h5editor.didialift.com/project/preview?id=5aa72bf823e2380c378563ea&debug=data") { (jsonModel) in
+            let reStr = H5EditorToFrame<H5EditorObjc>(m:H5EditorObjc()).convert(h5editor: jsonModel)
+            print(reStr)
         }
-        task.resume()//网络请求开始执行
+        
         
     }
     
