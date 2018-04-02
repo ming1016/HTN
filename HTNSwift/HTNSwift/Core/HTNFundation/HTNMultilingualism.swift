@@ -23,7 +23,6 @@ protocol HTNMultilingualismSpecification {
     func idProperty(pt: HTNMt.WgPt, idPar: String, prefix: String) -> String  //属性
     
     func flowViewLayout(fl:HTNMt.Flowly) -> String             //flow 布局
-    
     func scale(_ v:Float) -> String                            //适应屏幕尺寸 scale 转换
 }
 extension HTNMultilingualismSpecification {

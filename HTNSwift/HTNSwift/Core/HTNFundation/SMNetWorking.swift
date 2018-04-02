@@ -9,13 +9,15 @@
 import Foundation
 
 open class SMNetWorking<T:Codable> {
-    //链式属性
     var op:Optionals = Optionals()
     
     open let session:URLSession
     
     typealias CompletionJSONClosure = (_ data:T) -> Void
     var completionJSONClosure:CompletionJSONClosure =  {_ in }
+    
+    typealias ConfigRequestClosure = (_ request:URLRequest) -> Void
+    var configRequestClosure:ConfigRequestClosure = {_ in }
     
     public init() {
         self.session = URLSession.shared
@@ -28,6 +30,7 @@ open class SMNetWorking<T:Codable> {
         self.completionJSONClosure = doneClosure
         var request:URLRequest = NSURLRequest.init(url: url.asURL()) as URLRequest
         request.httpMethod = op.httpMethod.rawValue
+        self.configRequestClosure(request) //block 方式自定义 request 的属性
         let task = self.session.dataTask(with: request) { (data, res, error) in
             if (error == nil) {
                 let decoder = JSONDecoder()
@@ -38,7 +41,6 @@ open class SMNetWorking<T:Codable> {
                 } catch {
                     print("解析 JSON 失败")
                 }
-                
             }
         }
         task.resume()
@@ -46,14 +48,20 @@ open class SMNetWorking<T:Codable> {
     
     //链式方法
     //HTTPMethod 的设置
-    func httpMethod(_ md:HTTPMethod) -> SMNetWorking {
+    func method(_ md:HTTPMethod) -> SMNetWorking {
         self.op.httpMethod = md
+        return self
+    }
+    func configRequest(_ c:@escaping ConfigRequestClosure) -> SMNetWorking {
+        self.configRequestClosure = c
         return self
     }
     
     //struct
     struct Optionals {
         var httpMethod:HTTPMethod = .GET
+        //后期继续添加更多
+        //...
     }
     
     //enum
