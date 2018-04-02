@@ -45,12 +45,11 @@ class ViewController: NSViewController {
         
     }
     fileprivate func javascriptTest() {
-
         
-        SMNetWorking<H5Editor>().requestJSON("http://h5editor.didialift.com/project/preview?id=5aa72bf823e2380c378563ea&debug=data") { (jsonModel) in
-            let reStr = H5EditorToFrame<H5EditorObjc>(m:H5EditorObjc()).convert(h5editor: jsonModel)
-            print(reStr)
-        }
+SMNetWorking<H5Editor>().httpMethod(.GET).requestJSON("http://h5editor.didialift.com/project/preview?id=5aa72bf823e2380c378563ea&debug=data") { (jsonModel) in
+    let reStr = H5EditorToFrame<H5EditorObjc>(m:H5EditorObjc()).convert(h5editor: jsonModel)
+    print(reStr)
+}
         
         
     }

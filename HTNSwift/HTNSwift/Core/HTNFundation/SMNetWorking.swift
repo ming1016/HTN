@@ -9,6 +9,9 @@
 import Foundation
 
 open class SMNetWorking<T:Codable> {
+    //链式属性
+    var op:Optionals = Optionals()
+    
     open let session:URLSession
     
     typealias CompletionJSONClosure = (_ data:T) -> Void
@@ -23,15 +26,39 @@ open class SMNetWorking<T:Codable> {
                      doneClosure:@escaping CompletionJSONClosure
                     ) {
         self.completionJSONClosure = doneClosure
-        let request:URLRequest = NSURLRequest.init(url: url.asURL()) as URLRequest
+        var request:URLRequest = NSURLRequest.init(url: url.asURL()) as URLRequest
+        request.httpMethod = op.httpMethod.rawValue
         let task = self.session.dataTask(with: request) { (data, res, error) in
             if (error == nil) {
                 let decoder = JSONDecoder()
-                let jsonModel = try! decoder.decode(T.self, from: data!)
-                self.completionJSONClosure(jsonModel)
+                do {
+                    print("解析 JSON 成功")
+                    let jsonModel = try decoder.decode(T.self, from: data!)
+                    self.completionJSONClosure(jsonModel)
+                } catch {
+                    print("解析 JSON 失败")
+                }
+                
             }
         }
         task.resume()
+    }
+    
+    //链式方法
+    //HTTPMethod 的设置
+    func httpMethod(_ md:HTTPMethod) -> SMNetWorking {
+        self.op.httpMethod = md
+        return self
+    }
+    
+    //struct
+    struct Optionals {
+        var httpMethod:HTTPMethod = .GET
+    }
+    
+    //enum
+    enum HTTPMethod: String {
+        case GET,OPTIONS,HEAD,POST,PUT,PATCH,DELETE,TRACE,CONNECT
     }
     
 }
