@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14109" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14109"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
         <capability name="stacking Non-gravity area distributions on NSStackView" minToolsVersion="7.0" minSystemVersion="10.11"/>
     </dependencies>
@@ -715,18 +715,18 @@
                                 <rect key="frame" x="10" y="10" width="960" height="509"/>
                                 <subviews>
                                     <stackView distribution="fill" orientation="vertical" alignment="centerX" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eZ0-0t-T6g">
-                                        <rect key="frame" x="0.0" y="16" width="499" height="477"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="499" height="509"/>
                                         <subviews>
                                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VEI-gK-Qln">
-                                                <rect key="frame" x="181" y="453" width="139" height="26"/>
-                                                <popUpButtonCell key="cell" type="push" title="Javascript 测试" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="05b-H6-mxx" id="8id-Gk-yZK">
+                                                <rect key="frame" x="181" y="485" width="139" height="26"/>
+                                                <popUpButtonCell key="cell" type="push" title="JSON 转 Frame" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="eZx-a6-a3z" id="8id-Gk-yZK">
                                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="menu"/>
                                                     <menu key="menu" id="C0i-9v-nYL">
                                                         <items>
                                                             <menuItem title="HTML 转 Texture" id="WeD-wA-Qxx"/>
-                                                            <menuItem title="JSON 转 Frame" id="eZx-a6-a3z"/>
-                                                            <menuItem title="Javascript 测试" state="on" id="05b-H6-mxx"/>
+                                                            <menuItem title="JSON 转 Frame" state="on" id="eZx-a6-a3z"/>
+                                                            <menuItem title="Javascript 测试" id="05b-H6-mxx"/>
                                                         </items>
                                                     </menu>
                                                 </popUpButtonCell>
@@ -735,17 +735,17 @@
                                                 </connections>
                                             </popUpButton>
                                             <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OjU-wi-pqJ">
-                                                <rect key="frame" x="55" y="0.0" width="390" height="448"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="499" height="480"/>
                                                 <clipView key="contentView" id="y2i-Xp-LcG">
-                                                    <rect key="frame" x="1" y="1" width="373" height="446"/>
+                                                    <rect key="frame" x="1" y="1" width="482" height="478"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
                                                         <textView importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" smartInsertDelete="YES" id="GCh-Aa-BZd">
-                                                            <rect key="frame" x="0.0" y="0.0" width="373" height="446"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="482" height="478"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                                            <size key="minSize" width="373" height="446"/>
-                                                            <size key="maxSize" width="463" height="10000000"/>
+                                                            <size key="minSize" width="482" height="478"/>
+                                                            <size key="maxSize" width="482" height="10000000"/>
                                                             <color key="insertionPointColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                                         </textView>
                                                     </subviews>
@@ -756,7 +756,7 @@
                                                     <autoresizingMask key="autoresizingMask"/>
                                                 </scroller>
                                                 <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="1I0-Y4-cA8">
-                                                    <rect key="frame" x="374" y="1" width="15" height="446"/>
+                                                    <rect key="frame" x="483" y="1" width="15" height="478"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                 </scroller>
                                             </scrollView>

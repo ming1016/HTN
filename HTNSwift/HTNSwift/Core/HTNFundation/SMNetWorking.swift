@@ -13,9 +13,11 @@ open class SMNetWorking<T:Codable> {
     
     open let session:URLSession
     
+    //处理数据的 block
     typealias CompletionJSONClosure = (_ data:T) -> Void
     var completionJSONClosure:CompletionJSONClosure =  {_ in }
     
+    //配置 request
     typealias ConfigRequestClosure = (_ request:URLRequest) -> Void
     var configRequestClosure:ConfigRequestClosure = {_ in }
     
