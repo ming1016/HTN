@@ -42,14 +42,13 @@ class ViewController: NSViewController {
     }
     
     fileprivate func jsonToFrame() {
-        SMNetWorking<H5Editor>().requestJSON("http://www.starming.com") { (jsonModel) in
+        //请求地址在输入框输入
+        SMNetWorking<H5Editor>().requestJSON(inputTv.string) { (jsonModel) in
             let reStr = H5EditorToFrame<H5EditorObjc>(H5EditorObjc()).convert(jsonModel)
             print(reStr)
         }
     }
     fileprivate func javascriptTest() {
-        
-        
         
     }
     
