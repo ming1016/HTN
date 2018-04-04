@@ -42,7 +42,7 @@ class ViewController: NSViewController {
     }
     
     fileprivate func jsonToFrame() {
-        SMNetWorking<H5Editor>().requestJSON("http://h5editor.didialift.com/project/preview?id=5aa72bf823e2380c378563ea&debug=data") { (jsonModel) in
+        SMNetWorking<H5Editor>().requestJSON("http://www.starming.com") { (jsonModel) in
             let reStr = H5EditorToFrame<H5EditorObjc>(H5EditorObjc()).convert(jsonModel)
             print(reStr)
         }
