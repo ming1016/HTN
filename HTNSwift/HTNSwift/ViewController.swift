@@ -17,11 +17,11 @@ struct Data {
 
 class ViewController: NSViewController {
     
-    @IBOutlet var inputTv: NSTextView!
-
+    @IBOutlet weak var inputLb: NSTextField!
+    
+    @IBOutlet var nativeCodeLb: NSTextView!
     @IBOutlet weak var inputTypeSelect: NSPopUpButton!
     @IBOutlet weak var toNativeBt: NSButton!
-    @IBOutlet weak var codeShowLb: NSTextField!
     
     @IBAction func toNativeAction(_ sender: Any) {
         guard let item = inputTypeSelect.selectedItem else {
@@ -42,10 +42,16 @@ class ViewController: NSViewController {
     }
     
     fileprivate func jsonToFrame() {
+        guard inputLb.stringValue.count > 0 else {
+            return;
+        }
         //请求地址在输入框输入
-        SMNetWorking<H5Editor>().requestJSON(inputTv.string) { (jsonModel) in
+        SMNetWorking<H5Editor>().requestJSON(inputLb.stringValue) { (jsonModel) in
             let reStr = H5EditorToFrame<H5EditorObjc>(H5EditorObjc()).convert(jsonModel)
             print(reStr)
+            DispatchQueue.main.async {
+                self.nativeCodeLb.string = reStr
+            }
         }
     }
     fileprivate func javascriptTest() {
@@ -56,7 +62,7 @@ class ViewController: NSViewController {
     
     //递归所有子节点
     fileprivate func htmlToTexture() {
-        let treeBuilder = HTMLTreeBuilder(inputTv.string)
+        let treeBuilder = HTMLTreeBuilder(inputLb.stringValue)
         _ = treeBuilder.parse()
         let cssStyle = CSSParser(treeBuilder.doc.allStyle()).parseSheet()
         let document = StyleResolver().resolver(treeBuilder.doc, styleSheet: cssStyle)
@@ -65,11 +71,12 @@ class ViewController: NSViewController {
         //转 Textrue
         let layoutElement = LayoutElement().createRenderer(doc: document)
         _ = HTMLToTexture(nodeName:"Flexbox").converter(layoutElement);
-        codeShowLb.stringValue = ""
+        nativeCodeLb.string = ""
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.nativeCodeLb.font = NSFont.userFont(ofSize: 16)
         
         var htmlStr = """
         <!DOCTYPE html>
