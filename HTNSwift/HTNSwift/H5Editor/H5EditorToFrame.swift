@@ -15,9 +15,9 @@ class H5EditorToFrame<M:HTNMultilingualismSpecification> {
     }
     
     func convert(_ h5editor:H5Editor) -> String {
-        m.pageId = h5editor.data.pages[0].id
+        m.pageId = h5editor.data?.pages![0].id ?? ""
         //全部 widget
-        let allWidgets = h5editor.data.pages[0].widgets;
+        let allWidgets = h5editor.data?.pages![0].widgets ?? [];
         //流式布局 widget
         var flowWidgets = [H5Editor.Data.Page.Widget]()
         //普通布局 widget
@@ -40,14 +40,14 @@ class H5EditorToFrame<M:HTNMultilingualismSpecification> {
         //对 flow 的所有 widget 的处理
         for widget in flowWidgets {
             let wd = widgetStructConvertToStr(widget: widget)
-            m.id = widget.id
+            m.id = widget.id ?? ""
             wgPropertyStr += wd.propertyStr
             wgInitStr += wd.initStr
             wgGetterStr += wd.getterStr
             
             var fl = HTNMt.Flowly()
             fl.id = m.id
-            fl.lastId = m.validIdStr(id: lastWidget.id)
+            fl.lastId = m.validIdStr(id: lastWidget.id ?? "")
             fl.isFirst = i == 0
             fl.viewPt = wd.viewPt
             
@@ -60,7 +60,7 @@ class H5EditorToFrame<M:HTNMultilingualismSpecification> {
         //对于 normal 的处理
         for widget in normalWidgets {
             let wd = widgetStructConvertToStr(widget: widget)
-            m.id = widget.id
+            m.id = widget.id ?? ""
             wgPropertyStr += wd.propertyStr
             wgInitStr += wd.initStr
             wgGetterStr += wd.getterStr
@@ -75,6 +75,13 @@ class H5EditorToFrame<M:HTNMultilingualismSpecification> {
         let nativeMStr = m.impFile(impf: imp)
         let nativeHStr = m.interfaceFile(intf: HTNMt.InterfaceFile())
         print(nativeHStr)
+        
+        //生成文件测试
+//        let hFilePath = "/Users/didi/Documents/Demo/HomePageTest/HomePageTest/\(m.pageId).h"
+//        let mFilePath = "/Users/didi/Documents/Demo/HomePageTest/HomePageTest/\(m.pageId).m"
+//        try! nativeHStr.write(toFile: hFilePath, atomically: true, encoding: String.Encoding.utf8)
+//        try! nativeMStr.write(toFile: mFilePath, atomically: true, encoding: String.Encoding.utf8)
+        
         return nativeMStr
     }
     
@@ -102,33 +109,33 @@ class H5EditorToFrame<M:HTNMultilingualismSpecification> {
         }
         //h5editor 结构体和 htn 多语言结构体的转换
         var vp = HTNMt.ViewPt()
-        vp.id = m.validIdStr(id: widget.id)
+        vp.id = m.validIdStr(id: widget.id ?? "")
         vp.viewType = uiType
         vp.layoutType = layoutType
-        vp.width = widget.width
-        vp.height = widget.height
-        vp.top = widget.top
-        vp.left = widget.left
+        vp.width = widget.width ?? 0
+        vp.height = widget.height ?? 0
+        vp.top = widget.top ?? 0
+        vp.left = widget.left ?? 0
         
-        vp.text = widget.data.content ?? ""
-        vp.fontSize = widget.data.fontSize ?? 32
-        vp.textColor = widget.data.color ?? ""
+        vp.text = widget.data?.content ?? ""
+        vp.fontSize = widget.data?.fontSize ?? 32
+        vp.textColor = widget.data?.color ?? ""
         
-        vp.imageUrl = widget.data.url ?? ""
+        vp.imageUrl = widget.data?.url ?? ""
         
         vp.isNormal = widget.layout == "normal"
         
         //padding 的处理
-        if widget.padding.count > 0 {
-            let paddingArr = widget.padding.split(separator: " ")
-            if paddingArr.count == 4 {
-                vp.padding = HTNMt.Padding(top: Float(paddingArr[0])!, left: Float(paddingArr[1])!, bottom: Float(paddingArr[2])!, right: Float(paddingArr[3])!)
+        if (widget.padding?.count)! > 0 {
+            let paddingArr = widget.padding?.split(separator: " ")
+            if paddingArr?.count == 4 {
+                vp.padding = HTNMt.Padding(top: Float(paddingArr![0])!, left: Float(paddingArr![1])!, bottom: Float(paddingArr![2])!, right: Float(paddingArr![3])!)
             }
         }
         
         //横向和纵向
         var vAlign = HTNMt.VerticalAlign.padding
-        switch widget.data.verticalAlign {
+        switch widget.data?.verticalAlign {
         case "middle"?:
             vAlign = .middle
         case "top"?:
@@ -141,7 +148,7 @@ class H5EditorToFrame<M:HTNMultilingualismSpecification> {
         vp.verticalAlign = vAlign
         
         var hAlign = HTNMt.HorizontalAlign.padding
-        switch widget.data.horizontalAlign {
+        switch widget.data?.horizontalAlign {
         case "center"?:
             hAlign = .center
         case "left"?:
