@@ -8,7 +8,6 @@
 
 import Foundation
 
-
 extension String {
     //let s = "hello"
     //s[0..<3] // "hel"

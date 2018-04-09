@@ -140,8 +140,22 @@ struct H5Editor : Codable {
         struct Description: Codable {
             
         }
+        //处理比如点击等事件
         struct Trigger: Codable {
+            var id: String?
+            var clazz: String?
+            var type: String?
+            var event: String?
+            var data: TriggerData?
+            var variableMap: VariableMap?
             
+            struct TriggerData: Codable {
+                var url: String?
+                var parameter: Bool?
+            }
+            struct VariableMap: Codable {
+                
+            }
         }
         struct VariableMap: Codable {
             
