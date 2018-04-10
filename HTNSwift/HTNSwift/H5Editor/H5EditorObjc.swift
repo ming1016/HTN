@@ -89,6 +89,9 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
                 //_myView.left = (HTNSCREENWIDTH * 16.0)/375;
                 p.left(.left).rightFloat(vpt.padding.left).add()
                 
+                //disable userInteraction
+//                p.leftId(cId).leftIdPrefix("").left(.enableClick).rightType(.int).rightInt(0).add()
+
                 p.add(addSubViewStr(host: cId, sub: "_" + vpt.id))
                 p.add(addSubViewStr(host: "\(selfStr).\(self.pageId)", sub: cId))
                 
@@ -105,6 +108,8 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
                 p.filter({ () -> Bool in
                     return vpt.textColor.count > 0
                 }).equalType(.set).left(.titleColor).rightType(.color).rightColor(vpt.textColor).rightSuffix(" forState:UIControlStateNormal").add()
+                //disable userInteraction
+//                p.equalType(.normal).left(.enableClick).rightType(.int).rightInt(0).rightSuffix("").add()
                 
                 p.add(addSubViewStr(host: "self.\(self.pageId)", sub: "_" + vpt.id))
             }).filter({ () -> Bool in
@@ -185,9 +190,29 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
             }).left(.borderColor).rightType(.color).rightColor(vpt.borderColor).rightSuffix(".CGColor") .add()
         }).filter({ () -> Bool in
             //处理有跳转的的情况
-            return vpt.redirectUrl.count > 0
+            return vpt.viewType != .button && vpt.viewType != .scrollView && vpt.redirectUrl.count > 0
         }).once({ (p) in
-            //TODO:如果有跳转添加一个 button
+            //如果有跳转添加一个 button
+            //enable userInteraction
+            p.leftId(vpt.id).leftIdPrefix("_").left(.enableClick).rightType(.int).rightInt(1).add()
+            let btnId = vpt.id + "Btn"
+            p.add(newEqualStr(vType: .button, id: btnId))
+            //myViewBtn.width = _hllfxu51uie.width;
+            p.leftId(btnId)
+                .leftIdPrefix("")
+                .left(.width)
+                .rightId(vpt.id)
+                .rightIdPrefix("_")
+                .rightType(.pt)
+                .right(.width)
+                .add()
+            //myViewContainer.height = _hllfxu51uie.height;
+            p.left(.height).right(.height).add()
+            //myViewContainer.top = 0;
+            p.left(.top).rightType(.float).rightFloat(0).add()
+            p.left(.left).rightFloat(0).add()
+            p.add(addSubViewStr(host: "_" + vpt.id, sub: btnId))
+            p.left(.racCommand).rightType(.racCommand).rightString(vpt.redirectUrl).add()
         }).mutiEqualStr
         
         //处理有跳转的的情况
@@ -287,6 +312,14 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
             rightStr = "[UIFont systemFontOfSize:\(pe.rightFloat/2)]"
         case .size:
             rightStr = "CGSizeMake(\(scale(pe.rightSize.0)), \(scale(pe.rightSize.1)))"
+        case .racCommand:
+            rightStr = """
+            [[RACCommand alloc] initWithSignalBlock:^RACSignal *(id input) {
+            NSString *redirectUrl = @"\(pe.rightString)";
+            [HTNUI redirectPageWithURLString:redirectUrl];
+            return [RACSignal empty];
+            }]
+            """
         }
         var equalStr = " = "
         var endStr = ";"
@@ -310,6 +343,7 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
         #import "\(pageId).h"
         #import "HTNUI.h"
         #import <SDWebImage/UIImageView+WebCache.h>
+        #import <ReactiveCocoa/ReactiveCocoa.h>
         
         @interface \(pageId)()
         \(impf.properties)
@@ -400,6 +434,8 @@ extension HTNMt.WgPt {
             return "layer.masksToBounds"
         case .clips:
             return "clipsToBounds"
+        case .enableClick:
+            return "userInteractionEnabled"
         case .text:
             return "attributedText"
         case .font:
@@ -416,6 +452,8 @@ extension HTNMt.WgPt {
             return "titleLabel.font"
         case .titleColor:
             return "TitleColor"
+        case .racCommand:
+            return "rac_command"
         case .contentSize:
             return "contentSize"
         case .bounces:

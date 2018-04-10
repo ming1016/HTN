@@ -173,13 +173,13 @@ struct HTNMt {
         case none
         case new
         case top,bottom,left,right,center //位置相关属性
-        case width,height,tag,bgColor,radius,borderColor,borderWidth,masksToBounds,clips //通用属性
+        case width,height,tag,bgColor,radius,borderColor,borderWidth,masksToBounds,clips,enableClick //通用属性
         case text,font,textColor,lineBreakMode,numberOfLines //label 相关属性
-        case title,titleFont,titleColor //button 相关属性
+        case title,titleFont,titleColor,racCommand //button 相关属性
         case contentSize,bounces,pagingEnabled,showHIndicator,showVIndicator //scrollView 相关属性
     }
     enum PtEqualRightType {
-        case pt,float,int,string,color,text,new,font,size
+        case pt,float,int,string,color,text,new,font,size,racCommand
     }
     //表达式所需结构
     struct PtEqual {
