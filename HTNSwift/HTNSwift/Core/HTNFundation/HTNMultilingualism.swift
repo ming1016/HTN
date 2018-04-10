@@ -146,6 +146,7 @@ struct HTNMt {
         var borderColor = ""  //边框颜色
         var borderWidth:Float = 0  //边框宽度
         var hasBorder = false   //是否有边框
+        var redirectUrl = ""  //点击跳转地址
     }
     enum VerticalAlign {
         case padding
