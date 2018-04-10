@@ -10,11 +10,17 @@ import Foundation
 
 //多语言协议规范
 protocol HTNMultilingualismSpecification {
-    var pageId: String {get set}                               //页面 id
-    var id: String {get set}                                   //动态 id
+    var pageId: String {get set}             //页面 id
+    var id: String {get set}                 //动态 id
+    var selfId: String {get}                 //self.id
+    var selfStr: String {get}                //self
+    var selfPtStr: String {get}              //self.
+    func validIdStr(id: String) -> String    //对 id 字符串的合法化
+    
     func newEqualStr(vType:HTNMt.ViewType,id:String) -> String //初始化一个类型对象
-    func validIdStr(id: String) -> String                      //对 id 字符串的合法化
+    
     func viewPtToStrStruct(vpt:HTNMt.ViewPt) -> HTNMt.ViewStrStruct //视图属性转视图结构
+    
     func viewTypeClassStr(vt:HTNMt.ViewType) -> String         //视图类型类名的映射
     func ptEqualToStr(pe:HTNMt.PtEqual) -> String              //属性表达式
     func addSubViewStr(host: String,sub: String) -> String     //添加 subView
@@ -24,9 +30,77 @@ protocol HTNMultilingualismSpecification {
     
     func flowViewLayout(fl:HTNMt.Flowly) -> String             //flow 布局
     func scale(_ v:Float) -> String                            //适应屏幕尺寸 scale 转换
+    
+    func sizeToFit(elm:String) -> String  //处理label sizeToFit
 }
 extension HTNMultilingualismSpecification {
-    
+    func flowViewLayout(fl:HTNMt.Flowly) -> String {
+        let cId = id + "Container"
+        var lyStr = ""
+        //UIView *myViewContainer = [UIView new];
+        lyStr += newEqualStr(vType: .view, id: cId) + "\n"
+        
+        //属性拼装
+        lyStr += HTNMt.PtEqualC().accumulatorLine({ (pe) -> String in
+            return self.ptEqualToStr(pe: pe)
+        }).once({ (p) in
+            p.left(.top).leftId(cId).end()
+            if fl.isFirst {
+                //myViewContainer.top = 0.0;
+                p.rightType(.float).rightFloat(0).add()
+            } else {
+                //myViewContainer.top = lastView.bottom;
+                p.rightId(fl.lastId + "Container").rightType(.pt).right(.bottom).add()
+            }
+        }).once({ (p) in
+            //myViewContainer.left = 0.0;
+            p.leftId(cId).left(.left).rightType(.float).rightFloat(0).add()
+        }).once({ (p) in
+            //myViewContainer.width = self.myView.width;
+            p.leftId(cId).left(.width).rightType(.pt).rightIdPrefix(selfPtStr).rightId(id).right(.width).add()
+            
+            //myViewContainer.height = self.myView.height;
+            p.left(.height).right(.height).add()
+        }).once({ (p) in
+            //self.myView.width -= 16 * 2;
+            p.left(.width).leftId(id).leftIdPrefix(selfPtStr).rightType(.float).rightFloat(fl.viewPt.padding.left * 2).equalType(.decrease).add()
+            
+            //self.myView.height -= 8 * 2;
+            p.left(.height).rightFloat(fl.viewPt.padding.top * 2).add()
+            
+            //self.myView.top = 8;
+            p.equalType(.normal).left(.top).rightType(.float).rightFloat(fl.viewPt.padding.top).add()
+            
+            //属性 verticalAlign 或 horizontalAlign 是 padding 和其它排列时的区别处理
+            if fl.viewPt.horizontalAlign == .padding {
+                //self.myView.left = 16;
+                p.left(.left).rightFloat(fl.viewPt.padding.left).add()
+            } else {
+                //[self.myView sizeToFit];
+                p.add(sizeToFit(elm: "\(selfId)"))
+                p.left(.height).rightType(.pt).rightId(cId).right(.height).add()
+                switch fl.viewPt.horizontalAlign {
+                case .center:
+                    p.left(HTNMt.WgPt.center).right(.center).add()
+                case .left:
+                    p.left(.left).right(.left).add()
+                case .right:
+                    p.left(.right).right(.right).add()
+                default:
+                    ()
+                }
+            }
+            
+            
+        }).mutiEqualStr
+        
+        //[myViewContainer addSubview:self.myView];
+        lyStr += addSubViewStr(host: cId, sub: "\(selfId)") + "\n"
+        //[self addSubview:myViewContainer];
+        lyStr += addSubViewStr(host: selfStr, sub: cId) + "\n"
+        
+        return lyStr
+    }
 }
 /*-----------协议所需结构和枚举------------*/
 struct HTNMt {

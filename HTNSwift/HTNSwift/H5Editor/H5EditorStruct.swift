@@ -9,104 +9,103 @@
 import Foundation
 
 struct H5Editor : Codable {
-    let errno: Int
-    let msg: String
-    let data: Data
+    var errno: Int?
+    var msg: String?
+    var data: Data?
     
     struct Data: Codable {
-        let _id: String
-        let clazz: String
-        let userId: String
-        let name: String
-        let title: String
-        let pages: [Page]
+        var _id: String?
+        //var clazz: String?
+        //var userId: String?
+        var name: String?
+        var title: String?
+        var pages: [Page]?
         
         struct Page: Codable {
-            let id: String
-            let clazz: String
-            let name: String
-            let bgColor: String
-            let bgImage: String
-            let bgImagePosition: String
-            let bgImageRepeat: String
-            let widgets: [Widget]
-            let isSelected: Bool
-            let width: Float
-            let height: Float
-            let type: String
-            let triggers: [Trigger]
-            let variableMap: VariableMap
-            let isStandard: Bool
-            let panelType: String?
-            let createAt: String?
-            let themeType: String?
-            
+            var id: String?
+            //var clazz: String?
+            var name: String?
+            var bgColor: String?
+            var bgImage: String?
+            var bgImagePosition: String?
+            var bgImageRepeat: String?
+            var widgets: [Widget]?
+            var isSelected: Bool?
+            var width: Float?
+            var height: Float?
+            var type: String?
+            var triggers: [Trigger]?
+            var variableMap: VariableMap?
+            var isStandard: Bool?
+            var panelType: String?
+            var createAt: String?
+            var themeType: String?
             
             struct Widget: Codable {
-                let id: String
-                let name: String
-                let type: String               //类型
-                let location: String           //相对定位的位置 page
-                let align: String              //排列方式 free
-                let alignLeftMargin: Float     //边距
-                let alignRightMargin: Float
-                let alignTopMargin: Float
-                let alignBottomMargin: Float
-                let width: Float               //宽
-                let height: Float              //高
-                let top: Float                 //顶部
-                let left: Float                //居左多少
-                let rotate: Float              //旋转
-                let bgColor: String            //背景颜色 rgba(255,255,255,0)
-                let bgImage: String            //背景图片
-                let bgImagePosition: String    //背景图片位置 center-center
-                let bgImageRepeat: String      //背景图片是否平铺 none
-                let borderRadius: Float        //圆角 0
-                let visible: Bool              //是否可视 true
-                let data: WidgetData           //数据
-                let animations: [Animation]    //动画
-                let triggers: [Trigger]        //触发器
-                let isSelected: Bool           //是否选择 false
-                let layout: String             //布局 flow
-                let pageWidth: Float           //所属页面宽度
-                let pageHeight: Float          //所属页面高度
-                let opacity: Float             //不透明度 100
-                let hasBorder: Bool            //是否有边框 false
-                let borderStyle: String        //边框样式 solid
-                let borderWidth: Float         //边框宽度 1
-                let borderColor: String        //边框颜色
-                let borderDirections: [String] //边框包含那些边['top','right','bottom','left']
-                let condition: Condition       //组件条件
-                let variableMap: VariableMap   //组件属性的映射变量表
-                let needAttach: Bool           //是否吸附其它组件 false
-                let attach: String             //吸附组件 ''
-                let locked: Bool               //锁定位置
-                let readonly: Bool             //是否只读
-                let layers: [Layer]            //
-                let hasLayers: Bool
-                let defaultLayerCount: Float
-                let maxLayerCount: Float
-                let padding: String            //内边距
-                let children: [Widget]?
+                var id: String?
+                var name: String?
+                var type: String?               //类型
+                var location: String?           //相对定位的位置 page
+                var align: String?              //排列方式 free
+                var alignLeftMargin: Float?     //边距
+                var alignRightMargin: Float?
+                var alignTopMargin: Float?
+                var alignBottomMargin: Float?
+                var width: Float?               //宽
+                var height: Float?              //高
+                var top: Float?                 //顶部
+                var left: Float?                //居左多少
+                var rotate: Float?              //旋转
+                var bgColor: String?            //背景颜色 rgba(255,255,255,0)
+                var bgImage: String?            //背景图片
+                var bgImagePosition: String?    //背景图片位置 center-center
+                var bgImageRepeat: String?      //背景图片是否平铺 none
+                var borderRadius: Float?        //圆角 0
+                var visible: Bool?              //是否可视 true
+                var data: WidgetData?           //数据
+                var animations: [Animation]?    //动画
+                var triggers: [Trigger]?        //触发器
+                var isSelected: Bool?           //是否选择 false
+                var layout: String?             //布局 flow
+                var pageWidth: Float?           //所属页面宽度
+                var pageHeight: Float?          //所属页面高度
+                var opacity: Float?             //不透明度 100
+                var hasBorder: Bool?            //是否有边框 false
+                var borderStyle: String?        //边框样式 solid
+                var borderWidth: Float?         //边框宽度 1
+                var borderColor: String?        //边框颜色
+                var borderDirections: [String]? //边框包含那些边['top','right','bottom','left']
+                var condition: Condition?       //组件条件
+                var variableMap: VariableMap?   //组件属性的映射变量表
+                var needAttach: Bool?           //是否吸附其它组件 false
+                var attach: String?             //吸附组件 ''
+                var locked: Bool?               //锁定位置
+                var readonly: Bool?             //是否只读
+                var layers: [Layer]?            //
+                var hasLayers: Bool?
+                var defaultLayerCount: Float?
+                var maxLayerCount: Float?
+                var padding: String?            //内边距
+                var children: [Widget]?
                 struct WidgetData: Codable {
                     //label
-                    let content: String?
-                    let color: String?
-                    let fontSize: Float?
-                    let fontFamily: String?
-                    let fontWeight: String?
-                    let verticalAlign: String?
-                    let horizontalAlign: String?
-                    let lineHeight: Float?
-                    let letterSpacing: Float?
+                    var content: String?
+                    var color: String?
+                    var fontSize: Float?
+                    var fontFamily: String?
+                    var fontWeight: String?
+                    var verticalAlign: String?
+                    var horizontalAlign: String?
+                    var lineHeight: Float?
+                    var letterSpacing: Float?
                     //image
-                    let url: String?
-                    let usePicSet: Bool?
-                    let size: Size?
+                    var url: String?
+                    var usePicSet: Bool?
+                    var size: Size?
                     
                     struct Size: Codable {
-                        let height: Float
-                        let width: Float
+                        var height: Float
+                        var width: Float
                     }
                 }
                 struct Animation: Codable {
@@ -121,28 +120,42 @@ struct H5Editor : Codable {
             }
             
         }
-        let createTime: String
-        let lastModifyTime: String
-        let publishTime: String
-        let layout: String
-        let carouselDirection: String
-        let dataUrl: String
-        let descUrl: String
-        let descriptions: [Description]
-        let useData: Bool
-        let triggers: [Trigger]
-        let variableMap: VariableMap
-        let type: String
-        let lastModifiedDate: String
-        let config: Config
-        let editable: Bool
-        let logId: String
+        var createTime: String?
+        var lastModifyTime: String?
+        var publishTime: String?
+        var layout: String?
+        var carouselDirection: String?
+        var dataUrl: String?
+        var descUrl: String?
+        var descriptions: [Description]?
+        var useData: Bool?
+        var triggers: [Trigger]?
+        var variableMap: VariableMap?
+        var type: String?
+        var lastModifiedDate: String?
+        var config: Config?
+        var editable: Bool?
+        var logId: String?
         
         struct Description: Codable {
             
         }
+        //处理比如点击等事件
         struct Trigger: Codable {
+            var id: String?
+            var clazz: String?
+            var type: String?
+            var event: String?
+            var data: TriggerData?
+            var variableMap: VariableMap?
             
+            struct TriggerData: Codable {
+                var url: String?
+                var parameter: Bool?
+            }
+            struct VariableMap: Codable {
+                
+            }
         }
         struct VariableMap: Codable {
             
