@@ -108,6 +108,7 @@ class H5EditorToFrame<M:HTNMultilingualismSpecification> {
             layoutType = .flow
         }
         //h5editor 结构体和 htn 多语言结构体的转换
+        
         var vp = HTNMt.ViewPt()
         vp.id = m.validIdStr(id: widget.id ?? "")
         vp.viewType = uiType
@@ -118,6 +119,7 @@ class H5EditorToFrame<M:HTNMultilingualismSpecification> {
         vp.left = widget.left ?? 0
         
         vp.text = widget.data?.content ?? ""
+        
         vp.fontSize = widget.data?.fontSize ?? 32
         vp.textColor = widget.data?.color ?? ""
         

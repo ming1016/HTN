@@ -90,7 +90,7 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
                 p.left(.left).rightFloat(vpt.padding.left).add()
                 
                 p.add(addSubViewStr(host: cId, sub: "_" + vpt.id))
-                p.add(addSubViewStr(host: "self", sub: cId))
+                p.add(addSubViewStr(host: selfStr, sub: cId))
                 
             }).mutiEqualStr
         case .button:
@@ -106,7 +106,7 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
                 p.add(sdSetImageUrl(view: "_" + vpt.id, url: vpt.imageUrl))
                 
                 //[self addSubview:_myView];
-                p.add(addSubViewStr(host: "self", sub: "_" + vpt.id))
+                p.add(addSubViewStr(host: selfStr, sub: "_" + vpt.id))
             }).filter({ () -> Bool in
                 return vpt.isNormal
             }).once({ (p) in
@@ -148,7 +148,7 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
                 return self.ptEqualToStr(pe: pe)
             }).once({ (p) in
                 //self.myView.tag = 1;
-                p.leftIdPrefix("self.").left(.tag).leftId(vpt.id).rightType(.int).rightInt(1).add()
+                p.leftIdPrefix(selfPtStr).left(.tag).leftId(vpt.id).rightType(.int).rightInt(1).add()
             }).mutiEqualStr
         }
         
