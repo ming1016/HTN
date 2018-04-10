@@ -19,26 +19,20 @@ class H5EditorToFrame<M:HTNMultilingualismSpecification> {
         //全部 widget
         let allWidgets = h5editor.data.pages[0].widgets;
         //流式布局 widget
-        var flowWidgets = [H5Editor.Data.Page.Widget]()
+        let flowWidgets = allWidgets.filter { $0.layout == "flow" }
         //普通布局 widget
-        var normalWidgets = [H5Editor.Data.Page.Widget]()
-        //讲两类布局放到两个不同集合中，先处理和添加流式布局，再处理普通布局
-        for widget in allWidgets {
-            if widget.layout == "flow" {
-                flowWidgets.append(widget)
-            } else if widget.layout == "normal" {
-                normalWidgets.append(widget)
-            }
-        }
+        let normalWidgets = allWidgets.filter { $0.layout == "normal" }
         
         var wgPropertyStr = ""
         var wgInitStr = ""
         var wgGetterStr = ""
+        //先处理和添加流式布局，再处理普通布局
         //流式布局
-        var lastWidget = flowWidgets[0]
-        var i = 0
-        //对 flow 的所有 widget 的处理
-        for widget in flowWidgets {
+        var lastWidget : H5Editor.Data.Page.Widget
+        for (index, widget) in flowWidgets.enumerated() {
+            //更新标识
+            lastWidget = widget
+            //对 flow 的所有 widget 的处理
             let wd = widgetStructConvertToStr(widget: widget)
             m.id = widget.id
             wgPropertyStr += wd.propertyStr
@@ -48,15 +42,12 @@ class H5EditorToFrame<M:HTNMultilingualismSpecification> {
             var fl = HTNMt.Flowly()
             fl.id = m.id
             fl.lastId = m.validIdStr(id: lastWidget.id)
-            fl.isFirst = i == 0
+            fl.isFirst = index == 0
             fl.viewPt = wd.viewPt
             
             wgInitStr += m.flowViewLayout(fl: fl)
-            lastWidget = widget
-            
-            i += 1
         }
-        
+
         //对于 normal 的处理
         for widget in normalWidgets {
             let wd = widgetStructConvertToStr(widget: widget)
