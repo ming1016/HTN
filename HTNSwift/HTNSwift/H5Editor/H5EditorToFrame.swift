@@ -17,15 +17,21 @@ class H5EditorToFrame<M:HTNMultilingualismSpecification> {
     func convert(_ h5editor:H5Editor) -> String {
         m.pageId = h5editor.data?.pages![0].id ?? ""
         //全部 widget
-        let allWidgets = h5editor.data?.pages![0].widgets ?? [];
-        //流式布局 widget
-        let flowWidgets = allWidgets.filter { $0.layout == "flow" }
-        //普通布局 widget
-        let normalWidgets = allWidgets.filter { $0.layout == "normal" }
+        let page = h5editor.data?.pages![0];
+        let allWidgets = page?.widgets ?? [];
+        //流式布局 widget,逆序添加H5Editor的widgets
+        let flowWidgets = allWidgets.filter{ $0.layout == "flow" }.reversed()
+        //普通布局 widget,逆序添加H5Editor的widgets
+        let normalWidgets = allWidgets.filter{ $0.layout == "normal" }.reversed()
         
         var wgPropertyStr = ""
         var wgInitStr = ""
         var wgGetterStr = ""
+        //处理scrollView
+        let pageStruct = pageStructConvertToScrollView(page: page!)
+        wgPropertyStr += pageStruct.propertyStr
+        wgInitStr += pageStruct.initStr
+        wgGetterStr += pageStruct.getterStr
         //先处理和添加流式布局，再处理普通布局
         //流式布局
         var lastWidget : H5Editor.Data.Page.Widget
@@ -82,6 +88,19 @@ class H5EditorToFrame<M:HTNMultilingualismSpecification> {
         let getterStr: String
     }
     
+    fileprivate func pageStructConvertToScrollView(page: H5Editor.Data.Page) -> HTNMt.ViewStrStruct {
+        //h5editor 结构体和 htn 多语言结构体的转换
+        var vp = HTNMt.ViewPt()
+        vp.id = m.pageId
+        vp.viewType = .scrollView
+        vp.width = page.width ?? 0
+        vp.height = page.height ?? 0
+        vp.bgColor = page.bgColor ?? ""
+        
+        let pageStruct = m.viewPtToStrStruct(vpt: vp)
+        return pageStruct
+    }
+    
     fileprivate func widgetStructConvertToStr(widget:H5Editor.Data.Page.Widget) -> HTNMt.ViewStrStruct {
         var uiType = HTNMt.ViewType.label
         switch widget.type {
@@ -107,8 +126,17 @@ class H5EditorToFrame<M:HTNMultilingualismSpecification> {
         vp.height = widget.height ?? 0
         vp.top = widget.top ?? 0
         vp.left = widget.left ?? 0
+        vp.bgColor = widget.bgColor ?? ""
+        vp.radius = widget.borderRadius ?? 0
+        vp.borderColor = widget.borderColor ?? ""
+        vp.borderWidth = widget.borderWidth ?? 0
+        vp.hasBorder = widget.hasBorder ?? false
         
-        vp.text = widget.data?.content ?? ""
+        if uiType == .button {
+            vp.text = widget.data?.text ?? ""
+        }else{
+            vp.text = widget.data?.content ?? ""
+        }
         vp.fontSize = widget.data?.fontSize ?? 32
         vp.textColor = widget.data?.color ?? ""
         

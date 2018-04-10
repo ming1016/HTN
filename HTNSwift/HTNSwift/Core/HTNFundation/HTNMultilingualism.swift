@@ -26,7 +26,7 @@ protocol HTNMultilingualismSpecification {
     func addSubViewStr(host: String,sub: String) -> String     //添加 subView
     func impFile(impf:HTNMt.ImpFile) -> String                 //实现文件的内容
     func interfaceFile(intf:HTNMt.InterfaceFile) -> String                    //接口文件的内容
-    func idProperty(pt: HTNMt.WgPt, idPar: String, prefix: String) -> String  //属性
+    func idProperty(pt: HTNMt.WgPt, idPar: String, prefix: String, equalT: HTNMt.EqualType) -> String  //属性
     
     func flowViewLayout(fl:HTNMt.Flowly) -> String             //flow 布局
     func scale(_ v:Float) -> String                            //适应屏幕尺寸 scale 转换
@@ -119,7 +119,7 @@ struct HTNMt {
     }
     //视图类型
     enum ViewType {
-        case view,label,image,button
+        case view,label,image,button,scrollView
     }
     enum LayoutType {
         case normal,flow
@@ -141,6 +141,11 @@ struct HTNMt {
         var verticalAlign:VerticalAlign = .padding
         var horizontalAlign:HorizontalAlign = .padding
         var imageUrl  = ""  //图片链接
+        var bgColor = "" //背景色
+        var radius:Float = 0  //圆角
+        var borderColor = ""  //边框颜色
+        var borderWidth:Float = 0  //边框宽度
+        var hasBorder = false   //是否有边框
     }
     enum VerticalAlign {
         case padding
@@ -166,12 +171,14 @@ struct HTNMt {
     enum WgPt {
         case none
         case new
-        case top,bottom,left,right,center                    //位置相关属性
+        case top,bottom,left,right,center //位置相关属性
+        case width,height,tag,bgColor,radius,borderColor,borderWidth,masksToBounds,clips //通用属性
         case text,font,textColor,lineBreakMode,numberOfLines //label 相关属性
-        case width,height,tag                                //通用属性
+        case title,titleFont,titleColor //button 相关属性
+        case contentSize,bounces,pagingEnabled,showHIndicator,showVIndicator //scrollView 相关属性
     }
     enum PtEqualRightType {
-        case pt,float,int,string,color,text,new,font
+        case pt,float,int,string,color,text,new,font,size
     }
     //表达式所需结构
     struct PtEqual {
@@ -184,6 +191,7 @@ struct HTNMt {
         var right = WgPt.none
         var rightFloat:Float = 0
         var rightInt:Int = 0
+        var rightSize:(Float,Float) = (0,0)
         var rightColor = ""
         var rightText = ""
         var rightString = ""
@@ -282,6 +290,10 @@ struct HTNMt {
             filterBl ? self.pe.rightInt = i : ()
             return self
         }
+        func rightSize(w:Float, h:Float) -> PtEqualC {
+            filterBl ? self.pe.rightSize = (w,h) : ()
+            return self
+        }
         func rightColor(_ str:String) -> PtEqualC {
             filterBl ? self.pe.rightColor = str : ()
             return self
@@ -306,7 +318,7 @@ struct HTNMt {
     }
     //等号类型
     enum EqualType {
-        case normal,accumulation,decrease
+        case normal,accumulation,decrease,set
     }
     //实现文件所需结构
     struct ImpFile {

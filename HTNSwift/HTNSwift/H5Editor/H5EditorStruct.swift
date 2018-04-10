@@ -90,6 +90,7 @@ struct H5Editor : Codable {
                 struct WidgetData: Codable {
                     //label
                     var content: String?
+                    var text: String?
                     var color: String?
                     var fontSize: Float?
                     var fontFamily: String?
