@@ -140,7 +140,8 @@ struct HTNMt {
         var padding = Padding()
         var verticalAlign:VerticalAlign = .padding
         var horizontalAlign:HorizontalAlign = .padding
-        var imageUrl  = ""  //图片链接
+        var imageUrl  = ""    //图片链接
+        var redirectUrl = ""  //点击跳转地址
     }
     enum VerticalAlign {
         case padding

@@ -108,14 +108,10 @@ class H5EditorToFrame<M:HTNMultilingualismSpecification> {
         vp.height = widget.height ?? 0
         vp.top = widget.top ?? 0
         vp.left = widget.left ?? 0
-        
         vp.text = widget.data?.content ?? ""
-        
         vp.fontSize = widget.data?.fontSize ?? 32
         vp.textColor = widget.data?.color ?? ""
-        
         vp.imageUrl = widget.data?.url ?? ""
-        
         vp.isNormal = widget.layout == "normal"
         
         //padding 的处理
@@ -152,6 +148,18 @@ class H5EditorToFrame<M:HTNMultilingualismSpecification> {
             hAlign = .padding
         }
         vp.horizontalAlign = hAlign
+        
+        //处理 trigger
+        if let triggers = widget.triggers {
+            if triggers.count > 0 {
+                for trigger in triggers {
+                    //跳转属性
+                    if trigger.type == "Redirect", let url = trigger.data?.url {
+                        vp.redirectUrl = url
+                    }
+                }
+            }
+        }
         
         let reStruct = m.viewPtToStrStruct(vpt: vp)
         

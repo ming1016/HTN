@@ -130,7 +130,16 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
             
             //_myView.height = (HTNSCREENWIDTH * 48.0)/375;
             p.left(.height).rightType(.float).rightFloat(vpt.height).add()
+        }).filter({ () -> Bool in
+            //处理有跳转的的情况
+            return vpt.redirectUrl.count > 0
+        }).once({ (p) in
+            //TODO:如果有跳转添加一个 button
+            
         }).mutiEqualStr
+        
+        //处理有跳转的的情况
+        
         
         getter = """
         - (\(vClassStr) *)\(vpt.id) {
@@ -308,10 +317,10 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
         return "(HTNSCREENWIDTH * \(v))/375"
     }
     
-    //协议外的一些方法
     func sizeToFit(elm:String) -> String {
         return "[\(elm) sizeToFit];"
     }
+    //协议外的一些方法
     fileprivate func sdSetImageUrl(view:String, url:String) -> String {
         let encodeUrl = """
         [@"\(url)" stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
