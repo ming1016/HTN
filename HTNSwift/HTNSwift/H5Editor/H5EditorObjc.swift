@@ -30,7 +30,7 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
                 p.leftId(vpt.id).leftIdPrefix("_").left(.none).rightType(.new).rightString(vClassStr).add()
                 
                 //_myView.attributedText = [[NSAttributedString alloc] initWithData:[@"<p><span>流式1</span></p>" dataUsingEncoding:NSUTF8StringEncoding] options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType, NSCharacterEncodingDocumentAttribute: @(NSUTF8StringEncoding)} documentAttributes:nil error:nil];
-                p.left(.text).rightType(.text).rightText(vpt.text).add()
+//                p.left(.text).rightType(.text).rightText(vpt.text).add()
                 
                 //_myView.lineBreakMode = NSLineBreakByWordWrapping;
                 p.left(.lineBreakMode).rightType(.string).rightString("NSLineBreakByWordWrapping").add()
@@ -243,7 +243,28 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
                 p.leftIdPrefix(selfPtStr).left(.tag).leftId(vpt.id).rightType(.int).rightInt(1).add()
             }).mutiEqualStr
         }
-        
+        //处理attributedText
+        initContent += HTNMt.PtEqualC().accumulatorLine({ (pe) -> String in
+            return self.ptEqualToStr(pe: pe)
+        }).filter({ () -> Bool in
+            return vpt.viewType == .label && vpt.text.count > 0
+        }).once({ (p) in
+            p.add("dispatch_async(dispatch_get_main_queue(), ^{")
+        }).filter({ () -> Bool in
+            return vpt.viewType == .label && vpt.text.count > 0
+        }).once({ (p) in
+            p.leftIdPrefix(selfPtStr)
+                .left(.text)
+                .leftId(vpt.id)
+                .rightType(.text)
+                .rightText(vpt.text)
+                .add()
+        }).filter({ () -> Bool in
+            return vpt.viewType == .label && vpt.text.count > 0
+        }).once({ (p) in
+            p.add("});")
+        }).mutiEqualStr
+
         return HTNMt.ViewStrStruct(propertyStr: property, initStr: initContent, getterStr: getter, viewPt: vpt)
     }
     func addSubViewStr(host: String,sub: String) -> String {
