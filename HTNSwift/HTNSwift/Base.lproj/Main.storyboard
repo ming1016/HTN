@@ -715,7 +715,7 @@
                                 <rect key="frame" x="20" y="469" width="970" height="40"/>
                                 <subviews>
                                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VEI-gK-Qln">
-                                        <rect key="frame" x="-2" y="7" width="205" height="26"/>
+                                        <rect key="frame" x="-2" y="7" width="139" height="26"/>
                                         <popUpButtonCell key="cell" type="push" title="JSON 转 Frame" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="eZx-a6-a3z" id="8id-Gk-yZK">
                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="menu"/>
@@ -727,12 +727,9 @@
                                                 </items>
                                             </menu>
                                         </popUpButtonCell>
-                                        <connections>
-                                            <action selector="select:" target="XfG-lQ-9wD" id="WtE-Sr-5qA"/>
-                                        </connections>
                                     </popUpButton>
                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FU9-l6-oA2">
-                                        <rect key="frame" x="208" y="9" width="699" height="22"/>
+                                        <rect key="frame" x="142" y="9" width="765" height="22"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="请输入URL" drawsBackground="YES" id="CKp-0z-EFh">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -775,7 +772,7 @@
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                             <size key="minSize" width="953" height="437"/>
-                                            <size key="maxSize" width="953" height="10000000"/>
+                                            <size key="maxSize" width="970" height="10000000"/>
                                             <color key="insertionPointColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                         </textView>
                                     </subviews>

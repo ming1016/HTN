@@ -53,17 +53,11 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
                 //UIView *myViewContainer = [[UIView alloc] init];
                 p.add(newEqualStr(vType: .view, id: cId))
                 
-                //myViewContainer.width = _hllfxu51uie.width;
-                p.leftId(cId)
-                    .left(.width)
-                    .rightId(vpt.id)
-                    .rightIdPrefix("_")
-                    .rightType(.pt)
-                    .right(.width)
-                    .add()
+                //myViewContainer.width = (HTNSCREENWIDTH * 48.0)/375;
+                p.leftId(cId).left(.width).rightType(.float).rightFloat(vpt.width).add()
                 
-                //myViewContainer.height = _hllfxu51uie.height;
-                p.left(.height).right(.height).add()
+                //myViewContainer.height = (HTNSCREENWIDTH * 48.0)/375;
+                p.left(.height).rightType(.float).rightFloat(vpt.height).add()
                 
                 //myViewContainer.top = (HTNSCREENWIDTH * 65.0)/375;
                 p.left(.top).rightType(.float).rightFloat(vpt.top).add()
@@ -71,10 +65,20 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
                 //myViewContainer.left = (HTNSCREENWIDTH * 95.0)/375;
                 p.left(.left).rightFloat(vpt.left).add()
                 
-                //_myView.width -= (HTNSCREENWIDTH * 32.0)/375;
+                //_myView.width = myViewContainer.width;
                 p.leftIdPrefix("_")
                     .leftId(vpt.id)
                     .left(.width)
+                    .rightId(cId)
+                    .rightType(.pt)
+                    .right(.width)
+                    .add()
+                
+                //_myView.height = myViewContainer.height;
+                p.left(.height).right(.height).add()
+
+                //_myView.width -= (HTNSCREENWIDTH * 32.0)/375;
+                p.left(.width)
                     .equalType(.decrease)
                     .rightType(.float)
                     .rightFloat(vpt.padding.left * 2)
@@ -164,12 +168,14 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
             return self.ptEqualToStr(pe: pe)
         }).once({ (p) in
             p.leftId(vpt.id).leftIdPrefix("_").end()
-            //_myView.width = (HTNSCREENWIDTH * 375.0)/375;
-            p.left(.width).rightType(.float).rightFloat(vpt.width).add()
-            
-            //_myView.height = (HTNSCREENWIDTH * 48.0)/375;
-            p.left(.height).rightType(.float).rightFloat(vpt.height).add()
-            
+            if vpt.viewType != .label {
+                //label的宽高由container决定
+                //_myView.width = (HTNSCREENWIDTH * 375.0)/375;
+                p.left(.width).rightType(.float).rightFloat(vpt.width).add()
+                
+                //_myView.height = (HTNSCREENWIDTH * 48.0)/375;
+                p.left(.height).rightType(.float).rightFloat(vpt.height).add()
+            }
             //backgroundColor
             p.left(.bgColor).rightType(.color).rightColor(vpt.bgColor).add()
             
