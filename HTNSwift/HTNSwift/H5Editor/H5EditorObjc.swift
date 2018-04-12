@@ -38,13 +38,13 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
                 //_myView.numberOfLines = (HTNSCREENWIDTH * 0.0)/375;
                 p.left(.numberOfLines).rightType(.int).rightInt(0).add()
                 
-                //_myView.font = [UIFont systemFontOfSize:16.0];
-                p.left(.font).rightType(.font).rightFloat(vpt.fontSize).add()
-                
-                //textColor
-                p.filter({ () -> Bool in
-                    return vpt.textColor.count > 0
-                }).left(.textColor).rightType(.color).rightColor(vpt.textColor).add()
+//                //_myView.font = [UIFont systemFontOfSize:16.0];
+//                p.left(.font).rightType(.font).rightFloat(vpt.fontSize).add()
+//
+//                //textColor
+//                p.filter({ () -> Bool in
+//                    return vpt.textColor.count > 0
+//                }).left(.textColor).rightType(.color).rightColor(vpt.textColor).add()
                 
             }).filter({ () -> Bool in
                 return vpt.isNormal
@@ -94,8 +94,10 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
                 p.left(.left).rightFloat(vpt.padding.left).add()
                 
                 //disable userInteraction
-//                p.leftId(cId).leftIdPrefix("").left(.enableClick).rightType(.int).rightInt(0).add()
-
+                p.filter({ () -> Bool in
+                    return vpt.redirectUrl.count == 0
+                }).leftId(cId).leftIdPrefix("").left(.enableClick).rightType(.int).rightInt(0).add()
+                
                 p.add(addSubViewStr(host: cId, sub: "_" + vpt.id))
                 p.add(addSubViewStr(host: "\(selfStr).\(self.pageId)", sub: cId))
                 
@@ -113,8 +115,10 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
                     return vpt.textColor.count > 0
                 }).equalType(.set).left(.titleColor).rightType(.color).rightColor(vpt.textColor).rightSuffix(" forState:UIControlStateNormal").add()
                 //disable userInteraction
-//                p.equalType(.normal).left(.enableClick).rightType(.int).rightInt(0).rightSuffix("").add()
-                
+                p.filter({ () -> Bool in
+                    return vpt.redirectUrl.count == 0
+                }).equalType(.normal).left(.enableClick).rightType(.int).rightInt(0).rightSuffix("").add()
+
                 p.add(addSubViewStr(host: "self.\(self.pageId)", sub: "_" + vpt.id))
             }).filter({ () -> Bool in
                 return vpt.isNormal
@@ -243,7 +247,8 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
                 p.leftIdPrefix(selfPtStr).left(.tag).leftId(vpt.id).rightType(.int).rightInt(1).add()
             }).mutiEqualStr
         }
-        //处理attributedText
+        //添加attributedText、font和textColor
+        //用[NSAttributedString alloc] initWithData:创建的富文本需要先设置attributedText再设置font和textColor,
         initContent += HTNMt.PtEqualC().accumulatorLine({ (pe) -> String in
             return self.ptEqualToStr(pe: pe)
         }).filter({ () -> Bool in
@@ -259,6 +264,12 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
                 .rightType(.text)
                 .rightText(vpt.text)
                 .add()
+            //self.myView.font = [UIFont systemFontOfSize:16.0];
+            p.left(.font).rightType(.font).rightFloat(vpt.fontSize).add()
+            //textColor
+            p.filter({ () -> Bool in
+                return vpt.textColor.count > 0
+            }).left(.textColor).rightType(.color).rightColor(vpt.textColor).add()
         }).filter({ () -> Bool in
             return vpt.viewType == .label && vpt.text.count > 0
         }).once({ (p) in
