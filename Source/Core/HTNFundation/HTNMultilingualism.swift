@@ -9,7 +9,7 @@
 import Foundation
 
 //多语言协议规范
-protocol HTNMultilingualismSpecification {
+public protocol HTNMultilingualismSpecification {
     var pageId: String {get set}             //页面 id
     var id: String {get set}                 //动态 id
     var selfId: String {get}                 //self.id
@@ -34,7 +34,7 @@ protocol HTNMultilingualismSpecification {
     func sizeToFit(elm:String) -> String  //处理label sizeToFit
 }
 extension HTNMultilingualismSpecification {
-    func flowViewLayout(fl:HTNMt.Flowly) -> String {
+    public func flowViewLayout(fl:HTNMt.Flowly) -> String {
         let cId = id + "Container"
         var lyStr = ""
         //UIView *myViewContainer = [UIView new];
@@ -103,9 +103,9 @@ extension HTNMultilingualismSpecification {
     }
 }
 /*-----------协议所需结构和枚举------------*/
-struct HTNMt {
+public struct HTNMt {
     //flow布局
-    struct Flowly {
+    public struct Flowly {
         var id = ""
         var lastId = ""
         var isFirst = false
@@ -118,14 +118,14 @@ struct HTNMt {
         var right:Float = 0
     }
     //视图类型
-    enum ViewType {
+    public enum ViewType {
         case view,label,image,button,scrollView
     }
     enum LayoutType {
         case normal,flow
     }
     //视图属性数据结构
-    struct ViewPt {
+    public struct ViewPt {
         var id = ""
         var viewType:ViewType = .label
         var layoutType:LayoutType = .normal
@@ -161,7 +161,7 @@ struct HTNMt {
         case right
     }
     
-    struct ViewStrStruct {
+    public struct ViewStrStruct {
         let propertyStr: String
         let initStr: String
         let getterStr: String
@@ -169,7 +169,7 @@ struct HTNMt {
     }
     
     //属性类型定义
-    enum WgPt {
+    public enum WgPt {
         case none
         case new
         case top,bottom,left,right,center //位置相关属性
@@ -182,7 +182,7 @@ struct HTNMt {
         case pt,float,int,string,color,text,new,font,size,racCommand
     }
     //表达式所需结构
-    struct PtEqual {
+    public struct PtEqual {
         var leftId = ""
         var left = WgPt.none
         var leftIdPrefix = "" //左前缀
@@ -318,17 +318,17 @@ struct HTNMt {
         
     }
     //等号类型
-    enum EqualType {
+    public enum EqualType {
         case normal,accumulation,decrease,set
     }
     //实现文件所需结构
-    struct ImpFile {
+    public struct ImpFile {
         var properties = ""
         var initContent = ""
         var getters = ""
     }
     //接口文件所需结构
-    struct InterfaceFile {
+    public struct InterfaceFile {
         
     }
 }

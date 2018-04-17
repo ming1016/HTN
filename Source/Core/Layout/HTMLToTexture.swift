@@ -20,12 +20,12 @@ struct ClassProperty {
     }
 }
 
-class HTMLToTexture {
+public class HTMLToTexture {
     static var index=0;
     var classPropertyArray = [String: ClassProperty]()
     let nodeClassName:String
     
-    init(nodeName:String) {
+    public init(nodeName:String) {
         nodeClassName = nodeName
     }
     

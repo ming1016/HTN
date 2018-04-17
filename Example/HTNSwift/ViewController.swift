@@ -7,7 +7,7 @@
 //
 
 import Cocoa
-import Alamofire
+import HTN
 
 
 struct Data {
@@ -41,7 +41,7 @@ class ViewController: NSViewController {
         
     }
     
-    fileprivate func jsonToFrame() {
+    func jsonToFrame() {
         guard inputLb.stringValue.count > 0 else {
             return;
         }
@@ -54,14 +54,14 @@ class ViewController: NSViewController {
             }
         }
     }
-    fileprivate func javascriptTest() {
+    public func javascriptTest() {
         
     }
     
     
     
     //递归所有子节点
-    fileprivate func htmlToTexture() {
+    public func htmlToTexture() {
         let treeBuilder = HTMLTreeBuilder(inputLb.stringValue)
         _ = treeBuilder.parse()
         let cssStyle = CSSParser(treeBuilder.doc.allStyle()).parseSheet()

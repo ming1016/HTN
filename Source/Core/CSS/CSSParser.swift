@@ -19,7 +19,7 @@ public class CSSParser {
     private var _currentProperty: CSSProperty
     private var _currentRule: CSSRule
     
-    init(_ input: String) {
+    public init(_ input: String) {
         self.styleSheet = CSSStyleSheet()
         //过滤注释
         var newStr = ""

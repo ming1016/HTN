@@ -10,8 +10,11 @@ import Foundation
 /**
  布局类
  **/
-class LayoutElement {
-
+public class LayoutElement {
+    public init() {
+        
+    }
+    
     public func createRenderer(doc:Document)->Document {
         layoutBlockChildren(doc)
         return doc

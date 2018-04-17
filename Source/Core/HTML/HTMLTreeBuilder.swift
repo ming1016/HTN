@@ -17,14 +17,14 @@ public class HTMLTreeBuilder {
     private var _currentElement: Element //当前元素
     private var _currentParent: Element? //当前元素父元素
     
-    init(_ input: String) {
+    public init(_ input: String) {
         doc = Document()
         tokenizer = HTMLTokenizer(input)
         _lastElement = Element()
         _currentElement = Element()
     }
     
-    func parse() -> [HTMLToken] {
+    public func parse() -> [HTMLToken] {
         
         let tks = tokenizer.parse() //词法分析
         

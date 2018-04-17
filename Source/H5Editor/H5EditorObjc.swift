@@ -8,14 +8,17 @@
 
 import Foundation
 
-struct H5EditorObjc: HTNMultilingualismSpecification {
-    var pageId = "" { didSet { pageId = validIdStr(id: pageId) } }
-    var id = "" { didSet { id = validIdStr(id: id) } }
-    var selfId: String { return "self.\(self.id)" }
-    var selfStr = "self"
-    var selfPtStr = "self."
+public struct H5EditorObjc: HTNMultilingualismSpecification {
+    public var pageId = "" { didSet { pageId = validIdStr(id: pageId) } }
+    public var id = "" { didSet { id = validIdStr(id: id) } }
+    public var selfId: String { return "self.\(self.id)" }
+    public var selfStr = "self"
+    public var selfPtStr = "self."
     
-    func viewPtToStrStruct(vpt:HTNMt.ViewPt) -> HTNMt.ViewStrStruct {
+    public init() {
+        
+    }
+    public func viewPtToStrStruct(vpt:HTNMt.ViewPt) -> HTNMt.ViewStrStruct {
         var getter = ""
         var initContent = ""
         var property = ""
@@ -278,10 +281,10 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
 
         return HTNMt.ViewStrStruct(propertyStr: property, initStr: initContent, getterStr: getter, viewPt: vpt)
     }
-    func addSubViewStr(host: String,sub: String) -> String {
+    public func addSubViewStr(host: String,sub: String) -> String {
         return "[\(host) addSubview:\(sub)];"
     }
-    func viewTypeClassStr(vt: HTNMt.ViewType) -> String {
+    public func viewTypeClassStr(vt: HTNMt.ViewType) -> String {
         switch vt {
         case .view:
             return "UIView"
@@ -295,11 +298,11 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
             return "UIScrollView"
         }
     }
-    func newEqualStr(vType: HTNMt.ViewType, id: String) -> String {
+    public func newEqualStr(vType: HTNMt.ViewType, id: String) -> String {
         let vClass = viewTypeClassStr(vt: vType)
         return "\(vClass) *\(id) = [[\(vClass) alloc] init];"
     }
-    func idProperty(pt: HTNMt.WgPt, idPar: String, prefix: String, equalT: HTNMt.EqualType) -> String {
+    public func idProperty(pt: HTNMt.WgPt, idPar: String, prefix: String, equalT: HTNMt.EqualType) -> String {
         var idStr = "\(self.id)"
         if idPar.count > 0 {
             idStr = "\(idPar)"
@@ -314,7 +317,7 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
         return prefix + idStr + ptStr
     }
     
-    func ptEqualToStr(pe:HTNMt.PtEqual) -> String {
+    public func ptEqualToStr(pe:HTNMt.PtEqual) -> String {
         let leftStr = idProperty(pt: pe.left, idPar: pe.leftId, prefix: pe.leftIdPrefix,equalT: pe.equalType)
         var rightStr = ""
         switch pe.rightType {
@@ -375,7 +378,7 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
         return leftStr + equalStr + rightStr + pe.rightSuffix + endStr
     }
     
-    func impFile(impf: HTNMt.ImpFile) -> String {
+    public func impFile(impf: HTNMt.ImpFile) -> String {
         return """
         #import <UIKit/UIKit.h>
         #import "\(pageId).h"
@@ -408,7 +411,7 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
         @end
         """
     }
-    func interfaceFile(intf:HTNMt.InterfaceFile) -> String {
+    public func interfaceFile(intf:HTNMt.InterfaceFile) -> String {
         return """
         #import <UIKit/UIKit.h>
         
@@ -417,15 +420,15 @@ struct H5EditorObjc: HTNMultilingualismSpecification {
         @end
         """
     }
-    func validIdStr(id: String) -> String {
+    public func validIdStr(id: String) -> String {
         return "h" + id;
     }
     
-    func scale(_ v: Float) -> String {
+    public func scale(_ v: Float) -> String {
         return "(HTNSCREENWIDTH * \(v))/375"
     }
     
-    func sizeToFit(elm:String) -> String {
+    public func sizeToFit(elm:String) -> String {
         return "[\(elm) sizeToFit];"
     }
     //协议外的一些方法

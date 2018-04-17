@@ -8,13 +8,13 @@
 
 import Foundation
 
-class H5EditorToFrame<M:HTNMultilingualismSpecification> {
+public class H5EditorToFrame<M:HTNMultilingualismSpecification> {
     var m:M //多语言的支持
-    init(_ m:M) {
+    public init(_ m:M) {
         self.m = m
     }
     
-    func convert(_ h5editor:H5Editor) -> String {
+    public func convert(_ h5editor:H5Editor) -> String {
         m.pageId = h5editor.data?.pages![0].id ?? ""
         //全部 widget
         let page = h5editor.data?.pages![0];

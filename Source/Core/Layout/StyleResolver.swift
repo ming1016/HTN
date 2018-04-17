@@ -9,6 +9,9 @@
 import Foundation
 
 public class StyleResolver {
+    public init() {
+        
+    }
     public func resolver(_ doc:Document, styleSheet:CSSStyleSheet) -> Document{
         //样式映射表
         //这种结构能够支持多级 Selector

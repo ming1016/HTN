@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct H5Editor : Codable {
+public struct H5Editor : Codable {
     var errno: Int?
     var msg: String?
     var data: Data?

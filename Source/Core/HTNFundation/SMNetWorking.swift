@@ -8,13 +8,13 @@
 
 import Foundation
 
-open class SMNetWorking<T:Codable> {
+public class SMNetWorking<T:Codable> {
     var op:Optionals = Optionals()
     
     open let session:URLSession
     
     //处理数据的 block
-    typealias CompletionJSONClosure = (_ data:T) -> Void
+    public typealias CompletionJSONClosure = (_ data:T) -> Void
     var completionJSONClosure:CompletionJSONClosure =  {_ in }
     
     //配置 request
@@ -26,7 +26,7 @@ open class SMNetWorking<T:Codable> {
     }
     
     //JSON的请求
-    func requestJSON(_ url: SMURLNetWorking,
+    public func requestJSON(_ url: SMURLNetWorking,
                      doneClosure:@escaping CompletionJSONClosure
                     ) {
         self.completionJSONClosure = doneClosure
@@ -74,7 +74,7 @@ open class SMNetWorking<T:Codable> {
 }
 
 /*----------Protocol----------*/
-protocol SMURLNetWorking {
+public protocol SMURLNetWorking {
     func asURL() -> URL
 }
 
