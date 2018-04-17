@@ -10,6 +10,6 @@ let package = Package(
     ],
     dependencies: [],
     targets: [
-        .target(name: "HTN", dependencies: [], path: "Source")
+        .target(name: "HTN", dependencies: [], path: "Sources")
     ]
 )
