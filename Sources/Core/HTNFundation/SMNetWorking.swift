@@ -14,7 +14,7 @@ public class SMNetWorking<T:Codable> {
     open let session:URLSession
     
     //处理数据的 block
-    public typealias CompletionJSONClosure = (_ data:T) -> Void
+    public typealias CompletionJSONClosure = (_ data:T?) -> Void
     var completionJSONClosure:CompletionJSONClosure =  {_ in }
     
     //配置 request
@@ -42,6 +42,7 @@ public class SMNetWorking<T:Codable> {
                     self.completionJSONClosure(jsonModel)
                 } catch {
                     print("解析 JSON 失败")
+                    self.completionJSONClosure(nil)
                 }
             }
         }

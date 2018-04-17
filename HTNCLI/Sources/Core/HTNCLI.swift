@@ -23,8 +23,12 @@ public class HTNCLI {
         for url in urls {
             print("Request url:\(url)")
             SMNetWorking<H5Editor>().requestJSON(url) { (jsonModel) in
+                guard let model = jsonModel else {
+                    self.sema.signal()
+                    return
+                }
                 let converter = H5EditorToFrame<H5EditorObjc>(H5EditorObjc())
-                let reStr = converter.convert(jsonModel)
+                let reStr = converter.convert(model)
 //                print(reStr)
 //                print(converter.m.pageId)
                 let hPath = path + Path(converter.m.pageId + ".h")

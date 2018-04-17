@@ -11,7 +11,7 @@ class BuildCommand: Command {
     
     public func execute() throws {
         let buildType = type.value ?? "h5editor" //默认是H5Editor的json类型
-        let urls = (urlFlag.value ?? "").split(separator: ",").map(String.init)
+        let urls = (urlFlag.value ?? "").split(separator: ",").map(String.init).filter{ $0.count > 0}
         let outputPath = outputFlag.value ?? "."
         
         let htn = HTNCLI()
