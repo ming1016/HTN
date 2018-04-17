@@ -9,12 +9,12 @@
 import Foundation
 
 public class H5EditorToFrame<M:HTNMultilingualismSpecification> {
-    var m:M //多语言的支持
+    public var m:M //多语言的支持
     public init(_ m:M) {
         self.m = m
     }
     
-    public func convert(_ h5editor:H5Editor) -> String {
+    public func convert(_ h5editor:H5Editor) -> (String, String) {
         m.pageId = h5editor.data?.pages![0].id ?? ""
         //全部 widget
         let page = h5editor.data?.pages![0];
@@ -71,7 +71,7 @@ public class H5EditorToFrame<M:HTNMultilingualismSpecification> {
         
         let nativeMStr = m.impFile(impf: imp)
         let nativeHStr = m.interfaceFile(intf: HTNMt.InterfaceFile())
-        print(nativeHStr)
+//        print(nativeHStr)
         
         //生成文件测试
 //        let hFilePath = "/Users/didi/Documents/Demo/HomePageTest/HomePageTest/\(m.pageId).h"
@@ -79,7 +79,7 @@ public class H5EditorToFrame<M:HTNMultilingualismSpecification> {
 //        try! nativeHStr.write(toFile: hFilePath, atomically: true, encoding: String.Encoding.utf8)
 //        try! nativeMStr.write(toFile: mFilePath, atomically: true, encoding: String.Encoding.utf8)
         
-        return nativeMStr
+        return (nativeHStr, nativeMStr)
     }
     
     struct WidgetStr {

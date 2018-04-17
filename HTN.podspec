@@ -38,12 +38,12 @@ Pod::Spec.new do |s|
 
   # Core
   s.subspec 'Core' do |core|
-    core.source_files = 'Source/Core/**/*'
+    core.source_files = 'Sources/Core/**/*'
   end
 
   # H5Editor
   s.subspec 'H5Editor' do |h5Editor|
-    h5Editor.source_files = 'Source/H5Editor/**/*'
+    h5Editor.source_files = 'Sources/H5Editor/**/*'
     h5Editor.dependency 'HTN/Core'
   end
 end

@@ -48,9 +48,9 @@ class ViewController: NSViewController {
         //请求地址在输入框输入
         SMNetWorking<H5Editor>().requestJSON(inputLb.stringValue) { (jsonModel) in
             let reStr = H5EditorToFrame<H5EditorObjc>(H5EditorObjc()).convert(jsonModel)
-            print(reStr)
+//            print(reStr)
             DispatchQueue.main.async {
-                self.nativeCodeLb.string = reStr
+                self.nativeCodeLb.string = reStr.0 + "\n\n" + reStr.1
             }
         }
     }

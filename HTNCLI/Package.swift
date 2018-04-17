@@ -11,9 +11,11 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/ming1016/HTN", from: "0.1.0"),
         .package(url: "https://github.com/jakeheis/SwiftCLI", from: "4.2.0"),
-        .package(url: "https://github.com/onevcat/Rainbow", from: "3.1.1")
+        .package(url: "https://github.com/onevcat/Rainbow", from: "3.1.1"),
+        .package(url: "https://github.com/kylef/PathKit", from: "0.9.1")
     ],
     targets: [
-        .target(name: "HTNCLI", dependencies: ["HTNCLI"])
+        .target(name: "CLI", dependencies: ["Core", "SwiftCLI"]),
+        .target(name: "Core", dependencies: ["HTN", "SwiftCLI", "Rainbow", "PathKit"])
     ]
 )
