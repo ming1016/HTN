@@ -6,10 +6,10 @@ import PackageDescription
 let package = Package(
     name: "HTN",
     products: [
-        .library(name: "HTN",targets: ["HTN"])
+        .library(name: "HTN",targets: [ "HTN" ]),
     ],
     dependencies: [],
     targets: [
-        .target(name: "HTN", dependencies: [], path: "Sources")
+        .target(name: "HTN", dependencies: [], path: "Sources"),
     ]
 )

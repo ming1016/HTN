@@ -9,6 +9,7 @@
 import Foundation
 import HTN
 import PathKit
+import Dispatch
 
 public class HTNCLI {
     public static let version = "0.1.0"
