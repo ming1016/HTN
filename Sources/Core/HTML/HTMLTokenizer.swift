@@ -239,7 +239,7 @@ public class HTMLTokenizer {
         _bufferToken = HTMLToken()
     }
     func advanceIndex() {
-        _input.characters.formIndex(after: &_index)
+        _input.formIndex(after: &_index)
     }
     func advanceIndexAndResetCurrentStr() {
         _bufferStr = ""

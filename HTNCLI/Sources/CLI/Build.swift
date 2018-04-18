@@ -1,5 +1,4 @@
 import SwiftCLI
-import Core
 
 class BuildCommand: Command {
     
