@@ -104,11 +104,11 @@ public class H5EditorToFrame<M:HTNMultilingualismSpecification> {
     fileprivate func widgetStructConvertToStr(widget:H5Editor.Data.Page.Widget) -> HTNMt.ViewStrStruct {
         var uiType = HTNMt.ViewType.label
         switch widget.type {
-        case "RichText","NormalText":
+        case .some("RichText"),.some("NormalText"):
             uiType = .label
-        case "Image":
+        case .some("Image"):
             uiType = .image
-        case "Button":
+        case .some("Button"):
             uiType = .button
         default:
             uiType = .label
