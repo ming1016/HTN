@@ -22,6 +22,7 @@ public struct H5EditorObjc: HTNMultilingualismSpecification {
         var getter = ""
         var initContent = ""
         var property = ""
+        var layouts = ""
         let vClassStr = viewTypeClassStr(vt: vpt.viewType)
         property = "@property (nonatomic, strong) \(vClassStr) *\(vpt.id);\n"
         switch vpt.viewType {
@@ -40,70 +41,20 @@ public struct H5EditorObjc: HTNMultilingualismSpecification {
                 
                 //_myView.numberOfLines = (HTNSCREENWIDTH * 0.0)/375;
                 p.left(.numberOfLines).rightType(.int).rightInt(0).add()
-                
-//                //_myView.font = [UIFont systemFontOfSize:16.0];
-//                p.left(.font).rightType(.font).rightFloat(vpt.fontSize).add()
-//
-//                //textColor
-//                p.filter({ () -> Bool in
-//                    return vpt.textColor.count > 0
-//                }).left(.textColor).rightType(.color).rightColor(vpt.textColor).add()
-                
             }).filter({ () -> Bool in
                 return vpt.isNormal
             }).once({ (p) in
-                let cId = vpt.id + "Container"
-                //UIView *myViewContainer = [[UIView alloc] init];
-                p.add(newEqualStr(vType: .view, id: cId))
-                
-                //myViewContainer.width = (HTNSCREENWIDTH * 48.0)/375;
-                p.leftId(cId).left(.width).rightType(.float).rightFloat(vpt.width).add()
-                
-                //myViewContainer.height = (HTNSCREENWIDTH * 48.0)/375;
-                p.left(.height).rightType(.float).rightFloat(vpt.height).add()
-                
-                //myViewContainer.top = (HTNSCREENWIDTH * 65.0)/375;
-                p.left(.top).rightType(.float).rightFloat(vpt.top).add()
-                
-                //myViewContainer.left = (HTNSCREENWIDTH * 95.0)/375;
-                p.left(.left).rightFloat(vpt.left).add()
-                
-                //_myView.width = myViewContainer.width;
-                p.leftIdPrefix("_")
-                    .leftId(vpt.id)
-                    .left(.width)
-                    .rightId(cId)
-                    .rightType(.pt)
-                    .right(.width)
-                    .add()
-                
-                //_myView.height = myViewContainer.height;
-                p.left(.height).right(.height).add()
-
-                //_myView.width -= (HTNSCREENWIDTH * 32.0)/375;
-                p.left(.width)
-                    .equalType(.decrease)
-                    .rightType(.float)
-                    .rightFloat(vpt.padding.left * 2)
-                    .add()
-                
-                //_myView.height -= (HTNSCREENWIDTH * 16.0)/375;
-                p.left(.height).rightFloat(vpt.padding.top * 2).add()
-                
-                //_myView.top = (HTNSCREENWIDTH * 8.0)/375;
-                p.left(.top).equalType(.normal).rightFloat(vpt.padding.top).add()
-                
-                //_myView.left = (HTNSCREENWIDTH * 16.0)/375;
-                p.left(.left).rightFloat(vpt.padding.left).add()
-                
+                let left = vpt.left + vpt.padding.left
+                let top = vpt.top + vpt.padding.top
+                let width = vpt.width - vpt.padding.left - vpt.padding.right
+                let height = vpt.height - vpt.padding.top - vpt.padding.bottom
+                p.leftId(vpt.id).leftIdPrefix("_").left(.frame).rightType(.frame).rightFrame(l: left, t: top, w: width, h: height).add()
                 //disable userInteraction
                 p.filter({ () -> Bool in
                     return vpt.redirectUrl.count == 0
-                }).leftId(cId).leftIdPrefix("").left(.enableClick).rightType(.int).rightInt(0).add()
+                }).left(.enableClick).rightType(.int).rightInt(0).add()
                 
-                p.add(addSubViewStr(host: cId, sub: "_" + vpt.id))
-                p.add(addSubViewStr(host: "\(selfStr).\(self.pageId)", sub: cId))
-                
+                p.add(addSubViewStr(host: "\(selfStr).\(self.pageId)", sub: "_" + vpt.id))
             }).mutiEqualStr
         case .button:
             getter += HTNMt.PtEqualC().accumulatorLine({ (pe) -> String in
@@ -228,9 +179,6 @@ public struct H5EditorObjc: HTNMultilingualismSpecification {
             p.left(.racCommand).rightType(.racCommand).rightString(vpt.redirectUrl).add()
         }).mutiEqualStr
         
-        //处理有跳转的的情况
-        
-        
         getter = """
         - (\(vClassStr) *)\(vpt.id) {
         if(!_\(vpt.id)){
@@ -273,13 +221,30 @@ public struct H5EditorObjc: HTNMultilingualismSpecification {
             p.filter({ () -> Bool in
                 return vpt.textColor.count > 0
             }).left(.textColor).rightType(.color).rightColor(vpt.textColor).add()
+            //textAlignment
+            if vpt.horizontalAlign != .padding {
+                p.left(.alignment).rightType(.int).rightInt(vpt.horizontalAlign.rawValue).add()
+            }
         }).filter({ () -> Bool in
             return vpt.viewType == .label && vpt.text.count > 0
         }).once({ (p) in
             p.add("});")
         }).mutiEqualStr
+        
+        //添加frame重排版
+        layouts += HTNMt.PtEqualC().accumulatorLine({ (pe) -> String in
+            return self.ptEqualToStr(pe: pe)
+        }).filter({ () -> Bool in
+            return vpt.isNormal
+        }).once({ (p) in
+            let left = vpt.left + vpt.padding.left
+            let top = vpt.top + vpt.padding.top
+            let width = vpt.width - vpt.padding.left - vpt.padding.right
+            let height = vpt.height - vpt.padding.top - vpt.padding.bottom
+            p.leftIdPrefix(selfPtStr).leftId(vpt.id).left(.frame).rightType(.frame).rightFrame(l: left, t: top, w: width, h: height).add()
+        }).mutiEqualStr
 
-        return HTNMt.ViewStrStruct(propertyStr: property, initStr: initContent, getterStr: getter, viewPt: vpt)
+        return HTNMt.ViewStrStruct(propertyStr: property, initStr: initContent, getterStr: getter, layoutStr:layouts, viewPt: vpt)
     }
     public func addSubViewStr(host: String,sub: String) -> String {
         return "[\(host) addSubview:\(sub)];"
@@ -353,6 +318,8 @@ public struct H5EditorObjc: HTNMultilingualismSpecification {
             rightStr = "[UIFont systemFontOfSize:\(pe.rightFloat/2)]"
         case .size:
             rightStr = "CGSizeMake(\(scale(pe.rightSize.0)), \(scale(pe.rightSize.1)))"
+        case .frame:
+            rightStr = "CGRectMake(\(scale(pe.rightFrame.0)), \(scale(pe.rightFrame.1)), \(scale(pe.rightFrame.2)), \(scale(pe.rightFrame.3)))"
         case .racCommand:
             rightStr = """
             [[RACCommand alloc] initWithSignalBlock:^RACSignal *(id input) {
@@ -387,6 +354,7 @@ public struct H5EditorObjc: HTNMultilingualismSpecification {
         #import <ReactiveCocoa/ReactiveCocoa.h>
         
         @interface \(pageId)()
+        @property (nonatomic, assign) CGFloat maxWidth;
         \(impf.properties)
         @end
         
@@ -394,6 +362,7 @@ public struct H5EditorObjc: HTNMultilingualismSpecification {
         
         - (instancetype)init {
         if (self = [super init]) {
+        self.maxWidth = HTNSCREENWIDTH;
         \(impf.initContent)
         }
         return self;
@@ -401,10 +370,14 @@ public struct H5EditorObjc: HTNMultilingualismSpecification {
         
         - (void)layoutSubviews {
         [super layoutSubviews];
+        self.maxWidth = self.frame.size.width;
+        CGSize contentSize = self.\(self.pageId).contentSize;
         CGRect scrollRect = self.\(self.pageId).frame;
         scrollRect.size.width = self.frame.size.width;
         scrollRect.size.height = self.frame.size.height;
         self.\(self.pageId).frame = scrollRect;
+        self.\(self.pageId).contentSize = (contentSize.width > 0) ? CGSizeMake(self.maxWidth, contentSize.height * self.maxWidth / contentSize.width) : CGSizeMake(self.maxWidth, 0);
+        \(impf.layouts)
         }
         
         \(impf.getters)
@@ -425,7 +398,7 @@ public struct H5EditorObjc: HTNMultilingualismSpecification {
     }
     
     public func scale(_ v: Float) -> String {
-        return "(HTNSCREENWIDTH * \(v))/375"
+        return "(self.maxWidth * \(v))/375"
     }
     
     public func sizeToFit(elm:String) -> String {
@@ -461,6 +434,8 @@ extension HTNMt.WgPt {
             return "width"
         case .height:
             return "height"
+        case .frame:
+            return "frame"
         case .tag:
             return "tag"
         case .bgColor:
@@ -487,6 +462,8 @@ extension HTNMt.WgPt {
             return "lineBreakMode"
         case .numberOfLines:
             return "numberOfLines"
+        case .alignment:
+            return "textAlignment"
         case .title:
             return "Title"
         case .titleFont:

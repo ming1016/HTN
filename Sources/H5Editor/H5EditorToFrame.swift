@@ -27,6 +27,7 @@ public class H5EditorToFrame<M:HTNMultilingualismSpecification> {
         var wgPropertyStr = ""
         var wgInitStr = ""
         var wgGetterStr = ""
+        var wgLayoutStr = ""
         //处理scrollView
         let pageStruct = pageStructConvertToScrollView(page: page!)
         wgPropertyStr += pageStruct.propertyStr
@@ -44,6 +45,7 @@ public class H5EditorToFrame<M:HTNMultilingualismSpecification> {
             wgPropertyStr += wd.propertyStr
             wgInitStr += wd.initStr
             wgGetterStr += wd.getterStr
+            wgLayoutStr += wd.layoutStr
             
             var fl = HTNMt.Flowly()
             fl.id = m.id
@@ -61,6 +63,7 @@ public class H5EditorToFrame<M:HTNMultilingualismSpecification> {
             wgPropertyStr += wd.propertyStr
             wgInitStr += wd.initStr
             wgGetterStr += wd.getterStr
+            wgLayoutStr += wd.layoutStr
         }
         
         //最终对文件的拼装
@@ -68,6 +71,7 @@ public class H5EditorToFrame<M:HTNMultilingualismSpecification> {
         imp.properties = wgPropertyStr
         imp.initContent = wgInitStr
         imp.getters = wgGetterStr
+        imp.layouts = wgLayoutStr
         
         let nativeMStr = m.impFile(impf: imp)
         let nativeHStr = m.interfaceFile(intf: HTNMt.InterfaceFile())

@@ -154,17 +154,18 @@ public struct HTNMt {
         case top
         case bottom
     }
-    enum HorizontalAlign {
-        case padding
-        case center
-        case left
-        case right
+    enum HorizontalAlign: Int {
+        case left = 0
+        case center = 1
+        case right = 2
+        case padding = 3
     }
     
     public struct ViewStrStruct {
         let propertyStr: String
         let initStr: String
         let getterStr: String
+        let layoutStr: String
         var viewPt: ViewPt
     }
     
@@ -172,14 +173,14 @@ public struct HTNMt {
     public enum WgPt {
         case none
         case new
-        case top,bottom,left,right,center //位置相关属性
+        case top,bottom,left,right,center,frame //位置相关属性
         case width,height,tag,bgColor,radius,borderColor,borderWidth,masksToBounds,clips,enableClick //通用属性
-        case text,font,textColor,lineBreakMode,numberOfLines //label 相关属性
+        case text,font,textColor,lineBreakMode,numberOfLines,alignment //label 相关属性
         case title,titleFont,titleColor,racCommand //button 相关属性
         case contentSize,bounces,pagingEnabled,showHIndicator,showVIndicator //scrollView 相关属性
     }
     enum PtEqualRightType {
-        case pt,float,int,string,color,text,new,font,size,racCommand
+        case pt,float,int,string,color,text,new,font,size,frame,racCommand
     }
     //表达式所需结构
     public struct PtEqual {
@@ -193,6 +194,7 @@ public struct HTNMt {
         var rightFloat:Float = 0
         var rightInt:Int = 0
         var rightSize:(Float,Float) = (0,0)
+        var rightFrame:(Float,Float,Float,Float) = (0,0,0,0)
         var rightColor = ""
         var rightText = ""
         var rightString = ""
@@ -295,6 +297,10 @@ public struct HTNMt {
             filterBl ? self.pe.rightSize = (w,h) : ()
             return self
         }
+        func rightFrame(l:Float, t:Float, w:Float, h:Float) -> PtEqualC {
+            filterBl ? self.pe.rightFrame = (l,t,w,h) : ()
+            return self
+        }
         func rightColor(_ str:String) -> PtEqualC {
             filterBl ? self.pe.rightColor = str : ()
             return self
@@ -326,6 +332,7 @@ public struct HTNMt {
         var properties = ""
         var initContent = ""
         var getters = ""
+        var layouts = ""
     }
     //接口文件所需结构
     public struct InterfaceFile {
