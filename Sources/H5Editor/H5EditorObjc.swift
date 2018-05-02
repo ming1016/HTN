@@ -394,7 +394,7 @@ public struct H5EditorObjc: HTNMultilingualismSpecification {
         """
     }
     public func validIdStr(id: String) -> String {
-        return "h" + id;
+        return "h" + id
     }
     
     public func scale(_ v: Float) -> String {
