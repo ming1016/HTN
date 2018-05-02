@@ -15,7 +15,8 @@ public class H5EditorToFrame<M:HTNMultilingualismSpecification> {
     }
     
     public func convert(_ h5editor:H5Editor) -> (String, String) {
-        m.pageId = h5editor.data?.pages![0].id ?? ""
+//        m.pageId = h5editor.data?.pages![0].id ?? ""
+        m.pageId = h5editor.data?._id ?? ""
         //全部 widget
         let page = h5editor.data?.pages![0];
         let allWidgets = page?.widgets ?? [];
