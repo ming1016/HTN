@@ -24,7 +24,9 @@ public class JTraverser {
         }
         
         func traverseNode(node:JNode, parent:JNode) {
+            //TODO:改一下 visitor 的结构成 [String:[String:VisitorClosure]]。这样可以添加更多的执行，比如刚进来 enter 的 key 和离开节点的 exit
             //会执行外部传入的 Closure
+            //enter:
             if visitor.keys.contains(node.type.rawValue) {
                 if let closure:VisitorClosure = visitor[node.type.rawValue] {
                     closure(node,parent)
@@ -34,6 +36,7 @@ public class JTraverser {
             if node.params.count > 0 {
                 traverseChildNode(childrens: node.params, parent: node)
             }
+            //exit:
         }
         let rootNode = JNode()
         rootNode.type = .Root
