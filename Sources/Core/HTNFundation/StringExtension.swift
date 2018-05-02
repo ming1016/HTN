@@ -22,4 +22,26 @@ extension String {
     func escape() -> String {
         return self.replacingOccurrences(of: "\"", with: "\\\"")
     }
+    
+    //过滤注释
+    func filterAnnotationBlock() -> String {
+        //过滤注释
+        var newStr = ""
+        let annotationBlockPattern = "/\\*[\\s\\S]*?\\*/" //匹配/*...*/这样的注释
+        let regexBlock = try! NSRegularExpression(pattern: annotationBlockPattern, options: NSRegularExpression.Options(rawValue:0))
+        newStr = regexBlock.stringByReplacingMatches(in: self, options: NSRegularExpression.MatchingOptions(rawValue:0), range: NSMakeRange(0, self.count), withTemplate: "")
+        return newStr
+    }
+    //判断是否是整数
+    func isInt() -> Bool {
+        let scan:Scanner = Scanner(string: self)
+        var val:Int = 0
+        return scan.scanInt(&val) && scan.isAtEnd
+    }
+    //判断是否是 Float
+    func isFloat() -> Bool {
+        let scan:Scanner = Scanner(string: self)
+        var val:Float = 0
+        return scan.scanFloat(&val) && scan.isAtEnd
+    }
 }

@@ -30,7 +30,7 @@ Pod::Spec.new do |s|
 
   s.osx.deployment_target = '10.10'
   s.requires_arc = true
-  s.swift_version = '4.0'
+  #s.swift_version = '4.0'
   s.pod_target_xcconfig = { 'SWIFT_VERSION' => '4.0'}
 
   # s.resource_bundles = {
@@ -47,5 +47,11 @@ Pod::Spec.new do |s|
   s.subspec 'H5Editor' do |h5Editor|
     h5Editor.source_files = 'Sources/H5Editor/**/*'
     h5Editor.dependency 'HTN/Core'
+  end
+
+  # VueTemplate
+  s.subspec 'VueTemplate' do |vueTemplate|
+    vueTemplate.source_files = 'Sources/VueTemplate/**/*'
+    vueTemplate.dependency 'HTN/Core'
   end
 end
