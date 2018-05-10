@@ -64,6 +64,9 @@ public class JTokenizer {
             if s == "/" {
                 var cSb = ""
                 var escaped = false
+                var tk = JToken()
+                tk.type = .regular
+                
                 while let cChar = currentChar {
                     let str = cChar.description
                     cSb.append(str)
@@ -81,23 +84,17 @@ public class JTokenizer {
                     }
                     // 下个不是 [ 及不满足正则表达式，直接把 / 作为 token
                     if currentChar?.description != "[" && !escaped && str == "/" {
-                        var tk = JToken()
                         tk.type = .slash
-                        tk.value = s
-                        tokens.append(tk)
-                        
                         break
                     }
-                }
-                var tk = JToken()
-                tk.type = .regular
+                } // end while
                 tk.value = cSb
                 tokens.append(tk)
                 continue
-            }
+            } // end if
             
             
-            // 处理 " ", "\n", ";"
+            // 处理 " ", "\n", ";" 等间隔符号
             if eofs.contains(s) {
                 // 空格
                 advanceIndex()
@@ -105,18 +102,18 @@ public class JTokenizer {
             }
             
             if symbols.contains(s) {
-                // 处理符号
+                // 处理保留符号
                 var cSb = ""
                 while let cChar = currentChar {
                     let sb = cChar.description
                     if eofs.contains(sb) {
-                        break
+                        break //空字符和结束符时跳出
                     }
                     let checkForwardStr = cSb + sb
                     if symbols.contains(checkForwardStr) {
                         cSb = checkForwardStr
                     } else {
-                        break
+                        break //检查加上这个符号后是否满足组合保留符号
                     }
                     advanceIndex()
                     continue
@@ -136,6 +133,16 @@ public class JTokenizer {
                     }
                     advanceIndex()
                 }
+                var tk = JToken()
+                // 判断数字类型
+                if numStr.isInt() {
+                    tk.type = .int
+                }
+                if numStr.isFloat() {
+                    tk.type = .float
+                }
+                tk.value = numStr
+                tokens.append(tk)
                 continue
             } else {
                 // 处理关键字
@@ -152,6 +159,7 @@ public class JTokenizer {
                 }
                 //开始把连续字符进行 token 存储
                 if word.count > 0 {
+                    // 这里返回的 token 类型如果是 none 表示的就是非关键字的变量，函数名和方法什么的
                     tokens.append(tokenFrom(word))
                 }
                 continue
@@ -222,34 +230,49 @@ public class JTokenizer {
         // 有优先级的操作符
         case "|>":
             tk.type = .pipleline
+            tk.priority = 0
         case "??":
             tk.type = .nullishCoalescing
+            tk.priority = 1
         case "||":
             tk.type = .logicalOR
+            tk.priority = 1
         case "&&":
             tk.type = .logicalAND
+            tk.priority = 2
         case "|":
             tk.type = .bitwiseOR
+            tk.priority = 3
         case "^":
             tk.type = .bitwiseXOR
+            tk.priority = 4
         case "&":
             tk.type = .bitwiseAND
+            tk.priority = 5
         case "==", "!=", "===":
             tk.type = .equality
+            tk.priority = 6
         case "<", ">":
             tk.type = .relational
+            tk.priority = 7
         case "<<", ">>":
             tk.type = .bitShift
+            tk.priority = 8
         case "+", "-":
             tk.type = .plusMin
+            tk.priority = 9
         case "%":
             tk.type = .modulo
+            tk.priority = 10
         case "*":
             tk.type = .star
+            tk.priority = 10
         case "/":
             tk.type = .slash
+            tk.priority = 10
         case "**":
             tk.type = .exponent
+            tk.priority = 11
         
         // 关键字
         case "template":
