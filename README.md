@@ -24,6 +24,421 @@
 * 基本运算符对应oc，雏形。
 * Babel 插件研究。
 
+## 18.5.10 Case1
+
+### es 标准的分词
+
+创建 JToken.swift 定义一个枚举类型的，包含符号，操作符和关键字
+
+```swift
+// ES5
+public enum JTokenType:String {
+    case none
+    
+    case float
+    case int
+    case bingint
+    
+    case string    // 字符
+    case name      // 命名
+    case eof       // 间隔，包括空格和换行
+    case regular   // 正则
+    
+    // 标点符号
+    case bracketL  // [
+    case bracketR  // ]
+    case braceL    // {
+    case braceBarL // {|
+    case braceR    // }
+    case braceBarR // |}
+    case parenL    // (
+    case parenR    // )
+    case comma     // ,
+    case semi      // ;
+    case colon     // :
+    case doubleColon // ::
+    case dot       // .
+    case question  // ?
+    case questiondot // ?.
+    case arrow     // =>
+    case ellipsis  // ...
+    case backQuote // `
+    case dollarBraceL // ${
+    case at        // @
+    case hash      // #
+    
+    // 操作符
+    case eq        // =
+    case assign    // _=
+    case incDec    // ++ / --
+    case bang      // !
+    case tilde     // ~
+    
+    // 有优先级的操作符
+    case pipleline // |>
+    case nullishCoalescing // ??
+    case logicalOR // ||
+    case logicalAND // &&
+    case bitwiseOR  // |
+    case bitwiseXOR // ^
+    case bitwiseAND // &
+    case equality   // == / !=
+    case relational // < / >
+    case bitShift   // << / >>
+    case plusMin    // + / -
+    case modulo     // %
+    case star       // *
+    case slash      // /
+    case exponent   // **
+    
+    // 关键字
+    case template  // template
+    case `break`
+    case `case`
+    case `catch`
+    case `continue`
+    case `debugger`
+    case `default`
+    case `do`
+    case `else`
+    case `finally`
+    case `for`
+    case `function`
+    case `if`
+    case `return`
+    case `switch`
+    case `throw`
+    case `try`
+    case `var`
+    case `let`
+    case `const`
+    case `while`
+    case `with`
+    case `new`
+    case `this`
+    case `super`
+    case `class`
+    case `extends`
+    case `export`
+    case `import`
+    case `yield`
+    case `null`
+    case `true`
+    case `false`
+    case `in`
+    case `instanceof`
+    case `typeof`
+    case `void`
+    case `delete`
+}
+```
+
+在 JTokenizer.swift 里设计一个 JToken，操作符的话会有大于0的 priority，表示操作符的优先级，类型使用的是前面写的枚举类型 JTokenType，options 后面再处理，构建 AST 的使用。下面是 JToken 的结构：
+
+```swift
+public struct JToken {
+    public var type = JTokenType.none
+    public var value = ""
+    public var options = [JTokenOption]()
+    public var priority:Int = 0
+}
+```
+
+接下来分析下分词，处理顺序从情况的包含关系出发，当出现字符串标识引号时，后面那些正则的表达，关键字，操作符和数字等都会被包含进去，所以字符串是优先处理的。
+
+### 处理 String
+
+String 的处理需要注意这样几个问题
+
+* 引号：引号需要注意的是当遇到第一个引号时就开始不断累加后面的字符到字符集里知道遇到闭合的那个引号。同时开始和结束的引号都不需要添加到 token 里。
+* 转移符号 \：这个可以通过设计一个布尔值 escaped，当遇到这个符号时标记下，后面的引号就直接累加到 token 里。
+
+处理 String 类型 token 的代码如下：
+
+```swift
+if s == "\"" || s == "'" {
+    let closer = s
+    var cSb = ""
+    var escaped = false
+    while currentChar != nil {
+        // token 里不用记录 " 或者 '
+        advanceIndex()
+        if escaped {
+            escaped = false
+        } else if currentChar?.description == "\\" {
+            escaped = true
+        } else if currentChar?.description == closer {
+            advanceIndex()
+            break
+        }
+        if let currentStr = currentChar?.description {
+            cSb.append(currentStr)
+        }
+    }
+    var tk = JToken()
+    tk.type = .string
+    tk.value = cSb
+    tokens.append(tk)
+    continue
+}
+```
+
+### 正则分词
+
+字符串处理完就是正则的处理，正则开始的标示是 /[，和字符串的处理不同的是需要判断两个字符才能确定是正则的处理。其它的处理和字符串类似，具体实现如下：
+
+```swift
+// 处理 / 符号，这个是正则的处理，比如 if (/[0-9\.]/.test(currentChar)) {
+if s == "/" {
+    var cSb = ""
+    var escaped = false
+    var tk = JToken()
+    tk.type = .regular
+
+    while let cChar = currentChar {
+        let str = cChar.description
+        cSb.append(str)
+        advanceIndex()
+        if escaped {
+            escaped = false
+        } else if str == "\\" {
+            escaped = true
+        } else if str == "]" {
+            if currentChar?.description == s {
+                cSb.append(s)
+                advanceIndex()
+                break
+            }
+        }
+        // 下个不是 [ 及不满足正则表达式，直接把 / 作为 token
+        if currentChar?.description != "[" && !escaped && str == "/" {
+            tk.type = .slash
+            break
+        }
+    }
+
+    tk.value = cSb
+    tokens.append(tk)
+    continue
+}
+```
+
+### 空格换行和 ; 符号等间隔符号
+
+这些都直接跳过：
+
+```swift
+// 处理 " ", "\n", ";"
+if eofs.contains(s) {
+    // 空格
+    advanceIndex()
+    continue
+}
+```
+
+### 保留符号和操作符
+
+这里需要注意下面几个问题
+
+* 先创建一个集合，通过判断当前字符是否在那个集合里进行处理。
+* 跳出处理的两个条件，第一个是空字符和结束符时跳出，第二个是加上这个符号后是否满足组合保留符号
+* 保留符号设计时会考虑到避免多个字符的保留符号会包含保留符号的情况。比如 === 包含了 == 所以这样的情况会在后面的 parser 阶段去处理
+
+完整实现如下：
+
+```swift
+if symbols.contains(s) {
+    // 处理保留符号
+    var cSb = ""
+    while let cChar = currentChar {
+        let sb = cChar.description
+        if eofs.contains(sb) {
+            break //空字符和结束符时跳出
+        }
+        let checkForwardStr = cSb + sb
+        if symbols.contains(checkForwardStr) {
+            cSb = checkForwardStr
+        } else {
+            break //检查加上这个符号后是否满足组合保留符号
+        }
+        advanceIndex()
+        continue
+    }
+    tokens.append(tokenFrom(cSb))
+    continue
+```
+
+### 数字的处理
+
+数字的跳出条件是遇到空格，换行，结束符号，除点符号外的非数字符号都会跳出。数字和点符号都会累加最后形成完整的一个数字 token。最后判断下数字的类型是整形还是浮点。下面是数字处理的完整实现：
+
+```swift
+} else if (s.isInt()) {
+    // 处理数字
+    // 在 else 条件里处理数字 0.1 这样的，当第一个是数字时，连续开始处理数字，有 . 符号也不 break，除非是碰到非数字或者其它符号
+    var numStr = ""
+    while let cChar = currentChar {
+        let str = cChar.description
+        if str.isInt() || str == "." {
+            numStr.append(str)
+        } else {
+            break
+        }
+        advanceIndex()
+    }
+    var tk = JToken()
+    // 判断数字类型
+    if numStr.isInt() {
+        tk.type = .int
+    }
+    if numStr.isFloat() {
+        tk.type = .float
+    }
+    tk.value = numStr
+    tokens.append(tk)
+    continue
+```
+
+### 关键字，变量，函数名和方法等
+
+老规矩找出跳出条件，这些的通性在于遇到保留符号和空格那些间隔符号时跳出。设计一个 tokenFrom 函数统一处理 token 的生成，还有操作符的优先级设置等，里面把 token 的类型和入参字符串绑定，如果不是关键字字符串就将类型设置为 none，在语义分析环节进行类别分析。
+
+```swift
+} else {
+    // 处理关键字
+    // TODO: 允许 $ 和 _ 符号作为开头，或者在 parser 环节处理。
+    var word = ""
+    while let sChar = currentChar {
+        let str = sChar.description
+        if symbols.contains(str) || eofs.contains(str) {
+            break
+        }
+        word.append(str)
+        advanceIndex()
+        continue
+    }
+    //开始把连续字符进行 token 存储
+    if word.count > 0 {
+        // 这里返回的 token 类型如果是 none 表示的就是非关键字的变量，函数名和方法什么的
+        tokens.append(tokenFrom(word))
+    }
+    continue
+```
+
+### 测试 Case1
+
+将前面做的做个测试 case，用来跟踪后面的修改是否会影响前面的开发。总的思想是 hash 保留正确的结果，后面通过和动态得到的结果进行比较来看是否能够通过。这个 case 主要的关注点是字符串，正则，数字。
+
+先写个需要测试的代码：
+
+```swift
+let _case_1 = """
+const tokens = [45,34.5,"this","is","case1 content is const tokens = [\\"bulabula\\"]"];
+if (/[0-9]/.test(currentChar)) {
+    var num = 1244.7 % 889;
+}
+"""
+```
+
+编写一个函数用来返回 hash 的结果，入参是 token 集合
+
+```swift
+// 打印 token 并返回 hash 的 token
+func hashFrom(tokens:[JToken]) -> String {
+    var hash = ""
+    for tk in tokens {
+        if isPrintable {
+            print("\(tk.value)      :::    \(tk.type.rawValue)")
+        }
+        hash.append("\(tk.value)|\(tk.type.rawValue):")
+    }
+    let reHash = hash.replacingOccurrences(of: "\\", with: "slash")
+    if isPrintable {
+        print(reHash)
+    }
+    return reHash
+}
+```
+
+看看打印出来的结果：
+
+```bash
+Case1 String is:const tokens = [45,34.5,"this","is","case1 content is const tokens = [\"bulabula\"]"];
+if (/[0-9]/.test(currentChar)) {
+    var num = 1244.7 % 889;
+}
+const      :::    const
+tokens      :::    none
+=      :::    eq
+[      :::    braceL
+45      :::    float
+,      :::    comma
+34.5      :::    float
+,      :::    comma
+this      :::    string
+,      :::    comma
+is      :::    string
+,      :::    comma
+case1 content is const tokens = [\"bulabula\"]      :::    string
+]      :::    braceR
+if      :::    if
+(      :::    parenL
+/[0-9]/      :::    regular
+.      :::    dot
+test      :::    none
+(      :::    parenL
+currentChar      :::    none
+)      :::    parenR
+)      :::    parenR
+{      :::    braceL
+var      :::    var
+num      :::    none
+=      :::    eq
+1244.7      :::    float
+%      :::    modulo
+889      :::    float
+}      :::    braceR
+const|const:tokens|none:=|eq:[|braceL:45|float:,|comma:34.5|float:,|comma:this|string:,|comma:is|string:,|comma:case1 content is const tokens = [slash"bulabulaslash"]|string:]|braceR:if|if:(|parenL:/[0-9]/|regular:.|dot:test|none:(|parenL:currentChar|none:)|parenR:)|parenR:{|braceL:var|var:num|none:=|eq:1244.7|float:%|modulo:889|float:}|braceR:
+```
+
+正确的结果我们先记录下来：
+
+```swift
+let _case_1_hash = """
+const|const:tokens|none:=|eq:[|braceL:45|float:,|comma:34.5|float:,|comma:this|string:,|comma:is|string:,|comma:case1 content is const tokens = [slash"bulabulaslash"]|string:]|braceR:if|if:(|parenL:/[0-9]/|regular:.|dot:test|none:(|parenL:currentChar|none:)|parenR:)|parenR:{|braceL:var|var:num|none:=|eq:1244.7|float:%|modulo:889|float:}|braceR:
+"""
+```
+
+后面编写个 case1 的函数用来比较后面跑的结果是否和预期正确的结果是否相等。
+
+```swift
+// Case1 包含了字符串，正则，数字还有基本的 token 的测试
+func checkCase_1() {
+    let tks = JTokenizer(_case_1).tokenizer()
+    if isPrintable {
+        print("Case1 String is:\(_case_1)")
+    }
+    let hash = hashFrom(tokens: tks)
+    if hash == _case_1_hash {
+        print("case1 ✅")
+    } else {
+        print("case1 ❌")
+    }
+}
+```
+
+这样如果 case1 通过就会打印
+
+```bash
+case1 ✅
+```
+
+没通过
+
+```bash
+case1 ❌
+```
+
 ## 18.5.4
 
 * Babel 插件调研。总结
@@ -1047,10 +1462,6 @@ func recursionSelectorMatch(_ selectors:[String], parentElement:Element) -> Bool
 
 }
 ```
-
-
-
-
 
 
 
