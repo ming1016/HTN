@@ -85,11 +85,10 @@ class ViewController: NSViewController {
         
 //        let a = JTokenizer("(add 2 (subtract 4.4 2))").tokenizer()
 //        print("\(a)")
-        CodeGeneratorFromJSToOC("(add 2 (subtract 4.4 2))")
-        
+//        _ = CodeGeneratorFromJSToOC("(add 2 (subtract 4.4 2))")
         
         //justTest()
-        
+        VueTest().LetTestBegin()
         
     }
 //    class CM {

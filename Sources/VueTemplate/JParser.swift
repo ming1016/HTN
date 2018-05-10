@@ -40,7 +40,7 @@ public protocol JNodeCallExpression {
 
 // ExpressionStatement
 public protocol JNodeExpressionStatement {
-    var expressions: [JNode] {get}
+    var expressions: [JNode] {get} //可以改成字典结构，比如 [String:JNode]，这里 String 为 expression，后面类似的处理调整下
 }
 // Struct
 public class JNode:JNodeBase,
@@ -94,14 +94,14 @@ public class JParser {
         var tk = _tokens[_current]
         let jNode = JNode()
         //检查是不是数字类型节点
-        if tk.type == "int" || tk.type == "float" {
+        if tk.type == .int || tk.type == .float {
             _current += 1
             jNode.type = .NumberLiteral
-            if tk.type == "int", let intV = Int(tk.value) {
+            if tk.type == .int, let intV = Int(tk.value) {
                 jNode.intValue = intV
                 jNode.numberType = .int
             }
-            if tk.type == "float", let floatV = Float(tk.value) {
+            if tk.type == .float, let floatV = Float(tk.value) {
                 jNode.floatValue = floatV
                 jNode.numberType = .float
             }
@@ -109,7 +109,7 @@ public class JParser {
             
         }
         //检查是否是 CallExpressions 类型
-        if tk.type == "paren" && tk.value == "(" {
+        if tk.type == .parenL && tk.value == "(" {
             //跳过符号
             _current += 1
             tk = _tokens[_current]
@@ -117,7 +117,7 @@ public class JParser {
             jNode.type = .CallExpression
             jNode.name = tk.value
             _current += 1
-            while tk.type != "paren" || (tk.type == "paren" && tk.value != ")") {
+            while tk.type != .parenL || (tk.type == .parenL && tk.value != ")") {
                 //递归
                 jNode.params.append(walk())
                 tk = _tokens[_current]
