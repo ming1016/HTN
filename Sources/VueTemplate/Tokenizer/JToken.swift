@@ -16,7 +16,7 @@ public enum JTokenOption {
     case prefix
     case postfix
 }
-// ES5
+// ES 标准
 public enum JTokenType:String {
     case none
     

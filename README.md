@@ -2,7 +2,7 @@
 
 ## 待完成
 
-* 使用 babel 转 es7 和 es6 到 es5，按 es5 <https://github.com/estree/estree/blob/master/es5.md> 节点标准来设计 JNode
+* 一元 操作符
 * 依据 antlr 里 grammars-v4
  <https://github.com/antlr/grammars-v4/blob/master/objc/ObjectiveCParser.g4> 设计对应 OC 的 ONode 用作 AST 转换，该语法规则已在 AFNetworking，SDWebImage，ReactiveCocoa，AsyncDisplayKit 和 fmdb 等大型开源库上 parsed，正确率超过 95%。
 * 变量，函数，绑定，调用对应oc
@@ -11,18 +11,59 @@
 * htn 的 html 和 css 来解析器来解析 vue 模版的 html 标签
 * 设计 HObject 作为基类适配js弱类型，值类型作为属性，对象类型继承这个基类
 * vue 数据响应式 v-model 和原生响应式 kvo 对应
+* 完善异常处理
 * 写40个不重复情况测试用例，保证后面增加修改删除时输入和输出不受影响，或局部影响可控，用于测试各个过程
 * babel 工具链和终端程序的结合，调用和输出的获取，使用 Process 和 Pipe
 * 研究 facebook 的 Flow 的实现原理，改库用于将 js 的类型固定：[GitHub - facebook/flow: Adds static typing to JavaScript to improve developer productivity and code quality.](https://github.com/facebook/flow)
 * 调研抽象解释器
+* ES6 解析支持
+* 测试 Case 的编写可以参考：[grammars-v4/javascript/examples at master · antlr/grammars-v4 · GitHub](https://github.com/antlr/grammars-v4/tree/master/javascript/examples)。ES5 和 ES6 各种语法比较（全） [ECMAScript 6: New Features: Overview and Comparison](http://es6-features.org/#Constants)
+* ES6 各种语法的 token 测试 Case 编写
+* ES6 各种语法的 AST 测试 Case 编写
+* Vue 模版编写
 
 ## 已完成
 
+* tokenizer 里添加 peek 方法，完善 token 处理
+* 使用 babel 转 es7 和 es6 到 es5，按 ES5 <https://github.com/estree/estree/blob/master/es5.md> 节点标准来设计 JNode
 * 完成 Token 类型 es 标准的设计以及字符串的获取，正则的获取，空格换行和 ; 符号，数字，关键字，符号和操作符的处理。
-* 编写了Case1，包含了字符串和正则的处理。
+* 编写了 Case1，其主要包含了字符串，正则，数字和基本操作符关键字等的测试 Case 编写。
 * 完成，代码 -> AST -> 新 AST -> 代码，及 JTokenizer，JParser，JTraverser，JTransformer，CodeGeneratorFromJSToOC 主程序架子搭建和表达式转换雏形流程跑通。
 * 基本运算符对应oc，雏形。
 * Babel 插件研究。
+
+## 18.5.12
+
+### peek
+
+处理 ${ 和 _= 组成符号的情况需要 `瞥一眼` 功能，先创建个函数
+
+```swift
+// 访问下当前字符的下一个字符，而不更新当前字符位置
+var peek: Character? {
+    if _index < _input.endIndex {
+        let nextIndex =  _input.index(after: _index)
+        return nextIndex < _input.endIndex ? _input[nextIndex] : nil
+    } else {
+        return nil
+    }
+}
+```
+
+再更新下 tokenizer 方法，在处理普通字符时加上 peek，这样就可以把 ${ 和 _= 提取出来了。
+
+```swift
+// 处理关键字和其它定义字符集
+var word = ""
+// 处理 ${ 和 _= 组成符号的情况
+if currentChar?.description == "$" && self.peek == "{" {
+    word = "${"
+    advanceIndex()
+} else if currentChar?.description == "_" && self.peek == "=" {
+    word = "_="
+    advanceIndex()
+} else {
+```
 
 ## 18.5.10 Case1
 
@@ -31,7 +72,7 @@
 创建 JToken.swift 定义一个枚举类型的，包含符号，操作符和关键字
 
 ```swift
-// ES5
+// ES 标准
 public enum JTokenType:String {
     case none
     

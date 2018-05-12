@@ -25,8 +25,9 @@ public class JTokenizer {
     
     public func tokenizer() -> [JToken] {
         var tokens = [JToken]()
-        
-        let symbols = ["[", "]", "{", "{|", "}", "|}", "|", "(", ")", ",", ":", "::", ".", "?", "?.", "=>", "...", "=", "_=", "++", "--", ">", "`", "${", "$", "@", "#", "_", "=", "+", "!", "~", "|>", "??", "||", "&&", "&", "==", "!=", "^", "<", "<<", ">>", "-", "%", "*", "/", "**"]
+        // $  _  _= ${ 符号不放到里面
+        // TODO: 找到合理了的处理 $， _， _=，和 ${ 的方法，其中 $ 和 _ 是可以放到变量开头的。
+        let symbols = ["[", "]", "{", "{|", "}", "|}", "|", "(", ")", ",", ":", "::", ".", "?", "?.", "=>", "...", "=", "++", "--", ">", "`", "@", "#", "=", "+", "!", "~", "|>", "??", "||", "&&", "&", "==", "!=", "^", "<", "<<", ">>", "-", "%", "*", "/", "**"]
         let eofs = [" ", "\n", ";"]
         
         while let aChar = currentChar {
@@ -145,18 +146,28 @@ public class JTokenizer {
                 tokens.append(tk)
                 continue
             } else {
-                // 处理关键字
-                // TODO: 允许 $ 和 _ 符号作为开头，或者在 parser 环节处理。
+                // 处理关键字和其它定义字符集
                 var word = ""
-                while let sChar = currentChar {
-                    let str = sChar.description
-                    if symbols.contains(str) || eofs.contains(str) {
-                        break
-                    }
-                    word.append(str)
+                // 处理 ${ 和 _= 组成符号的情况
+                if currentChar?.description == "$" && self.peek == "{" {
+                    word = "${"
                     advanceIndex()
-                    continue
+                } else if currentChar?.description == "_" && self.peek == "=" {
+                    word = "_="
+                    advanceIndex()
+                } else {
+                    while let sChar = currentChar {
+                        let str = sChar.description
+                        
+                        if symbols.contains(str) || eofs.contains(str) {
+                            break
+                        }
+                        word.append(str)
+                        advanceIndex()
+                        continue
+                    }
                 }
+                
                 //开始把连续字符进行 token 存储
                 if word.count > 0 {
                     // 这里返回的 token 类型如果是 none 表示的就是非关键字的变量，函数名和方法什么的
@@ -359,13 +370,23 @@ public class JTokenizer {
         return tk
     }
     
-    //parser tool
+    // parser tool
     var currentChar: Character? {
         return _index < _input.endIndex ? _input[_index] : nil
     }
     func advanceIndex() {
         if _index < _input.endIndex {
             _input.formIndex(after: &_index)
+        }
+        
+    }
+    // 访问下当前字符的下一个字符，而不更新当前字符位置
+    var peek: Character? {
+        if _index < _input.endIndex {
+            let nextIndex =  _input.index(after: _index)
+            return nextIndex < _input.endIndex ? _input[nextIndex] : nil
+        } else {
+            return nil
         }
         
     }
