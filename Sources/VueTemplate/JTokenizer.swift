@@ -97,8 +97,23 @@ public class JTokenizer {
             
             // 处理 " ", "\n", ";" 等间隔符号
             if eofs.contains(s) {
-                // 空格
-                advanceIndex()
+                if s == "\n" || s == ";" {
+                    while let cChar = currentChar {
+                        let str = cChar.description
+                        if str == "\n" || str == ";" {
+                            advanceIndex()
+                            continue
+                        } else {
+                            break
+                        }
+                    }
+                    var tk = JToken()
+                    tk.type = .eof
+                    tokens.append(tk)
+                } else {
+                    // 空格
+                    advanceIndex()
+                }
                 continue
             }
             
@@ -118,6 +133,9 @@ public class JTokenizer {
                     }
                     advanceIndex()
                     continue
+                }
+                if cSb == "" {
+                    cSb = s
                 }
                 tokens.append(tokenFrom(cSb))
                 continue
