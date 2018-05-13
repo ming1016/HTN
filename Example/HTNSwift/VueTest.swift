@@ -12,10 +12,9 @@ import HTN
 class VueTest {
     var isPrintable = true
     let _case_tmp = """
-const tokens _= [45,34.5,"this","is","case1 content is const tokens = [\\"bulabula\\"]"];
-if (/[0-9]/.test(currentChar)) ${
-    var num = 1244.7 % 889;
-}
+var a _= c
+var b = ${}
+var d = a / 34.3 + 3 * k
 """
     let _case_1 = """
 const tokens = [45,34.5,"this","is","case1 content is const tokens = [\\"bulabula\\"]"];

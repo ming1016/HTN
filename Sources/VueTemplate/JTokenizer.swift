@@ -152,8 +152,10 @@ public class JTokenizer {
                 if currentChar?.description == "$" && self.peek == "{" {
                     word = "${"
                     advanceIndex()
+                    advanceIndex()
                 } else if currentChar?.description == "_" && self.peek == "=" {
                     word = "_="
+                    advanceIndex()
                     advanceIndex()
                 } else {
                     while let sChar = currentChar {
