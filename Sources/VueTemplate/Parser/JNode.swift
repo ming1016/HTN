@@ -3,19 +3,24 @@
 //  HTN
 //
 //  Created by DaiMing on 2018/5/9.
-//
+
+//  Babylon AST node types
+//  https://github.com/babel/babel/blob/master/packages/babylon/ast/spec.md#node-objects
+//  last Commits on Apr 5, 2018
 
 import Foundation
 
 public protocol JNode {}
 // A literal token. May or may not represent an expression.
-public protocol JNodeLiterals: JNode {}
+public protocol JNodeLiteral: JNode {}
 public protocol JNodePattern: JNode {}
 public protocol JNodeStatement: JNode {}
 // Any expression node. Since the left-hand side of an assignment may be any expression in general, an expression can also be a pattern.
 public protocol JNodeExpression: JNode {}
 // Any declaration node. Note that declarations are considered statements; this is because declarations can appear in any statement context.
 public protocol JNodeDeclaration: JNodeStatement {}
+// A module `import` or `export` declaration.
+public protocol JNodeModuleDeclaration: JNode {}
 
 // 多重继承
 public protocol JNodeObjectMemberP: JNode {
@@ -49,7 +54,7 @@ public class JNodePrivateName: JNode {
     }
 }
 
-public class JNodeRegExpLiteral: JNodeLiterals {
+public class JNodeRegExpLiteral: JNodeLiteral {
     let type = "RegExpLiteral"
     let pattern: String
     let flags: String
@@ -59,11 +64,11 @@ public class JNodeRegExpLiteral: JNodeLiterals {
     }
 }
 
-public class JNodeNullLiteral: JNodeLiterals {
+public class JNodeNullLiteral: JNodeLiteral {
     let type = "NullLiteral"
 }
 
-public class JNodeStringLiteral: JNodeLiterals {
+public class JNodeStringLiteral: JNodeLiteral {
     var type = "StringLiteral"
     var value: String
     init(value: String) {
@@ -71,7 +76,7 @@ public class JNodeStringLiteral: JNodeLiterals {
     }
 }
 
-public class JNodeBooleanLiteral: JNodeLiterals {
+public class JNodeBooleanLiteral: JNodeLiteral {
     let type = "BooleanLiteral"
     let value: Bool
     init(value: Bool) {
@@ -79,7 +84,7 @@ public class JNodeBooleanLiteral: JNodeLiterals {
     }
 }
 
-public class JNodeNumericLiteral: JNodeLiterals {
+public class JNodeNumericLiteral: JNodeLiteral {
     let type = "NumericLiteral"
     let value: NSNumber
     init(value: NSNumber) {
@@ -458,7 +463,8 @@ public class JNodeObjectMember: JNodeObjectMemberP {
 public class JNodeObjectProperty: JNodeObjectMember {
     let type = "ObjectProperty"
     let shorthand: Bool
-    let value: JNodeExpression
+    // value 可能是 JNodeExpression 或者 JNodePattern（JNodeAssignmentProperty 里）
+    let value: JNode
     init(key: JNodeExpression, computed: Bool, decorators: JNodeDecorator, shorthand: Bool, value: JNodeExpression) {
         self.shorthand = shorthand
         self.value = value
@@ -754,6 +760,291 @@ public class JNodeTemplateElement: JNode {
     }
 }
 
+// ObjectPattern
+
+public class JNodeAssignmentProperty: JNodeObjectProperty {
+    override init(key: JNodeExpression, computed: Bool, decorators: JNodeDecorator, shorthand: Bool, value: JNodeExpression) {
+        super.init(key: key, computed: computed, decorators: decorators, shorthand: shorthand, value: value)
+    }
+}
+
+public class JNodeObjectPattern: JNodePattern {
+    let type = "ObjectPattern"
+    // properties: [ AssignmentProperty | RestElement ];
+    // TODO:
+    let properties: [JNode]
+    init(properties: [JNode]) {
+        self.properties = properties
+    }
+}
+
+public class JNodeArrayPattern: JNodePattern {
+    let type = "ArrayPattern"
+    let elements: [JNodePattern?]
+    init(elements: [JNodePattern?]) {
+        self.elements = elements
+    }
+}
+
+public class JNodeRestElement: JNodePattern {
+    let type = "RestElement"
+    let argument: JNodePattern
+    init(argument: JNodePattern) {
+        self.argument = argument
+    }
+}
+
+public class JNodeAssignmentPattern: JNodePattern {
+    let type = "AssignmentPattern"
+    let left: JNodePattern
+    let right: JNodeExpression
+    init(left: JNodePattern, right: JNodeExpression) {
+        self.left = left
+        self.right = right
+    }
+}
+
+public class JNodeClass: JNode {
+    let id: JNodeIdentifier?
+    let superClass: JNodeExpression?
+    let body: JNodeClassBody
+    let decorators: [JNodeDecorator]
+    init(id: JNodeIdentifier?, superClass: JNodeExpression?, body: JNodeClassBody, decorators: [JNodeDecorator]) {
+        self.id = id
+        self.superClass = superClass
+        self.body = body
+        self.decorators = decorators
+    }
+}
+
+public class JNodeClassBody: JNode {
+    let type = "ClassBody"
+    // body: [ ClassMethod | ClassPrivateMethod | ClassProperty | ClassPrivateProperty ];
+    // TODO:
+    let body: [JNode]
+    init(body: [JNode]) {
+        self.body = body
+    }
+}
+
+enum JNodeClassMethodKind: String {
+    case constructor, method, get, set
+}
+public class JNodeClassMethod: JNodeFunctionP {
+    let type = "ClassMethod"
+    let key: JNodeExpression
+    let kind: JNodeClassMethodKind
+    let computed: Bool
+    let `static`: Bool
+    let decorators: [JNodeDecorator]
+    public let id: JNodeIdentifier
+    public let params: [JNodePattern]
+    public let body: JNodeBlockStatement
+    public let generator: Bool
+    public let async: Bool
+    init(key: JNodeExpression, kind: JNodeClassMethodKind, computed: Bool, static: Bool, decorators: [JNodeDecorator], id: JNodeIdentifier, params: [JNodePattern], body: JNodeBlockStatement, generator: Bool, async: Bool) {
+        self.key = key
+        self.kind = kind
+        self.computed = computed
+        self.static = `static`
+        self.decorators = decorators
+        self.id = id
+        self.params = params
+        self.body = body
+        self.generator = generator
+        self.async = async
+    }
+}
+
+public class JNodeClassPrivateMethod: JNodeFunctionP {
+    let type = "ClassPrivateMethod"
+    let key: JNodePrivateName
+    let kind: JNodeClassMethodKind
+    let `static`: Bool
+    let decorators: [JNodeDecorator]
+    public let id: JNodeIdentifier
+    public let params: [JNodePattern]
+    public let body: JNodeBlockStatement
+    public let generator: Bool
+    public let async: Bool
+    init(key: JNodePrivateName, kind: JNodeClassMethodKind, computed: Bool, static: Bool, decorators: [JNodeDecorator], id: JNodeIdentifier, params: [JNodePattern], body: JNodeBlockStatement, generator: Bool, async: Bool) {
+        self.key = key
+        self.kind = kind
+        self.static = `static`
+        self.decorators = decorators
+        self.id = id
+        self.params = params
+        self.body = body
+        self.generator = generator
+        self.async = async
+    }
+}
+
+public class JNodeClassProperty: JNode {
+    let type = "ClassProperty"
+    let key: JNodeExpression
+    let value: JNodeExpression
+    let `static`: Bool
+    let computed: Bool
+    init(key: JNodeExpression, value: JNodeExpression, static: Bool, computed: Bool) {
+        self.key = key
+        self.value = value
+        self.static = `static`
+        self.computed = computed
+    }
+}
+
+public class JNodeClassPrivateProperty: JNode {
+    let type = "ClassPrivateProperty"
+    let key: JNodePrivateName
+    let value: JNodeExpression
+    let `static`: Bool
+    init(key: JNodePrivateName, value: JNodeExpression, static: Bool) {
+        self.key = key
+        self.value = value
+        self.static = `static`
+    }
+}
+
+public class JNodeClassDeclaration: JNodeClass, JNodeDeclaration {
+    let type = "ClassDeclaration"
+    override init(id: JNodeIdentifier?, superClass: JNodeExpression?, body: JNodeClassBody, decorators: [JNodeDecorator]) {
+        // id: Identifier;
+        // TODO: id 做成非可选
+        super.init(id: id, superClass: superClass, body: body, decorators: decorators)
+    }
+}
+
+public class JNodeClassExpression: JNodeClass, JNodeExpression {
+    let type = "ClassExpression"
+    override init(id: JNodeIdentifier?, superClass: JNodeExpression?, body: JNodeClassBody, decorators: [JNodeDecorator]) {
+        super.init(id: id, superClass: superClass, body: body, decorators: decorators)
+    }
+}
+
+public class JNodeMetaProperty: JNodeExpression {
+    let type = "MetaProperty"
+    let meta: JNodeIdentifier
+    let property: JNodeIdentifier
+    init(meta: JNodeIdentifier, property: JNodeIdentifier) {
+        self.meta = meta
+        self.property = property
+    }
+}
+
+// Modules
+
+// A specifier in an import or export declaration.
+public class JNodeModuleSpecifier: JNode {
+    let local: JNodeIdentifier
+    init(local: JNodeIdentifier) {
+        self.local = local
+    }
+}
+
+// An import declaration, e.g., `import foo from "mod";`.
+public class JNodeImportDeclaration: JNodeModuleDeclaration {
+    let type = "ImportDeclaration"
+    // specifiers: [ ImportSpecifier | ImportDefaultSpecifier | ImportNamespaceSpecifier ];
+    // TODO:
+    let specifiers: [JNode]
+    let source: JNodeLiteral
+    init(specifiers: [JNode], source: JNodeLiteral) {
+        self.specifiers = specifiers
+        self.source = source
+    }
+}
+
+/*
+ An imported variable binding, e.g., `{foo}` in `import {foo} from "mod"` or `{foo as bar}` in `import {foo as bar} from "mod"`. The `imported` field refers to the name of the export imported from the module. The `local` field refers to the binding imported into the local module scope. If it is a basic named import, such as in `import {foo} from "mod"`, both `imported` and `local` are equivalent `Identifier` nodes; in this case an `Identifier` node representing `foo`. If it is an aliased import, such as in `import {foo as bar} from "mod"`, the `imported` field is an `Identifier` node representing `foo`, and the `local` field is an `Identifier` node representing `bar`.
+ */
+public class JNodeImportSpecifier: JNodeModuleSpecifier {
+    let type = "ImportSpecifier"
+    let imported: JNodeIdentifier
+    init(local: JNodeIdentifier, imported: JNodeIdentifier) {
+        self.imported = imported
+        super.init(local: local)
+    }
+}
+
+// A default import specifier, e.g., `foo` in `import foo from "mod.js"`.
+public class JNodeImportDefaultSpecifier: JNodeModuleSpecifier {
+    let type = "ImportDefaultSpecifier"
+    override init(local: JNodeIdentifier) {
+        super.init(local: local)
+    }
+}
+
+// A namespace import specifier, e.g., `* as foo` in `import * as foo from "mod.js"`.
+public class JNodeImportNamespaceSpecifier: JNodeModuleSpecifier {
+    let type = "ImportNamespaceSpecifier"
+    override init(local: JNodeIdentifier) {
+        super.init(local: local)
+    }
+}
+
+/*
+ An export named declaration, e.g., `export {foo, bar};`, `export {foo} from "mod";`, `export var foo = 1;` or `export * as foo from "bar";`.
+ 
+ _Note: Having `declaration` populated with non-empty `specifiers` or non-null `source` results in an invalid state._
+ */
+public class JNodeExportNamedDeclaration: JNodeModuleDeclaration {
+    let type = "ExportNamedDeclaration"
+    let declaration: JNodeDeclaration?
+    let specifiers: [JNodeExportSpecifier]
+    let source: JNodeLiteral?
+    init(declaration: JNodeDeclaration?, specifier: [JNodeExportSpecifier], source: JNodeLiteral?) {
+        self.declaration = declaration
+        self.specifiers = specifier
+        self.source = source
+    }
+}
+
+/*
+ An exported variable binding, e.g., `{foo}` in `export {foo}` or `{bar as foo}` in `export {bar as foo}`. The `exported` field refers to the name exported in the module. The `local` field refers to the binding into the local module scope. If it is a basic named export, such as in `export {foo}`, both `exported` and `local` are equivalent `Identifier` nodes; in this case an `Identifier` node representing `foo`. If it is an aliased export, such as in `export {bar as foo}`, the `exported` field is an `Identifier` node representing `foo`, and the `local` field is an `Identifier` node representing `bar`.
+ */
+public class JNodeExportSpecifier: JNodeModuleSpecifier {
+    let type = "ExportSpecifier"
+    let exported: JNodeIdentifier
+    init(local: JNodeIdentifier, exported: JNodeIdentifier) {
+        self.exported = exported
+        super.init(local: local)
+    }
+}
+
+// ExportDefaultDeclaration
+
+public class JNodeOptFunctionDeclaration: JNodeFunctionDeclaration {
+    override init(identifier: JNodeIdentifier, params: [JNodePattern], body: JNodeBlockStatement, generator: Bool, async: Bool) {
+        super.init(identifier: identifier, params: params, body: body, generator: generator, async: async)
+    }
+}
+
+public class JNodeOptClassDeclaration: JNodeClassDeclaration {
+    override init(id: JNodeIdentifier?, superClass: JNodeExpression?, body: JNodeClassBody, decorators: [JNodeDecorator]) {
+        super.init(id: id, superClass: superClass, body: body, decorators: decorators)
+    }
+}
+
+// An export default declaration, e.g., `export default function () {};` or `export default 1;`.
+public class JNodeExportDefaultDeclaration: JNodeModuleDeclaration {
+    let type = "ExportDefaultDeclaration"
+    // declaration: OptFunctionDeclaration | OptClassDeclaration | Expression;
+    // TODO:
+    let declaration: JNode
+    init(declaration: JNode) {
+        self.declaration = declaration
+    }
+}
+
+// An export batch declaration, e.g., `export * from "mod";`.
+public class JNodeExportAllDeclaration: JNodeModuleDeclaration {
+    let type = "ExportAllDeclaration"
+    let source: JNodeLiteral
+    init(source: JNodeLiteral) {
+        self.source = source
+    }
+}
 
 
 // ------------ 以前的 --------------
