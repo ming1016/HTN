@@ -49,9 +49,4 @@ Pod::Spec.new do |s|
     h5Editor.dependency 'HTN/Core'
   end
 
-  # VueTemplate
-  s.subspec 'VueTemplate' do |vueTemplate|
-    vueTemplate.source_files = 'Sources/VueTemplate/**/*'
-    vueTemplate.dependency 'HTN/Core'
-  end
 end
