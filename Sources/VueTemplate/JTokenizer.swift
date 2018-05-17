@@ -116,6 +116,16 @@ public class JTokenizer {
                 }
                 continue
             }
+            // 使用 CharacterSet.newlines 的方式再处理下
+            if CharacterSet.newlines.contains((currentChar?.unicodeScalars.first!)!) {
+                while let character = currentChar, CharacterSet.newlines.contains(character.unicodeScalars.first!) {
+                    advanceIndex()
+                }
+                var tk = JToken()
+                tk.type = .eof
+                tokens.append(tk)
+                continue
+            }
             
             if symbols.contains(s) {
                 // 处理保留符号
@@ -169,10 +179,6 @@ public class JTokenizer {
                 // 处理 ${ 和 _= 组成符号的情况
                 if currentChar?.description == "$" && self.peek == "{" {
                     word = "${"
-                    advanceIndex()
-                    advanceIndex()
-                } else if currentChar?.description == "_" && self.peek == "=" {
-                    word = "_="
                     advanceIndex()
                     advanceIndex()
                 } else {
