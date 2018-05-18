@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  JNode.swift
 //  HTN
 //
 //  Created by DaiMing on 2018/5/9.
@@ -11,7 +11,7 @@
 import Foundation
 
 public protocol JNode {
-    var type: String {get}
+    var type: String {get set}
 }
 // A literal token. May or may not represent an expression.
 public protocol JNodeLiteral: JNode {}
@@ -38,9 +38,22 @@ public protocol JNodeFunctionP: JNode {
     var async: Bool {get}
 }
 
+// 以下 base 是开发时占位用
+public class JNodeBase:JNode {
+    public var type = "Base"
+}
+
+public class JNodeStatementBase: JNodeStatement {
+    public var type = "StatementBase"
+}
+
+public class JNodeExpressionBase: JNodeExpression {
+    public var type = "ExpressionBase"
+}
+
 // An identifier. Note that an identifier may be an expression or a destructuring pattern.
-public class JNodeIdentifier: JNode {
-    public let type = "Identifier"
+public class JNodeIdentifier: JNodePattern, JNodeExpression {
+    public var type = "Identifier"
     let name: String
     init(name: String) {
         self.name = name
@@ -48,8 +61,8 @@ public class JNodeIdentifier: JNode {
 }
 
 // A Private Name Identifier.
-public class JNodePrivateName: JNode {
-    public let type = "PrivateName"
+public class JNodePrivateName: JNodePattern, JNodeExpression {
+    public var type = "PrivateName"
     let id: JNodeIdentifier
     init(id: JNodeIdentifier) {
         self.id = id
@@ -57,7 +70,7 @@ public class JNodePrivateName: JNode {
 }
 
 public class JNodeRegExpLiteral: JNodeLiteral {
-    public let type = "RegExpLiteral"
+    public var type = "RegExpLiteral"
     let pattern: String
     let flags: String
     init(pattern: String, flags: String) {
@@ -67,7 +80,7 @@ public class JNodeRegExpLiteral: JNodeLiteral {
 }
 
 public class JNodeNullLiteral: JNodeLiteral {
-    public let type = "NullLiteral"
+    public var type = "NullLiteral"
 }
 
 public class JNodeStringLiteral: JNodeLiteral {
@@ -79,7 +92,7 @@ public class JNodeStringLiteral: JNodeLiteral {
 }
 
 public class JNodeBooleanLiteral: JNodeLiteral {
-    public let type = "BooleanLiteral"
+    public var type = "BooleanLiteral"
     let value: Bool
     init(value: Bool) {
         self.value = value
@@ -87,7 +100,7 @@ public class JNodeBooleanLiteral: JNodeLiteral {
 }
 
 public class JNodeNumericLiteral: JNodeLiteral {
-    public let type = "NumericLiteral"
+    public var type = "NumericLiteral"
     let value: NSNumber
     init(value: NSNumber) {
         self.value = value
@@ -100,12 +113,12 @@ public enum JNodeSourceType {
 // A complete program source tree.
 // ES6 指定为 module，其它的使用 script
 public class JNodeProgram: JNode {
-    public let type = "program"
+    public var type = "program"
     let sourceType: JNodeSourceType
     // body: [ Statement | ModuleDeclaration ];
     // TODO: 能够支持 ModuleDeclaration
-    let body: [JNodeStatement]
-    let directives: [JNodeDirective]
+    var body: [JNodeStatement]
+    let directives: [JNodeDirective] // TODO:
     init(sourceType: JNodeSourceType, body: [JNodeStatement], directives: [JNodeDirective]) {
         self.sourceType = sourceType
         self.body = body
@@ -132,7 +145,7 @@ public class JNodeFunction: JNodeFunctionP {
 
 // An expression statement, i.e., a statement consisting of a single expression.
 public class JNodeExpressionStatement: JNodeStatement {
-    public let type = "ExpressionStatement"
+    public var type = "ExpressionStatement"
     let expression: JNodeExpression
     init(expression: JNodeExpression) {
         self.expression = expression
@@ -141,7 +154,7 @@ public class JNodeExpressionStatement: JNodeStatement {
 
 // A block statement, i.e., a sequence of statements surrounded by braces.
 public class JNodeBlockStatement: JNodeStatement {
-    public let type = "BlockStatement"
+    public var type = "BlockStatement"
     let body: [JNodeStatement]
     let directives: [JNodeDirective]
     init(body: [JNodeStatement], directives: [JNodeDirective]) {
@@ -152,17 +165,17 @@ public class JNodeBlockStatement: JNodeStatement {
 
 // An empty statement, i.e., a solitary semicolon.
 public class JNodeEmptyStatement: JNodeStatement {
-    public let type = "EmptyStatement"
+    public var type = "EmptyStatement"
 }
 
 // A `debugger` statement.
 public class JNodeDebuggerStatement: JNodeStatement {
-    public let type = "DebuggerStatement"
+    public var type = "DebuggerStatement"
 }
 
 // A `with` statement.
 public class JNodeWithStatement: JNodeStatement {
-    public let type = "WithStatement"
+    public var type = "WithStatement"
     let object: JNodeExpression
     let body: JNodeStatement
     init(object: JNodeExpression, body: JNodeStatement) {
@@ -174,7 +187,7 @@ public class JNodeWithStatement: JNodeStatement {
 // Control flow
 
 public class JNodeReturnStatement: JNodeStatement {
-    public let type = "ReturnStatement"
+    public var type = "ReturnStatement"
     let argument: JNodeExpression?
     init(argument: JNodeExpression?) {
         self.argument = argument
@@ -183,7 +196,7 @@ public class JNodeReturnStatement: JNodeStatement {
 
 // A labeled statement, i.e., a statement prefixed by a `break`/`continue` label.
 public class JNodeLabeledStatement: JNodeStatement {
-    public let type = "LabeledStatement"
+    public var type = "LabeledStatement"
     let label: JNodeIdentifier
     let body: JNodeStatement
     init(label: JNodeIdentifier, body: JNodeStatement) {
@@ -193,7 +206,7 @@ public class JNodeLabeledStatement: JNodeStatement {
 }
 
 public class JNodeBreakStatement: JNodeStatement {
-    public let type = "BreakStatement"
+    public var type = "BreakStatement"
     let label: JNodeIdentifier?
     init(label: JNodeIdentifier?) {
         self.label = label
@@ -201,7 +214,7 @@ public class JNodeBreakStatement: JNodeStatement {
 }
 
 public class JNodeContinueStatement: JNodeStatement {
-    public let type = "ContinueStatement"
+    public var type = "ContinueStatement"
     let label: JNodeIdentifier?
     init(label: JNodeIdentifier?) {
         self.label = label
@@ -211,7 +224,7 @@ public class JNodeContinueStatement: JNodeStatement {
 // Choice
 
 public class JNodeIfStatement: JNodeStatement {
-    public let type = "IfStatement"
+    public var type = "IfStatement"
     let test: JNodeExpression
     let consequent: JNodeStatement
     let alternate: JNodeStatement?
@@ -223,7 +236,7 @@ public class JNodeIfStatement: JNodeStatement {
 }
 
 public class JNodeSwitchStatement: JNodeStatement {
-    public let type = "SwitchStatement"
+    public var type = "SwitchStatement"
     let discriminant: JNodeExpression
     let cases: [JNodeSwitchCase]
     init(discriminant: JNodeExpression, cases: [JNodeSwitchCase]) {
@@ -234,7 +247,7 @@ public class JNodeSwitchStatement: JNodeStatement {
 
 // A `case` (if `test` is an `Expression`) or `default` (if `test === null`) clause in the body of a `switch` statement.
 public class JNodeSwitchCase: JNode {
-    public let type = "SwitchCase"
+    public var type = "SwitchCase"
     let test: JNodeExpression?
     let consequent: [JNodeStatement]
     init(test: JNodeExpression?, consequent: [JNodeStatement]) {
@@ -246,7 +259,7 @@ public class JNodeSwitchCase: JNode {
 // Exceptions
 
 public class JNodeThrowStatement: JNodeStatement {
-    public let type = "ThrowStatement"
+    public var type = "ThrowStatement"
     let argument: JNodeExpression
     init(argument: JNodeExpression) {
         self.argument = argument
@@ -255,7 +268,7 @@ public class JNodeThrowStatement: JNodeStatement {
 
 // A `try` statement. If `handler` is `null` then `finalizer` must be a `BlockStatement`.
 public class JNodeTryStatement: JNodeStatement {
-    public let type = "TryStatement"
+    public var type = "TryStatement"
     let block: JNodeBlockStatement
     let handler: JNodeCatchClause?
     let finalizer: JNodeBlockStatement?
@@ -268,7 +281,7 @@ public class JNodeTryStatement: JNodeStatement {
 
 // A `catch` clause following a `try` block.
 public class JNodeCatchClause: JNode {
-    public let type = "CatchClause"
+    public var type = "CatchClause"
     let param: JNodePattern?
     let body: JNodeBlockStatement
     init(param: JNodePattern?, body: JNodeBlockStatement) {
@@ -280,7 +293,7 @@ public class JNodeCatchClause: JNode {
 // Loops
 
 public class JNodeWhileStatement: JNodeStatement {
-    public let type = "WhileStatement"
+    public var type = "WhileStatement"
     let test: JNodeExpression
     let body: JNodeStatement
     init(test: JNodeExpression, body: JNodeStatement) {
@@ -291,7 +304,7 @@ public class JNodeWhileStatement: JNodeStatement {
 
 // A `do`/`while` statement.
 public class JNodeDoWhileStatement: JNodeStatement {
-    public let type = "DoWhileStatement"
+    public var type = "DoWhileStatement"
     let body: JNodeStatement
     let test: JNodeExpression
     init(body: JNodeStatement, test: JNodeExpression) {
@@ -301,7 +314,7 @@ public class JNodeDoWhileStatement: JNodeStatement {
 }
 
 public class JNodeForStatement: JNodeStatement {
-    public let type = "ForStatement"
+    public var type = "ForStatement"
     // init: VariableDeclaration | Expression | null;
     // TODO: VariableDeclaration
     let initialization: JNodeExpression?
@@ -347,21 +360,22 @@ public class JNodeFunctionDeclaration: JNodeFunction, JNodeDeclaration {
     }
 }
 
+// TODO: 暂时不用
 public enum JNodeVariableDeclarationKind {
     case `var`, `let`, `const`
 }
 public class JNodeVariableDeclaration: JNodeDeclaration {
-    public let type = "VariableDeclaration"
+    public var type = "VariableDeclaration"
     let declarations: [JNodeVariableDeclarator]
-    let kind: JNodeVariableDeclarationKind
-    init(declarations: [JNodeVariableDeclarator], kind: JNodeVariableDeclarationKind) {
+    let kind: String
+    init(declarations: [JNodeVariableDeclarator], kind: String) {
         self.declarations = declarations
         self.kind = kind
     }
 }
 
 public class JNodeVariableDeclarator: JNode {
-    public let type = "VariableDeclarator"
+    public var type = "VariableDeclarator"
     let id: JNodePattern
     let initialization: JNodeExpression?
     init(id: JNodePattern, initialization: JNodeExpression?) {
@@ -373,7 +387,7 @@ public class JNodeVariableDeclarator: JNode {
 // Misc
 
 public class JNodeDecorator: JNode {
-    public let type = "Decorator"
+    public var type = "Decorator"
     let expression: JNodeExpression
     init(expression: JNodeExpression) {
         self.expression = expression
@@ -381,7 +395,7 @@ public class JNodeDecorator: JNode {
 }
 
 public class JNodeDirective: JNode {
-    public let type = "Directive"
+    public var type = "Directive"
     let value: JNodeDirectiveLiteral
     init(value: JNodeDirectiveLiteral) {
         self.value = value
@@ -397,15 +411,15 @@ public class JNodeDirectiveLiteral: JNodeStringLiteral {
 
 // Express
 public class JNodeSuper: JNode {
-    public let type = "Super"
+    public var type = "Super"
 }
 
 public class JNodeImport: JNode {
-    public let type = "Import"
+    public var type = "Import"
 }
 
 public class JNodeThisExpression: JNodeExpression {
-    public let type = "ThisExpression"
+    public var type = "ThisExpression"
 }
 
 // A fat arrow function expression, e.g., `let foo = (bar) => { /* body */ }`.
@@ -416,7 +430,7 @@ public class JNodeArrowFunctionExpression: JNodeFunction, JNodeExpression {
 }
 
 public class JNodeYieldExpression: JNodeExpression {
-    public let type = "YieldExpression"
+    public var type = "YieldExpression"
     let argument: JNodeExpression?
     let delegate: Bool
     init(argument: JNodeExpression?, delegate: Bool) {
@@ -426,7 +440,7 @@ public class JNodeYieldExpression: JNodeExpression {
 }
 
 public class JNodeAwaitExpression: JNodeExpression {
-    public let type = "AwaitExpression"
+    public var type = "AwaitExpression"
     let argument: JNodeExpression?
     init(argument: JNodeExpression?) {
         self.argument = argument
@@ -434,7 +448,7 @@ public class JNodeAwaitExpression: JNodeExpression {
 }
 
 public class JNodeArrayExpression: JNodeExpression {
-    public let type = "ArrayExpression"
+    public var type = "ArrayExpression"
     // elements: [ Expression | SpreadElement | null ];
     // TODO: SpreadElement
     let elements: [JNode?]
@@ -444,7 +458,7 @@ public class JNodeArrayExpression: JNodeExpression {
 }
 
 public class JNodeObjectExpression: JNodeExpression {
-    public let type = "ObjectExpression"
+    public var type = "ObjectExpression"
     // properties: [ ObjectProperty | ObjectMethod | SpreadElement ];
     let properties: [JNode]
     init(properties: [JNode]) {
@@ -499,7 +513,7 @@ public class JNodeObjectMethod: JNodeObjectMemberP, JNodeFunctionP {
 }
 
 public class JNodeFunctionExpression: JNodeFunctionP, JNodeExpression {
-    public let type = "FunctionExpression"
+    public var type = "FunctionExpression"
     public let id: JNodeIdentifier
     public let params: [JNodePattern]
     public let body: JNodeBlockStatement
@@ -529,7 +543,7 @@ public enum JNodeUnaryOperator:String {
 }
 
 public class JNodeUnaryExpression: JNodeExpression {
-    public let type = "UnaryExpression"
+    public var type = "UnaryExpression"
     let `operator`: JNodeUnaryOperator
     let prefix: Bool
     let argument: JNodeExpression
@@ -546,7 +560,7 @@ public enum JNodeUpdateOperator:String {
 }
 // An update (increment or decrement) operator expression.
 public class JNodeUpdateExpression: JNodeExpression {
-    public let type = "UpdateExpression"
+    public var type = "UpdateExpression"
     let `operator`: JNodeUpdateOperator
     let argument: JNodeExpression
     let prefix: Bool
@@ -585,7 +599,7 @@ public enum JNodeBinaryOperator: String {
 }
 
 public class JNodeBinaryExpression: JNodeExpression {
-    public let type = "BinaryExpression"
+    public var type = "BinaryExpression"
     let `operator`: JNodeBinaryOperator
     let left: JNodeExpression
     let right: JNodeExpression
@@ -612,7 +626,7 @@ public enum JNodeAssignmentOperator: String {
     case bitwiseANDEqual = "&="
 }
 public class JNodeAssignmentExpression: JNodeExpression {
-    public let type = "AssignmentExpression"
+    public var type = "AssignmentExpression"
     let `operator`: JNodeAssignmentOperator
     // left: Pattern | Expression;
     // TODO: Pattern | Expression;
@@ -631,7 +645,7 @@ public enum JNodeLogicalOperator: String {
     case nullishCoalescing = "??"
 }
 public class JNodeLogicalExpression: JNodeExpression {
-    public let type = "LogicalExpression"
+    public var type = "LogicalExpression"
     let `operator`: JNodeLogicalOperator
     let left: JNodeExpression
     let right: JNodeExpression
@@ -643,7 +657,7 @@ public class JNodeLogicalExpression: JNodeExpression {
 }
 
 public class JNodeSpreadElement: JNode {
-    public let type = "SpreadElement"
+    public var type = "SpreadElement"
     let argument: JNodeExpression
     init(argument: JNodeExpression) {
         self.argument = argument
@@ -652,7 +666,7 @@ public class JNodeSpreadElement: JNode {
 
 // A member expression. If `computed` is `true`, the node corresponds to a computed (`a[b]`) member expression and `property` is an `Expression`. If `computed` is `false`, the node corresponds to a static (`a.b`) member expression and `property` is an `Identifier`. The `optional` flags indicates that the member expression can be called even if the object is null or undefined. If this is the object value (null/undefined) should be returned.
 public class JNodeMemberExpression: JNodeExpression, JNodePattern {
-    public let type = "MemberExpression"
+    public var type = "MemberExpression"
     // object: Expression | Super;
     // TODO:
     let object: JNode
@@ -668,7 +682,7 @@ public class JNodeMemberExpression: JNodeExpression, JNodePattern {
 }
 
 public class JNodeBindExpression: JNodeExpression {
-    public let type = "BindExpression"
+    public var type = "BindExpression"
     let object: JNodeExpression?
     let callee: JNodeExpression
     init(object: JNodeExpression?, callee: JNodeExpression) {
@@ -678,7 +692,7 @@ public class JNodeBindExpression: JNodeExpression {
 }
 
 public class JNodeConditionalExpression: JNodeExpression {
-    public let type = "ConditionalExpression"
+    public var type = "ConditionalExpression"
     let test: JNodeExpression
     let alternate: JNodeExpression
     let consequent: JNodeExpression
@@ -715,7 +729,7 @@ public class JNodeNewExpression: JNodeCallExpression {
 
 // A sequence expression, i.e., a comma-separated sequence of expressions.
 public class JNodeSequenceExpression: JNodeExpression {
-    public let type = "SequenceExpression"
+    public var type = "SequenceExpression"
     let expressions: [JNodeExpression]
     init(expressions: [JNodeExpression]) {
         self.expressions = expressions
@@ -723,7 +737,7 @@ public class JNodeSequenceExpression: JNodeExpression {
 }
 
 public class JNodeDoExpression: JNodeExpression {
-    public let type = "DoExpression"
+    public var type = "DoExpression"
     let body: JNodeBlockStatement
     init(body: JNodeBlockStatement) {
         self.body = body
@@ -732,7 +746,7 @@ public class JNodeDoExpression: JNodeExpression {
 
 // Template Literals
 public class JNodeTemplateLiteral: JNodeExpression {
-    public let type = "TemplateLiteral"
+    public var type = "TemplateLiteral"
     let quasis: [JNodeTemplateElement]
     let expressions: [JNodeExpression]
     init(quasis: [JNodeTemplateElement], expressions: [JNodeExpression]) {
@@ -742,7 +756,7 @@ public class JNodeTemplateLiteral: JNodeExpression {
 }
 
 public class JNodeTaggedTemplateExpression: JNodeExpression {
-    public let type = "TaggedTemplateExpression"
+    public var type = "TaggedTemplateExpression"
     let tag: JNodeExpression
     let quasi: JNodeTemplateLiteral
     init(tag: JNodeExpression, quasi: JNodeTemplateLiteral) {
@@ -756,7 +770,7 @@ public class JNodeTemplateElement: JNode {
         let cooked: String?
         let raw: String
     }
-    public let type = "TemplateElement"
+    public var type = "TemplateElement"
     let tail: Bool
     let value: ValueStruct
     init(tail: Bool, value: ValueStruct) {
@@ -774,7 +788,7 @@ public class JNodeAssignmentProperty: JNodeObjectProperty {
 }
 
 public class JNodeObjectPattern: JNodePattern {
-    public let type = "ObjectPattern"
+    public var type = "ObjectPattern"
     // properties: [ AssignmentProperty | RestElement ];
     // TODO:
     let properties: [JNode]
@@ -784,7 +798,7 @@ public class JNodeObjectPattern: JNodePattern {
 }
 
 public class JNodeArrayPattern: JNodePattern {
-    public let type = "ArrayPattern"
+    public var type = "ArrayPattern"
     let elements: [JNodePattern?]
     init(elements: [JNodePattern?]) {
         self.elements = elements
@@ -792,7 +806,7 @@ public class JNodeArrayPattern: JNodePattern {
 }
 
 public class JNodeRestElement: JNodePattern {
-    public let type = "RestElement"
+    public var type = "RestElement"
     let argument: JNodePattern
     init(argument: JNodePattern) {
         self.argument = argument
@@ -800,7 +814,7 @@ public class JNodeRestElement: JNodePattern {
 }
 
 public class JNodeAssignmentPattern: JNodePattern {
-    public let type = "AssignmentPattern"
+    public var type = "AssignmentPattern"
     let left: JNodePattern
     let right: JNodeExpression
     init(left: JNodePattern, right: JNodeExpression) {
@@ -824,7 +838,7 @@ public class JNodeClass: JNode {
 }
 
 public class JNodeClassBody: JNode {
-    public let type = "ClassBody"
+    public var type = "ClassBody"
     // body: [ ClassMethod | ClassPrivateMethod | ClassProperty | ClassPrivateProperty ];
     // TODO:
     let body: [JNode]
@@ -837,7 +851,7 @@ enum JNodeClassMethodKind: String {
     case constructor, method, get, set
 }
 public class JNodeClassMethod: JNodeFunctionP {
-    public let type = "ClassMethod"
+    public var type = "ClassMethod"
     let key: JNodeExpression
     let kind: JNodeClassMethodKind
     let computed: Bool
@@ -863,7 +877,7 @@ public class JNodeClassMethod: JNodeFunctionP {
 }
 
 public class JNodeClassPrivateMethod: JNodeFunctionP {
-    public let type = "ClassPrivateMethod"
+    public var type = "ClassPrivateMethod"
     let key: JNodePrivateName
     let kind: JNodeClassMethodKind
     let `static`: Bool
@@ -887,7 +901,7 @@ public class JNodeClassPrivateMethod: JNodeFunctionP {
 }
 
 public class JNodeClassProperty: JNode {
-    public let type = "ClassProperty"
+    public var type = "ClassProperty"
     let key: JNodeExpression
     let value: JNodeExpression
     let `static`: Bool
@@ -901,7 +915,7 @@ public class JNodeClassProperty: JNode {
 }
 
 public class JNodeClassPrivateProperty: JNode {
-    public let type = "ClassPrivateProperty"
+    public var type = "ClassPrivateProperty"
     let key: JNodePrivateName
     let value: JNodeExpression
     let `static`: Bool
@@ -929,7 +943,7 @@ public class JNodeClassExpression: JNodeClass, JNodeExpression {
 }
 
 public class JNodeMetaProperty: JNodeExpression {
-    public let type = "MetaProperty"
+    public var type = "MetaProperty"
     let meta: JNodeIdentifier
     let property: JNodeIdentifier
     init(meta: JNodeIdentifier, property: JNodeIdentifier) {
@@ -951,7 +965,7 @@ public class JNodeModuleSpecifier: JNode {
 
 // An import declaration, e.g., `import foo from "mod";`.
 public class JNodeImportDeclaration: JNodeModuleDeclaration {
-    public let type = "ImportDeclaration"
+    public var type = "ImportDeclaration"
     // specifiers: [ ImportSpecifier | ImportDefaultSpecifier | ImportNamespaceSpecifier ];
     // TODO:
     let specifiers: [JNode]
@@ -996,7 +1010,7 @@ public class JNodeImportNamespaceSpecifier: JNodeModuleSpecifier {
  _Note: Having `declaration` populated with non-empty `specifiers` or non-null `source` results in an invalid state._
  */
 public class JNodeExportNamedDeclaration: JNodeModuleDeclaration {
-    public let type = "ExportNamedDeclaration"
+    public var type = "ExportNamedDeclaration"
     let declaration: JNodeDeclaration?
     let specifiers: [JNodeExportSpecifier]
     let source: JNodeLiteral?
@@ -1035,7 +1049,7 @@ public class JNodeOptClassDeclaration: JNodeClassDeclaration {
 
 // An export default declaration, e.g., `export default function () {};` or `export default 1;`.
 public class JNodeExportDefaultDeclaration: JNodeModuleDeclaration {
-    public let type = "ExportDefaultDeclaration"
+    public var type = "ExportDefaultDeclaration"
     // declaration: OptFunctionDeclaration | OptClassDeclaration | Expression;
     // TODO:
     let declaration: JNode
@@ -1046,7 +1060,7 @@ public class JNodeExportDefaultDeclaration: JNodeModuleDeclaration {
 
 // An export batch declaration, e.g., `export * from "mod";`.
 public class JNodeExportAllDeclaration: JNodeModuleDeclaration {
-    public let type = "ExportAllDeclaration"
+    public var type = "ExportAllDeclaration"
     let source: JNodeLiteral
     init(source: JNodeLiteral) {
         self.source = source

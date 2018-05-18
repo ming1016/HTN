@@ -12,9 +12,8 @@ import HTN
 class VueTest {
     var isPrintable = true
     let _case_tmp = """
-var a _= c
-var b = ${}
-var d = a / 34.3 + 3 * k
+const PI = 3.141593
+PI > 3.0
 """
     let _case_1 = """
 const tokens = [45,34.5,"this","is","case1 content is const tokens = [\\"bulabula\\"]"];
@@ -23,19 +22,20 @@ if (/[0-9]/.test(currentChar)) {
 }
 """
     let _case_1_hash = """
-const|const:tokens|none:=|eq:[|braceL:45|float:,|comma:34.5|float:,|comma:this|string:,|comma:is|string:,|comma:case1 content is const tokens = [slash"bulabulaslash"]|string:]|braceR:|eof:if|if:(|parenL:/[0-9]/|regular:.|dot:test|none:(|parenL:currentChar|none:)|parenR:)|parenR:{|braceL:|eof:var|var:num|none:=|eq:1244.7|float:%|modulo:889|float:|eof:}|braceR:
+const|const:tokens|name:=|eq:[|braceL:45|float:,|comma:34.5|float:,|comma:this|string:,|comma:is|string:,|comma:case1 content is const tokens = [slash"bulabulaslash"]|string:]|braceR:|eof:if|if:(|parenL:/[0-9]/|regular:.|dot:test|name:(|parenL:currentChar|name:)|parenR:)|parenR:{|braceL:|eof:var|var:num|name:=|eq:1244.7|float:%|modulo:889|float:|eof:}|braceR:
 """
     
     func LetTestBegin() {
         checkCase_1()
         checkCase_2()
+        
     }
     
     // 检查 Case
     // Case2
     func checkCase_2() {
-        let tks = JTokenizer(_case_tmp).tokenizer()
-        let hash = hashFrom(tokens: tks)
+        let re = JParser(_case_tmp).parser()
+        
     }
     // Case1 包含了字符串，正则，数字还有基本的 token 的测试
     func checkCase_1() {

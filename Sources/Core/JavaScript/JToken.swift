@@ -26,7 +26,7 @@ public enum JTokenType:String {
     
     case string    // 字符
     case name      // 命名
-    case eof       // 间隔，包括空格和换行
+    case eof       // 间隔，换行
     case regular   // 正则
     
     // 标点符号

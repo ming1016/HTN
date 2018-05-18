@@ -206,7 +206,7 @@ public class JTokenizer {
         return tokens
     }
     
-    func tokenFrom(_ input:String) -> JToken {
+    private func tokenFrom(_ input:String) -> JToken {
         var tk = JToken()
         switch input {
         case "[":
@@ -388,9 +388,8 @@ public class JTokenizer {
             tk.type = .void
         case "delete":
             tk.type = .delete
-            
         default:
-            tk.type = .none
+            tk.type = .name
         }
         tk.value = input
         return tk

@@ -40,7 +40,6 @@ class ViewController: NSViewController {
             htmlToTexture()
         }
         
-        
     }
     
     func jsonToFrame() {
@@ -82,10 +81,6 @@ class ViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.nativeCodeLb.font = NSFont.userFont(ofSize: 16)
-        
-//        let a = JTokenizer("(add 2 (subtract 4.4 2))").tokenizer()
-//        print("\(a)")
-//        _ = CodeGeneratorFromJSToOC("(add 2 (subtract 4.4 2))")
         
         //justTest()
         VueTest().LetTestBegin()
