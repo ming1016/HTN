@@ -11,7 +11,15 @@ public struct JToken {
     public var type = JTokenType.none
     public var value = ""
     public var options = [JTokenOption]()
-    public var priority:Int = 0
+    public var binop:Int = 0
+    
+    public var beforeExpr = false
+    public var startsExpr = false
+    public var isLoop = false
+    public var isAssign = false
+    public var prefix = false
+    public var postfix = false
+    public var rightAssociative = false
 }
 
 public class JTokenizer {
@@ -56,6 +64,7 @@ public class JTokenizer {
                 }
                 var tk = JToken()
                 tk.type = .string
+                tk.startsExpr = true
                 tk.value = cSb
                 tokens.append(tk)
                 continue
@@ -166,9 +175,11 @@ public class JTokenizer {
                 // 判断数字类型
                 if numStr.isInt() {
                     tk.type = .int
+                    tk.startsExpr = true
                 }
                 if numStr.isFloat() {
                     tk.type = .float
+                    tk.startsExpr = true
                 }
                 tk.value = numStr
                 tokens.append(tk)
@@ -210,43 +221,61 @@ public class JTokenizer {
         var tk = JToken()
         switch input {
         case "[":
-            tk.type = .braceL
+            tk.type = .bracketL
+            tk.beforeExpr = true
+            tk.startsExpr = true
         case "]":
-            tk.type = .braceR
+            tk.type = .bracketR
         case "{":
             tk.type = .braceL
+            tk.beforeExpr = true
+            tk.startsExpr = true
         case "{|":
             tk.type = .braceBarL
+            tk.beforeExpr = true
+            tk.startsExpr = true
         case "}":
             tk.type = .braceR
         case "|}":
             tk.type = .braceBarR
         case "(":
             tk.type = .parenL
+            tk.beforeExpr = true
+            tk.startsExpr = true
         case ")":
             tk.type = .parenR
         case ",":
             tk.type = .comma
+            tk.beforeExpr = true
         case ";":
             tk.type = .semi
+            tk.beforeExpr = true
         case ":":
             tk.type = .colon
+            tk.beforeExpr = true
         case "::":
             tk.type = .doubleColon
+            tk.beforeExpr = true
         case ".":
             tk.type = .dot
         case "?":
             tk.type = .question
+            tk.beforeExpr = true
         case "?.":
             tk.type = .questiondot
         case "=>":
             tk.type = .arrow
+            tk.beforeExpr = true
         case "...":
             tk.type = .ellipsis
+            tk.beforeExpr = true
         case "`":
             tk.type = .backQuote
+            tk.startsExpr = true
         case "${":
             tk.type = .dollarBraceL
+            tk.beforeExpr = true
+            tk.startsExpr = true
         case "@":
             tk.type = .at
         case "#":
@@ -255,61 +284,79 @@ public class JTokenizer {
         // 操作符
         case "=":
             tk.type = .eq
+            tk.beforeExpr = true
+            tk.isAssign = true
         case "_=":
             tk.type = .assign
+            tk.beforeExpr = true
+            tk.isAssign = true
         case "++", "--":
             tk.type = .incDec
+            tk.prefix = true
+            tk.postfix = true
+            tk.startsExpr = true
         case "!":
             tk.type = .bang
+            tk.beforeExpr = true
+            tk.prefix = true
+            tk.startsExpr = true
         case "~":
             tk.type = .tilde
+            tk.beforeExpr = true
+            tk.prefix = true
+            tk.startsExpr = true
         
         // 有优先级的操作符
         case "|>":
             tk.type = .pipleline
-            tk.priority = 0
+            tk.binop = 0
         case "??":
             tk.type = .nullishCoalescing
-            tk.priority = 1
+            tk.binop = 1
         case "||":
             tk.type = .logicalOR
-            tk.priority = 1
+            tk.binop = 1
         case "&&":
             tk.type = .logicalAND
-            tk.priority = 2
+            tk.binop = 2
         case "|":
             tk.type = .bitwiseOR
-            tk.priority = 3
+            tk.binop = 3
         case "^":
             tk.type = .bitwiseXOR
-            tk.priority = 4
+            tk.binop = 4
         case "&":
             tk.type = .bitwiseAND
-            tk.priority = 5
+            tk.binop = 5
         case "==", "!=", "===":
             tk.type = .equality
-            tk.priority = 6
+            tk.binop = 6
         case "<", ">":
             tk.type = .relational
-            tk.priority = 7
+            tk.binop = 7
         case "<<", ">>":
             tk.type = .bitShift
-            tk.priority = 8
+            tk.binop = 8
         case "+", "-":
             tk.type = .plusMin
-            tk.priority = 9
+            tk.binop = 9
+            tk.beforeExpr = true
+            tk.prefix = true
+            tk.startsExpr = true
         case "%":
             tk.type = .modulo
-            tk.priority = 10
+            tk.binop = 10
         case "*":
             tk.type = .star
-            tk.priority = 10
+            tk.binop = 10
         case "/":
             tk.type = .slash
-            tk.priority = 10
+            tk.binop = 10
         case "**":
             tk.type = .exponent
-            tk.priority = 11
+            tk.binop = 11
+            tk.beforeExpr = true
+            tk.rightAssociative = true
         
         // 关键字
         case "template":
@@ -318,6 +365,7 @@ public class JTokenizer {
             tk.type = .break
         case "case":
             tk.type = .case
+            tk.beforeExpr = true
         case "catch":
             tk.type = .catch
         case "continue":
@@ -326,24 +374,34 @@ public class JTokenizer {
             tk.type = .debugger
         case "default":
             tk.type = .default
+            tk.beforeExpr = true
         case "do":
             tk.type = .do
+            tk.isLoop = true
+            tk.beforeExpr = true
         case "else":
             tk.type = .else
+            tk.beforeExpr = true
         case "finally":
             tk.type = .finally
         case "for":
             tk.type = .for
+            tk.isLoop = true
         case "function":
             tk.type = .function
+            tk.startsExpr = true
         case "if":
             tk.type = .if
         case "return":
             tk.type = .return
+            tk.beforeExpr = true
         case "switch":
             tk.type = .switch
         case "throw":
             tk.type = .throw
+            tk.beforeExpr = true
+            tk.prefix = true
+            tk.startsExpr = true
         case "try":
             tk.type = .try
         case "var":
@@ -354,42 +412,68 @@ public class JTokenizer {
             tk.type = .const
         case "while":
             tk.type = .while
+            tk.isLoop = true
         case "with":
             tk.type = .with
         case "new":
             tk.type = .new
+            tk.beforeExpr = true
+            tk.startsExpr = true
         case "this":
             tk.type = .this
+            tk.startsExpr = true
         case "super":
             tk.type = .super
+            tk.startsExpr = true
         case "class":
             tk.type = .class
         case "extends":
             tk.type = .extends
+            tk.beforeExpr = true
         case "export":
             tk.type = .export
         case "import":
             tk.type = .import
+            tk.startsExpr = true
         case "yield":
             tk.type = .yield
+            tk.beforeExpr = true
+            tk.startsExpr = true
         case "null":
             tk.type = .null
+            tk.startsExpr = true
         case "true":
             tk.type = .true
+            tk.startsExpr = true
         case "false":
             tk.type = .false
+            tk.startsExpr = true
         case "in":
             tk.type = .in
+            tk.beforeExpr = true
+            tk.binop = 7
         case "instance":
             tk.type = .instanceof
+            tk.beforeExpr = true
+            tk.binop = 7
         case "typeof":
             tk.type = .typeof
+            tk.beforeExpr = true
+            tk.prefix = true
+            tk.startsExpr = true
         case "void":
             tk.type = .void
+            tk.beforeExpr = true
+            tk.prefix = true
+            tk.startsExpr = true
         case "delete":
             tk.type = .delete
+            tk.beforeExpr = true
+            tk.prefix = true
+            tk.startsExpr = true
         default:
             tk.type = .name
+            tk.startsExpr = true
         }
         tk.value = input
         return tk

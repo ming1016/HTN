@@ -35,6 +35,10 @@ public class JParser {
         }
     }
     
+    private func match(_ tkType: JTokenType) -> Bool {
+        return _currentTk.type == tkType
+    }
+    
     // TODO: 未完成时用的，完成时应该去掉这个方法。每个 token 的前进都需要通过 eat 函数来
     private func advance() {
         _tkIndex += 1
@@ -55,14 +59,14 @@ public class JParser {
         return programNode
     }
     
+    // DONE
     private func parseBlockBody(program: JNodeProgram, end: JTokenType) {
         parseBlockOrModuleBlockBody(program: program, end: end)
     }
     
+    // DONE
     private func parseBlockOrModuleBlockBody(program: JNodeProgram, end: JTokenType) {
-//        while !eat(.eof) {
-//
-//        }
+
         var end = false
         while !end {
             let stmt = parseStatement()
@@ -76,11 +80,13 @@ public class JParser {
         
     }
     
+    // DONE
     private func parseStatement() -> JNodeStatement {
         // TODO * decorator
         return parseStatementContent()
     }
     
+    // TODO:
     private func parseStatementContent() -> JNodeStatement {
         let startType = _currentTk.type
         var node:JNodeStatement = JNodeStatementBase()
@@ -191,6 +197,7 @@ public class JParser {
         return JNodeStatementBase()
     }
     
+    // TODO:
     func parseVarStatement(kind: JTokenType) -> JNodeVariableDeclaration {
         advance()
         let node = parseVar(kind: kind)
@@ -198,6 +205,7 @@ public class JParser {
         return node
     }
     
+    // TODO:
     func parseVar(kind: JTokenType) -> JNodeVariableDeclaration {
         let declarations = [JNodeVariableDeclarator]()
         
@@ -213,20 +221,29 @@ public class JParser {
         return JNodeVariableDeclaration(declarations: declarations, kind: kind.rawValue)
     }
     
+    // DONE
     func parseVarHead() -> JNodePattern {
         return parseBindingAtom()
     }
     
+    // TODO:
     func parseBindingAtom() -> JNodePattern {
         switch _currentTk.type {
         case .yield, .name:
             return parseBindingIdentifier()
+        case .bracketL:
+            // TODO: ArrayPattern 的处理
+            _ = eat(.bracketL)
+            let elements = parseBindingList(close: .bracketR)
+            return JNodeArrayPattern(elements: elements)
+//        case .braceL:
+            
         default:
-            doNothing()
+            fatalError("parseBindingAtom expect legal token")
         }
-        return parseBindingIdentifier()
     }
     
+    // DONE
     func parseBindingIdentifier() -> JNodeIdentifier {
         var name = ""
         if eat(.name) {
@@ -234,6 +251,106 @@ public class JParser {
         }
         return JNodeIdentifier(name: name)
     }
+    
+    // TODO:
+    // 数组 []
+    func parseBindingList(close: JTokenType, allowEmpty:Bool = true) -> [JNodePattern?] {
+        var elts = [JNodePattern?]()
+        var first = true
+        
+        while !eat(close) {
+            if first {
+                first = false
+            } else {
+                _ = eat(.comma)
+            }
+            
+            if allowEmpty && eat(.comma) {
+                elts.append(nil)
+            } else if eat(close) {
+                break
+            } else if match(.ellipsis) {
+                // TODO: parseAssignableListItemTypes
+                break
+            } else {
+                // TODO: decorators
+                
+                elts.append(parseAssignableListItem())
+            }
+        }
+        
+        return [JNodePattern?]()
+    }
+    
+    // TODO:
+    func parseAssignableListItem() -> JNodePattern {
+        let left = parseMaybeDefault(left: nil)
+        return left
+    }
+    
+    // done 没有 = 号的只返回左边
+    func parseMaybeDefault(left: JNodePattern?) -> JNodePattern {
+        var mLeft = left
+        if left == nil {
+            mLeft = parseBindingAtom()
+        }
+        if !eat(.eq) {
+            return mLeft!
+        }
+        return JNodeAssignmentPattern(left: mLeft!, right: parseMaybeAssign())
+    }
+    
+    // TODO:
+    func parseMaybeAssign() -> JNodeExpression {
+        // TODO: yield afterLeftParse
+//        let left =
+        
+        return JNodeExpressionBase()
+    }
+    
+    // TODO:
+    func parseMaybeConditional() -> JNodeExpression {
+        //
+        return JNodeExpressionBase()
+    }
+    
+    // TODO:
+    func parseExprOps() -> JNodeExpression {
+        
+        return JNodeExpressionBase()
+    }
+    
+    // TODO:
+    func parseMaybeUnary() -> JNodeExpression {
+        if _currentTk.prefix {
+            let update = match(.incDec)
+            let opt = _currentTk.value
+            var prefix = true
+            
+            advance()
+            
+            let argType = _currentTk.type
+            let argument = parseMaybeUnary()
+            
+            if update {
+                return JNodeUpdateExpression(operator: opt, argument: argument, prefix: true)
+            } else {
+                return JNodeUnaryExpression(operator: opt, prefix: true, argument: argument)
+            }
+        }
+        
+    }
+    
+    // TODO:
+    func parseExprSubscripts() -> JNodeExpression {
+        return JNodeExpressionBase()
+    }
+    
+    // TODO:
+    func parseSubscript() -> JNodeExpression {
+        return JNodeExpressionBase()
+    }
+    
     
     func parseWhileStatement() -> JNodeStatement {
         return JNodeStatementBase()
