@@ -529,7 +529,7 @@ public class JNodeFunctionExpression: JNodeFunctionP, JNodeExpression {
 }
 
 // Unary operations
-
+// 暂时不用，做参考
 public enum JNodeUnaryOperator:String {
     case min = "-"
     case plus = "+"
@@ -539,21 +539,21 @@ public enum JNodeUnaryOperator:String {
     case void = "void"
     case delete = "delete"
     case `throw` = "throw"
-    
 }
 
 public class JNodeUnaryExpression: JNodeExpression {
     public var type = "UnaryExpression"
-    let `operator`: JNodeUnaryOperator
+    let `operator`: String
     let prefix: Bool
     let argument: JNodeExpression
-    init(operator: JNodeUnaryOperator, prefix: Bool, argument: JNodeExpression) {
+    init(operator: String, prefix: Bool, argument: JNodeExpression) {
         self.operator = `operator`
         self.prefix = prefix
         self.argument = argument
     }
 }
 
+// 暂时不用，做参考
 public enum JNodeUpdateOperator:String {
     case inc = "++"
     case dec = "--"
@@ -561,10 +561,10 @@ public enum JNodeUpdateOperator:String {
 // An update (increment or decrement) operator expression.
 public class JNodeUpdateExpression: JNodeExpression {
     public var type = "UpdateExpression"
-    let `operator`: JNodeUpdateOperator
+    let `operator`: String
     let argument: JNodeExpression
     let prefix: Bool
-    init(operator: JNodeUpdateOperator, argument: JNodeExpression, prefix: Bool) {
+    init(operator: String, argument: JNodeExpression, prefix: Bool) {
         self.operator = `operator`
         self.argument = argument
         self.prefix = prefix
@@ -610,6 +610,7 @@ public class JNodeBinaryExpression: JNodeExpression {
     }
 }
 
+// 暂时不用
 public enum JNodeAssignmentOperator: String {
     case equal = "="
     case plusEqual = "+="
@@ -627,12 +628,12 @@ public enum JNodeAssignmentOperator: String {
 }
 public class JNodeAssignmentExpression: JNodeExpression {
     public var type = "AssignmentExpression"
-    let `operator`: JNodeAssignmentOperator
+    let `operator`: String
     // left: Pattern | Expression;
     // TODO: Pattern | Expression;
     let left: JNode
     let right: JNodeExpression
-    init(operator: JNodeAssignmentOperator, left: JNode, right: JNodeExpression) {
+    init(operator: String, left: JNode, right: JNodeExpression) {
         self.operator = `operator`
         self.left = left
         self.right = right
@@ -1066,6 +1067,8 @@ public class JNodeExportAllDeclaration: JNodeModuleDeclaration {
         self.source = source
     }
 }
+
+
 
 
 

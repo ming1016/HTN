@@ -7,15 +7,6 @@
 
 import Foundation
 
-public enum JTokenOption {
-    case beforeExpr
-    case startsExpr
-    case rightAssociative
-    case isLoop
-    case isAssign
-    case prefix
-    case postfix
-}
 // ES 标准
 public enum JTokenType:String {
     case none

@@ -10,7 +10,6 @@ import Foundation
 public struct JToken {
     public var type = JTokenType.none
     public var value = ""
-    public var options = [JTokenOption]()
     public var binop:Int = 0
     
     public var beforeExpr = false
@@ -20,6 +19,8 @@ public struct JToken {
     public var prefix = false
     public var postfix = false
     public var rightAssociative = false
+    
+    public var isKeyword = false // 是否是关键字
 }
 
 public class JTokenizer {
@@ -361,116 +362,154 @@ public class JTokenizer {
         // 关键字
         case "template":
             tk.type = .template
+            tk.isKeyword = true
         case "break":
             tk.type = .break
+            tk.isKeyword = true
         case "case":
             tk.type = .case
             tk.beforeExpr = true
+            tk.isKeyword = true
         case "catch":
             tk.type = .catch
+            tk.isKeyword = true
         case "continue":
             tk.type = .continue
+            tk.isKeyword = true
         case "debugger":
             tk.type = .debugger
+            tk.isKeyword = true
         case "default":
             tk.type = .default
             tk.beforeExpr = true
+            tk.isKeyword = true
         case "do":
             tk.type = .do
             tk.isLoop = true
             tk.beforeExpr = true
+            tk.isKeyword = true
         case "else":
             tk.type = .else
             tk.beforeExpr = true
+            tk.isKeyword = true
         case "finally":
             tk.type = .finally
+            tk.isKeyword = true
         case "for":
             tk.type = .for
             tk.isLoop = true
+            tk.isKeyword = true
         case "function":
             tk.type = .function
             tk.startsExpr = true
+            tk.isKeyword = true
         case "if":
             tk.type = .if
+            tk.isKeyword = true
         case "return":
             tk.type = .return
             tk.beforeExpr = true
+            tk.isKeyword = true
         case "switch":
             tk.type = .switch
+            tk.isKeyword = true
         case "throw":
             tk.type = .throw
             tk.beforeExpr = true
             tk.prefix = true
             tk.startsExpr = true
+            tk.isKeyword = true
         case "try":
             tk.type = .try
+            tk.isKeyword = true
         case "var":
             tk.type = .var
+            tk.isKeyword = true
         case "let":
             tk.type = .let
+            tk.isKeyword = true
         case "const":
             tk.type = .const
+            tk.isKeyword = true
         case "while":
             tk.type = .while
             tk.isLoop = true
+            tk.isKeyword = true
         case "with":
             tk.type = .with
+            tk.isKeyword = true
         case "new":
             tk.type = .new
             tk.beforeExpr = true
             tk.startsExpr = true
+            tk.isKeyword = true
         case "this":
             tk.type = .this
             tk.startsExpr = true
+            tk.isKeyword = true
         case "super":
             tk.type = .super
             tk.startsExpr = true
+            tk.isKeyword = true
         case "class":
             tk.type = .class
+            tk.isKeyword = true
         case "extends":
             tk.type = .extends
             tk.beforeExpr = true
+            tk.isKeyword = true
         case "export":
             tk.type = .export
+            tk.isKeyword = true
         case "import":
             tk.type = .import
             tk.startsExpr = true
+            tk.isKeyword = true
         case "yield":
             tk.type = .yield
             tk.beforeExpr = true
             tk.startsExpr = true
+            tk.isKeyword = true
         case "null":
             tk.type = .null
             tk.startsExpr = true
+            tk.isKeyword = true
         case "true":
             tk.type = .true
             tk.startsExpr = true
+            tk.isKeyword = true
         case "false":
             tk.type = .false
             tk.startsExpr = true
+            tk.isKeyword = true
         case "in":
             tk.type = .in
             tk.beforeExpr = true
             tk.binop = 7
+            tk.isKeyword = true
         case "instance":
             tk.type = .instanceof
             tk.beforeExpr = true
             tk.binop = 7
+            tk.isKeyword = true
         case "typeof":
             tk.type = .typeof
             tk.beforeExpr = true
             tk.prefix = true
             tk.startsExpr = true
+            tk.isKeyword = true
         case "void":
             tk.type = .void
             tk.beforeExpr = true
             tk.prefix = true
             tk.startsExpr = true
+            tk.isKeyword = true
         case "delete":
             tk.type = .delete
             tk.beforeExpr = true
             tk.prefix = true
             tk.startsExpr = true
+            tk.isKeyword = true
         default:
             tk.type = .name
             tk.startsExpr = true
