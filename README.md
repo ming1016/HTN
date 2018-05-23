@@ -4,6 +4,7 @@
 
 ## 待完成
 
+* 延后解析 decorators，directives，await，async，arrow，parseArrowExpression，yield，containsEsc，regexp（regular）
 * 依据 antlr 里 grammars-v4
  <https://github.com/antlr/grammars-v4/blob/master/objc/ObjectiveCParser.g4> 设计对应 OC 的 ONode 用作 AST 转换，该语法规则已在 AFNetworking，SDWebImage，ReactiveCocoa，AsyncDisplayKit 和 fmdb 等大型开源库上 parsed，正确率超过 95%。
 * 设计 JState 结构来管理处理过程中的状态，async 语法的分析和支持
@@ -28,6 +29,7 @@
 
 ## 已完成
 
+* 不要返回的 eat 函数替换成 expect
 * tokenizer 里添加 peek 方法，完善 token 处理
 * 使用 babel 转 es7 和 es6 到 es5，按 ES5 <https://github.com/estree/estree/blob/master/es5.md> 节点标准来设计 JNode
 * 完成 Token 类型 es 标准的设计以及字符串的获取，正则的获取，空格换行和 ; 符号，数字，关键字，符号和操作符的处理。
@@ -36,9 +38,71 @@
 * 基本运算符对应oc，雏形。
 * Babel 插件研究。
 
-## 18.5.19
+## 待添加的 case
 
-### JNodeVariableDeclaration
+```js
+const callee = (node.callee = this.parseNoCallExpr());
+```
+
+## 18.5.23
+
+### JParser 里的工具函数
+
+```swift
+// 返回当前 token
+private var _currentTk: JToken {
+    if _tkIndex < _tks.count {
+        return _tks[_tkIndex]
+    }
+    return JToken()
+}
+
+// 下一个 token
+private var _nextTk: JToken {
+    if _tkIndex + 1 < _tks.count {
+        return _tks[_tkIndex + 1]
+    }
+    return JToken()
+}
+
+// 当前 token 如果符合入参指定类型就 eat 掉，同时当前 token 变为下一个 token
+private func eat(_ tkType: JTokenType) -> Bool {
+    if _currentTk.type == tkType {
+        _tkIndex += 1
+        return true
+    } else {
+        print("Error, next token not expect as \(tkType.rawValue)")
+        return false
+        //fatalError("Error, next token not expect as \(tkType.rawValue)")
+    }
+}
+
+// 和 eat 一样，但是没有返回布尔值，如果不匹配直接报错
+private func expect(_ tkType: JTokenType) {
+    if _currentTk.type == tkType {
+        _tkIndex += 1
+    } else {
+        fatalError("Error, next token not expect as \(tkType.rawValue)")
+    }
+}
+
+// 判断当前 token 是否和入参类型一样，返回布尔值，不匹配不会中断报错
+private func match(_ tkType: JTokenType) -> Bool {
+    return _currentTk.type == tkType
+}
+
+// 直接跳到下一个 token
+private func advance() {
+    _tkIndex += 1
+}
+
+// 判断是否是结束 token 不是就报错
+private func semicolon() {
+    if _currentTk.type != .eof {
+        fatalError("Error: Unexpected token, expected semi")
+    }
+}
+```
 
 ## 18.5.18
 

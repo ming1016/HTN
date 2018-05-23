@@ -11,6 +11,7 @@ public class JParser {
     private var _tkIndex = 0
     private var _tks = [JToken]()
     
+    // 返回当前 token
     private var _currentTk: JToken {
         if _tkIndex < _tks.count {
             return _tks[_tkIndex]
@@ -18,6 +19,7 @@ public class JParser {
         return JToken()
     }
     
+    // 下一个 token
     private var _nextTk: JToken {
         if _tkIndex + 1 < _tks.count {
             return _tks[_tkIndex + 1]
@@ -25,23 +27,42 @@ public class JParser {
         return JToken()
     }
     
+    // 当前 token 如果符合入参指定类型就 eat 掉，同时当前 token 变为下一个 token
     private func eat(_ tkType: JTokenType) -> Bool {
         if _currentTk.type == tkType {
             _tkIndex += 1
             return true
         } else {
-            fatalError("Error, next token not expect as \(tkType.rawValue)")
+            print("Error, next token not expect as \(tkType.rawValue)")
             return false
+            //fatalError("Error, next token not expect as \(tkType.rawValue)")
         }
     }
     
+    // 和 eat 一样，但是没有返回布尔值，如果不匹配直接报错
+    private func expect(_ tkType: JTokenType) {
+        if _currentTk.type == tkType {
+            _tkIndex += 1
+        } else {
+            fatalError("Error, next token not expect as \(tkType.rawValue)")
+        }
+    }
+    
+    // 判断当前 token 是否和入参类型一样，返回布尔值，不匹配不会中断报错
     private func match(_ tkType: JTokenType) -> Bool {
         return _currentTk.type == tkType
     }
     
-    // TODO: 未完成时用的，完成时应该去掉这个方法。每个 token 的前进都需要通过 eat 函数来
+    // 直接跳到下一个 token
     private func advance() {
         _tkIndex += 1
+    }
+    
+    // 判断是否是结束 token 不是就报错
+    private func semicolon() {
+        if _currentTk.type != .eof {
+            fatalError("Error: Unexpected token, expected semi")
+        }
     }
     
     public init(_ input: String) {
@@ -60,12 +81,12 @@ public class JParser {
     }
     
     // DONE
-    private func parseBlockBody(program: JNodeProgram, end: JTokenType) {
+    private func parseBlockBody(program: JNodeStatement, end: JTokenType) {
         parseBlockOrModuleBlockBody(program: program, end: end)
     }
     
     // DONE
-    private func parseBlockOrModuleBlockBody(program: JNodeProgram, end: JTokenType) {
+    private func parseBlockOrModuleBlockBody(program: JNodeStatement, end: JTokenType) {
 
         var end = false
         while !end {
@@ -73,11 +94,13 @@ public class JParser {
             if stmt.type == "" {
                 end = true
             } else {
-                program.body.append(stmt)
-            }
-            
-        }
-        
+                if program.type == "program" {
+                    (program as! JNodeProgram).body.append(stmt)
+                } else if program.type == "BlockStatement" {
+                    (program as! JNodeBlockStatement).body.append(stmt)
+                }
+            } // end if
+        } // end while
     }
     
     // DONE
@@ -153,7 +176,22 @@ public class JParser {
     }
     
     // ------ 不同节点类型 Parser --------
+    // TODO:
     func parseBreakContinueStatement() -> JNodeContinueStatement {
+        let isBreak = _currentTk.type == .break
+        advance()
+        
+        var label:JNodeIdentifier? = nil
+        
+        if _currentTk.type == .eof {
+            
+        } else if !match(.name) {
+            fatalError("Error: parseBreakContinueStatement not match name token type")
+        } else {
+            label = parseIdentifier()
+            
+        }
+        
         return JNodeContinueStatement(label: JNodeIdentifier(name: ""))
     }
     
@@ -173,8 +211,8 @@ public class JParser {
         return JNodeStatementBase()
     }
     
-    func parseClass() -> JNodeStatement {
-        return JNodeStatementBase()
+    func parseClass() -> JNodeClass {
+        return JNodeClass(id: nil, superClass: nil, body: JNodeClassBody(body: [JNode]()), decorators: [JNodeDecorator]())
     }
     
     func parseIfStatement() -> JNodeStatement {
@@ -201,7 +239,7 @@ public class JParser {
     func parseVarStatement(kind: JTokenType) -> JNodeVariableDeclaration {
         advance()
         let node = parseVar(kind: kind)
-        _ = eat(.eof)
+        expect(.eof)
         return node
     }
     
@@ -236,7 +274,7 @@ public class JParser {
             return parseBindingIdentifier()
         case .bracketL:
             // TODO: ArrayPattern 的处理
-            _ = eat(.bracketL)
+            expect(.bracketL)
             let elements = parseBindingList(close: .bracketR)
             return JNodeArrayPattern(elements: elements)
         case .braceL:
@@ -261,7 +299,7 @@ public class JParser {
             if first {
                 first = false
             } else {
-                _ = eat(.comma)
+                expect(.comma)
                 if eat(.braceR) {
                     break
                 }
@@ -312,7 +350,7 @@ public class JParser {
         var key:JNodeExpression = JNodeExpressionBase()
         if eat(.bracketL) {
             key = parseMaybeAssign()
-            _ = eat(.bracketR)
+            expect(.bracketR)
         } else {
             if match(.int) || match(.float) || match(.string) {
                 key = parseExprAtom()
@@ -374,7 +412,7 @@ public class JParser {
     
     // DONE
     func parseFunctionParams() -> [JNodePattern] {
-        _ = eat(.parenL)
+        expect(.parenL)
         return parseBindingList(close: .parenR) as! [JNodePattern]
     }
     
@@ -388,14 +426,16 @@ public class JParser {
         return parseBlock()
     }
     
-    // TODO:
+    // DONE
     func parseSpread() -> JNodeSpreadElement {
-        return JNodeSpreadElement(argument: JNodeExpressionBase())
+        advance()
+        return JNodeSpreadElement(argument: parseMaybeAssign())
     }
     
-    // TODO:
+    // DONE
     func parseDecorator() -> JNodeDecorator {
-        return JNodeDecorator(expression: JNodeExpressionBase())
+        advance()
+        return JNodeDecorator(expression: parseMaybeAssign())
     }
     
     // DONE
@@ -427,7 +467,7 @@ public class JParser {
             } else if match(.ellipsis) {
                 // TODO: parseAssignableListItemTypes
                 elts.append(parseAssignableListItemTypes(param: parseRest()))
-                _ = eat(close)
+                expect(close)
                 break
             } else {
                 // TODO: decorators
@@ -475,12 +515,12 @@ public class JParser {
     func parseMaybeAssign() -> JNodeExpression {
         // TODO: yield afterLeftParse
         let left = parseMaybeConditional()
-        
         if _currentTk.isAssign {
             let opt = _currentTk.value
             
             if match(.eq) {
-                toAssignable(node: left)
+                // TODO: 检查用
+                //_ = toAssignable(node: left)
             }
             advance()
             let right = parseMaybeAssign()
@@ -529,23 +569,51 @@ public class JParser {
         
     }
     
-    // TODO:
+    // DONE
     func parseConditional(expr: JNodeExpression) -> JNodeExpression {
-        return JNodeExpressionBase()
+        if eat(.question) {
+            let consequent = parseMaybeAssign()
+            expect(.colon)
+            let alternate = parseMaybeAssign()
+            return JNodeConditionalExpression(test: expr, alternate: alternate, consequent: consequent)
+        }
+        return expr
     }
     
     // DONE
-    func parseExprOps() -> JNodeExpression {
+    func parseExprOps(noIn: Bool = false) -> JNodeExpression {
         let expr = parseMaybeUnary()
         if expr.type == "ArrowFunctionExpression" {
             return expr
         }
-        return parseExprOp(left: expr)
+        return parseExprOp(left: expr, minPrec: -1)
     }
     
-    // TODO:
-    func parseExprOp(left: JNodeExpression) -> JNodeExpression {
-        return JNodeExpressionBase()
+    // DONE
+    func parseExprOp(left: JNodeExpression, minPrec: Int, noIn: Bool = false) -> JNodeExpression {
+        let prec = _currentTk.binop
+        if !noIn || !match(.in) {
+            if prec > minPrec {
+                let opt = _currentTk.value
+                
+                advance()
+                
+                var rightPrec = prec
+                if _currentTk.rightAssociative {
+                    rightPrec = prec - 1
+                }
+                
+                let right = parseExprOp(left: parseMaybeUnary(), minPrec: rightPrec, noIn: noIn)
+                
+                let tkType = _currentTk.type
+                if tkType == .logicalOR || tkType == .logicalAND || tkType == .nullishCoalescing {
+                    return parseExprOp(left: JNodeLogicalExpression(operator: opt, left: left, right: right), minPrec: minPrec, noIn: noIn)
+                } else {
+                    return parseExprOp(left: JNodeBinaryExpression(operator: opt, left: left, right: right), minPrec: minPrec, noIn: noIn)
+                }
+            }
+        }
+        return left
     }
     
     // DONE
@@ -595,22 +663,263 @@ public class JParser {
         let state = ParseSubscriptState()
         while !state.stop {
             //
-            reBase = parseSubscript(expr: reBase, state: state)
+            reBase = parseSubscript(base: reBase, state: state)
         }
         return reBase
     }
     
-    // TODO:
-    func parseSubscript(expr: JNodeExpression, state: ParseSubscriptState) -> JNodeExpression {
+    // DONE
+    func parseSubscript(base: JNodeExpression, state: ParseSubscriptState) -> JNodeExpression {
+        if eat(.doubleColon) {
+            state.stop = true
+            let exp = JNodeBindExpression(object: base, callee: parseNoCallExpr())
+            return parseSubscripts(base: exp)
+        } else if match(.questiondot) {
+            fatalError("Error: questiondot not support now in parseSubscript")
+        } else if eat(.dot) {
+            let pro = parseMaybePrivateName()
+            // TODO: optionalChainMember 状态
+            return JNodeMemberExpression(object: base, property: pro as! JNodeExpression, computed: false, optional: false)
+        } else if eat(.bracketL) {
+            let pro = parseExpression()
+            expect(.bracketR)
+            return JNodeMemberExpression(object: base, property: pro, computed: true, optional: false)
+        } else if match(.parenL) {
+            // TODO: Async 会调用 atPossibleAsync
+            advance()
+            let arg = parseCallExpressionArguments(close: .parenR)
+            return JNodeCallExpression(callee: base, arguments: arg, optional: false)
+        } else if match(.backQuote) {
+            fatalError("Error: template not support now in parseSubscript")
+        } else {
+            state.stop = true
+            return base
+        }
+        return JNodeExpressionBase()
+    }
+    
+    // DONE
+    func parseCallExpressionArguments(close: JTokenType) -> [JNodeExpression] {
+        var elts = [JNodeExpression]()
+        var first = true
+        
+        while !eat(close) {
+            if first {
+                first = false
+            } else {
+                expect(.comma)
+                if eat(close) {
+                    break
+                }
+            }
+            elts.append(parseExprListItem(allowEmpty: false)!)
+        }
+        
+        return elts
+    }
+    
+    // DONE
+    func parseExprListItem(allowEmpty: Bool = false) -> JNodeExpression? {
+        if allowEmpty && match(.comma) {
+            return nil
+        } else if match(.ellipsis) {
+            return parseSpread() as? JNodeExpression
+        } else {
+            return parseMaybeAssign()
+        }
+    }
+    
+    // DONE
+    func parseNoCallExpr() -> JNodeExpression {
+        return parseSubscripts(base: parseExprAtom())
+    }
+    
+    // DONE
+    func parseExprAtom() -> JNodeExpression {
+        switch _currentTk.type {
+        case .super:
+            advance()
+            return JNodeSuper()
+        case .import:
+            if _nextTk.type == .dot {
+                return parseImportMetaProperty()
+            }
+            advance()
+            return JNodeImport()
+        case .this:
+            advance()
+            return JNodeThisExpression()
+        case .yield:
+            fatalError("Error: parseExprAtom not support yield")
+        case .name:
+            return parseIdentifier()
+        case .do:
+            advance()
+            return JNodeDoExpression(body: parseBlock())
+        case .regular:
+            fatalError("Error: parseExprAtom not support regular")
+        case .int, .float, .bigint:
+            let value = _currentTk.value.numberValue!
+            advance()
+            return JNodeNumericLiteral(value: value)
+        case .string:
+            let value = _currentTk.value
+            advance()
+            return JNodeStringLiteral(value: value)
+        case .null:
+            advance()
+            return JNodeNullLiteral()
+        case .true, .false:
+            return parseBooleanLiteral()
+        case .parenL:
+            return parseParenAndDistinguishExpression()
+        case .bracketL:
+            advance()
+            return JNodeArrayExpression(elements: parseExprList(close: .bracketR, allowEmpty: true))
+        case .braceL:
+            return parseObj(isPattern: false)
+        case .function:
+            return parseFunctionExpression()
+        case .at:
+            fatalError("Error: parseExprAtom not support Decorator")
+        case .class:
+            // TODO: 处理 Decorator
+            return parseClass()
+        case .new:
+            return parseNew()
+        case .backQuote:
+            fatalError("Error: parseExprAtom not support parseTemplate for now")
+        case .doubleColon:
+            advance()
+            let callee = parseNoCallExpr()
+            if callee.type == "MemberExpression" {
+                return JNodeBindExpression(object: nil, callee: callee)
+            } else {
+                fatalError("Error: parseExprAtom Binding should be performed on object property.")
+            }
+        default:
+            fatalError("Error: parseExprAtom no case here")
+        }
         
         return JNodeExpressionBase()
     }
     
-    // TODO:
-    func parseExprAtom() -> JNodeExpression {
-        return JNodeExpressionBase()
+    // DONE
+    func parseNew() -> JNodeExpression {
+        let meta = parseIdentifier() // 暂时就 advance 跳过
+        if eat(.dot) {
+            let metaProp = parseMetaProperty(meta: meta)
+            return metaProp
+        }
+        
+        let callee = parseNoCallExpr()
+        if callee.type == "OptionalMemberExpression" || callee.type == "OptionalCallExpression" {
+            fatalError("Error: parseNew constructors in/after an Optional Chain are not allowed")
+        }
+        
+        if eat(.questiondot) {
+            fatalError("Error: parseNew constructors in/after an Optional Chain are not allowed")
+        }
+        
+        return JNodeNewExpression(callee: callee, arguments: parseNewArguments() as! [JNode], optional: false)
     }
     
+    // DONE
+    func parseNewArguments() -> [JNodeExpression?] {
+        if eat(.parenL) {
+            return parseExprList(close: .parenR)
+        } else {
+            return [JNodeExpression?]()
+        }
+    }
+    
+    // DONE
+    func parseMetaProperty(meta: JNodeIdentifier) -> JNodeMetaProperty {
+        return JNodeMetaProperty(meta: meta, property: parseIdentifier())
+    }
+    
+    // DONE
+    func parseFunctionExpression() -> JNodeExpression {
+        let meta = parseIdentifier()
+        if eat(.dot) {
+            return parseMetaProperty(meta: meta)
+        }
+        return parseFunction(isStatement: false)
+    }
+    
+    // DONE
+    func parseFunction(isStatement: Bool) -> JNodeFunction {
+        return JNodeFunction(id: JNodeIdentifier(name: ""), params: parseFunctionParams(), body: parseFunctionBodyAndFinish(), generator: false, async: false)
+    }
+    
+    // DONE
+    // 用于逗号分隔的表达式，close 是结束的符号
+    func parseExprList(close: JTokenType, allowEmpty: Bool = false) -> [JNodeExpression?] {
+        var elts = [JNodeExpression?]()
+        var first = true
+        
+        while !eat(close) {
+            if first {
+                first = false
+            } else {
+                expect(.comma)
+                if eat(close) {
+                    break
+                }
+            }
+            elts.append(parseExprListItem(allowEmpty: allowEmpty))
+        }
+        return elts
+    }
+    
+    // DONE
+    func parseParenAndDistinguishExpression() -> JNodeExpression {
+        expect(.parenL)
+        var exprList = [JNodeExpression]()
+        var first = true
+        
+        while !match(.parenR) {
+            if first {
+                first = false
+            } else {
+                expect(.comma)
+                if match(.parenR) {
+                    break
+                }
+            }
+            
+            if match(.ellipsis) {
+                exprList.append(parseRest())
+                break
+            } else {
+                exprList.append(parseMaybeAssign())
+            }
+            
+        }
+        
+        expect(.parenR)
+        
+        if exprList.count > 1 {
+            return JNodeSequenceExpression(expressions: exprList)
+        } else {
+            return exprList[0]
+        }
+        
+    }
+    
+    // DONE
+    func parseBooleanLiteral() -> JNodeBooleanLiteral {
+        let value = match(.true)
+        advance()
+        return JNodeBooleanLiteral(value: value)
+    }
+    
+    // DONE
+    func parseImportMetaProperty() -> JNodeMetaProperty {
+        let id = parseIdentifier()
+        expect(.dot)
+        return parseMetaProperty(meta: id)
+    }
     
     func parseWhileStatement() -> JNodeStatement {
         return JNodeStatementBase()
@@ -620,9 +929,12 @@ public class JParser {
         return JNodeStatementBase()
     }
     
-    // TODO:
+    // DONE
     func parseBlock() -> JNodeBlockStatement {
-        return JNodeBlockStatement(body: [JNodeStatement](), directives: [JNodeDirective]())
+        expect(.braceL)
+        let blockStatement = JNodeBlockStatement(body: [JNodeStatement](), directives: [JNodeDirective]())
+        parseBlockBody(program: blockStatement, end: .braceR)
+        return blockStatement
     }
     
     func parseEmptyStatement() -> JNodeStatement {
@@ -647,11 +959,6 @@ public class JParser {
     
     func parseLabeledStatement() -> JNodeLabeledStatement {
         return JNodeLabeledStatement(label: JNodeIdentifier(name: ""), body: parseStatement())
-    }
-    
-    // TODO:
-    func toAssignable(node: JNode) -> JNode {
-        return JNodeBase()
     }
     
     // 工具函数

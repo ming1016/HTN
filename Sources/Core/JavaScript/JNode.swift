@@ -30,7 +30,7 @@ public protocol JNodeObjectMemberP: JNode {
     var computed: Bool {get}
     var decorators: JNodeDecorator {get}
 }
-public protocol JNodeFunctionP: JNode {
+public protocol JNodeFunctionP: JNodeExpression {
     var id: JNodeIdentifier {get}
     var params: [JNodePattern] {get}
     var body: JNodeBlockStatement {get}
@@ -79,11 +79,11 @@ public class JNodeRegExpLiteral: JNodeLiteral {
     }
 }
 
-public class JNodeNullLiteral: JNodeLiteral {
+public class JNodeNullLiteral: JNodeLiteral, JNodeExpression {
     public var type = "NullLiteral"
 }
 
-public class JNodeStringLiteral: JNodeLiteral {
+public class JNodeStringLiteral: JNodeLiteral, JNodeExpression {
     public var type = "StringLiteral"
     var value: String
     init(value: String) {
@@ -91,7 +91,7 @@ public class JNodeStringLiteral: JNodeLiteral {
     }
 }
 
-public class JNodeBooleanLiteral: JNodeLiteral {
+public class JNodeBooleanLiteral: JNodeLiteral, JNodeExpression {
     public var type = "BooleanLiteral"
     let value: Bool
     init(value: Bool) {
@@ -99,7 +99,7 @@ public class JNodeBooleanLiteral: JNodeLiteral {
     }
 }
 
-public class JNodeNumericLiteral: JNodeLiteral {
+public class JNodeNumericLiteral: JNodeLiteral, JNodeExpression {
     public var type = "NumericLiteral"
     let value: NSNumber
     init(value: NSNumber) {
@@ -112,7 +112,7 @@ public enum JNodeSourceType {
 }
 // A complete program source tree.
 // ES6 指定为 module，其它的使用 script
-public class JNodeProgram: JNode {
+public class JNodeProgram: JNodeStatement {
     public var type = "program"
     let sourceType: JNodeSourceType
     // body: [ Statement | ModuleDeclaration ];
@@ -155,7 +155,7 @@ public class JNodeExpressionStatement: JNodeStatement {
 // A block statement, i.e., a sequence of statements surrounded by braces.
 public class JNodeBlockStatement: JNodeStatement {
     public var type = "BlockStatement"
-    let body: [JNodeStatement]
+    var body: [JNodeStatement]
     let directives: [JNodeDirective]
     init(body: [JNodeStatement], directives: [JNodeDirective]) {
         self.body = body
@@ -410,11 +410,11 @@ public class JNodeDirectiveLiteral: JNodeStringLiteral {
 }
 
 // Express
-public class JNodeSuper: JNode {
+public class JNodeSuper: JNodeExpression {
     public var type = "Super"
 }
 
-public class JNodeImport: JNode {
+public class JNodeImport: JNodeExpression {
     public var type = "Import"
 }
 
@@ -423,7 +423,7 @@ public class JNodeThisExpression: JNodeExpression {
 }
 
 // A fat arrow function expression, e.g., `let foo = (bar) => { /* body */ }`.
-public class JNodeArrowFunctionExpression: JNodeFunction, JNodeExpression {
+public class JNodeArrowFunctionExpression: JNodeFunction {
     override init(id: JNodeIdentifier, params: [JNodePattern], body: JNodeBlockStatement, generator: Bool, async: Bool) {
         super.init(id: id, params: params, body: body, generator: generator, async: async)
     }
@@ -572,6 +572,7 @@ public class JNodeUpdateExpression: JNodeExpression {
 }
 
 // Binary operations
+// 暂时不用
 public enum JNodeBinaryOperator: String {
     case equal = "=="
     case noEqual = "!="
@@ -600,10 +601,10 @@ public enum JNodeBinaryOperator: String {
 
 public class JNodeBinaryExpression: JNodeExpression {
     public var type = "BinaryExpression"
-    let `operator`: JNodeBinaryOperator
+    let `operator`: String
     let left: JNodeExpression
     let right: JNodeExpression
-    init(operator: JNodeBinaryOperator, left: JNodeExpression, right: JNodeExpression) {
+    init(operator: String, left: JNodeExpression, right: JNodeExpression) {
         self.operator = `operator`
         self.left = left
         self.right = right
@@ -640,6 +641,7 @@ public class JNodeAssignmentExpression: JNodeExpression {
     }
 }
 
+// 暂时不用
 public enum JNodeLogicalOperator: String {
     case logicalOR = "||"
     case logicalAND = "&&"
@@ -647,10 +649,10 @@ public enum JNodeLogicalOperator: String {
 }
 public class JNodeLogicalExpression: JNodeExpression {
     public var type = "LogicalExpression"
-    let `operator`: JNodeLogicalOperator
+    let `operator`: String
     let left: JNodeExpression
     let right: JNodeExpression
-    init(operator: JNodeLogicalOperator, left: JNodeExpression, right: JNodeExpression) {
+    init(operator: String, left: JNodeExpression, right: JNodeExpression) {
         self.operator = `operator`
         self.left = left
         self.right = right
@@ -806,7 +808,7 @@ public class JNodeArrayPattern: JNodePattern {
     }
 }
 
-public class JNodeRestElement: JNodePattern {
+public class JNodeRestElement: JNodePattern, JNodeExpression {
     public var type = "RestElement"
     let argument: JNodePattern
     init(argument: JNodePattern) {
@@ -824,7 +826,7 @@ public class JNodeAssignmentPattern: JNodePattern {
     }
 }
 
-public class JNodeClass: JNode {
+public class JNodeClass: JNodeExpression, JNodeStatement {
     public var type = "Class"
     let id: JNodeIdentifier?
     let superClass: JNodeExpression?
@@ -936,7 +938,7 @@ public class JNodeClassDeclaration: JNodeClass, JNodeDeclaration {
     }
 }
 
-public class JNodeClassExpression: JNodeClass, JNodeExpression {
+public class JNodeClassExpression: JNodeClass {
     override init(id: JNodeIdentifier?, superClass: JNodeExpression?, body: JNodeClassBody, decorators: [JNodeDecorator]) {
         super.init(id: id, superClass: superClass, body: body, decorators: decorators)
         self.type = "ClassExpression"

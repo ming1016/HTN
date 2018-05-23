@@ -9,21 +9,29 @@
 import Foundation
 
 extension String {
-    //let s = "hello"
-    //s[0..<3] // "hel"
-    //s[3..<s.count] // "lo"
+    // let s = "hello"
+    // s[0..<3] // "hel"
+    // s[3..<s.count] // "lo"
     subscript(_ range: CountableRange<Int>) -> String {
         let idx1 = index(startIndex, offsetBy: range.lowerBound)
         let idx2 = index(startIndex, offsetBy: range.upperBound)
         return String(self[idx1..<idx2])
     }
     
-    //转义
+    // String 转 NSNumber
+    var numberValue: NSNumber? {
+        if let value = Int(self) {
+            return NSNumber(value: value)
+        }
+        return nil
+    }
+    
+    // 转义
     func escape() -> String {
         return self.replacingOccurrences(of: "\"", with: "\\\"")
     }
     
-    //过滤注释
+    // 过滤注释
     func filterAnnotationBlock() -> String {
         //过滤注释
         var newStr = ""
@@ -32,16 +40,17 @@ extension String {
         newStr = regexBlock.stringByReplacingMatches(in: self, options: NSRegularExpression.MatchingOptions(rawValue:0), range: NSMakeRange(0, self.count), withTemplate: "")
         return newStr
     }
-    //判断是否是整数
+    // 判断是否是整数
     func isInt() -> Bool {
         let scan:Scanner = Scanner(string: self)
         var val:Int = 0
         return scan.scanInt(&val) && scan.isAtEnd
     }
-    //判断是否是 Float
+    // 判断是否是 Float
     func isFloat() -> Bool {
         let scan:Scanner = Scanner(string: self)
         var val:Float = 0
         return scan.scanFloat(&val) && scan.isAtEnd
     }
+    
 }

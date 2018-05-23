@@ -13,7 +13,7 @@ public enum JTokenType:String {
     
     case float
     case int
-    case bingint
+    case bigint
     
     case string    // 字符
     case name      // 命名
