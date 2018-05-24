@@ -10,6 +10,7 @@ import Foundation
 public class JParser {
     private var _tkIndex = 0
     private var _tks = [JToken]()
+    private var _lastTK = JToken()
     
     // 返回当前 token
     private var _currentTk: JToken {
@@ -30,7 +31,7 @@ public class JParser {
     // 当前 token 如果符合入参指定类型就 eat 掉，同时当前 token 变为下一个 token
     private func eat(_ tkType: JTokenType) -> Bool {
         if _currentTk.type == tkType {
-            _tkIndex += 1
+            advance()
             return true
         } else {
             print("Error, next token not expect as \(tkType.rawValue)")
@@ -42,7 +43,7 @@ public class JParser {
     // 和 eat 一样，但是没有返回布尔值，如果不匹配直接报错
     private func expect(_ tkType: JTokenType) {
         if _currentTk.type == tkType {
-            _tkIndex += 1
+            advance()
         } else {
             fatalError("Error, next token not expect as \(tkType.rawValue)")
         }
@@ -55,7 +56,9 @@ public class JParser {
     
     // 直接跳到下一个 token
     private func advance() {
+        _lastTK = _currentTk
         _tkIndex += 1
+        
     }
     
     // 判断是否是结束 token 不是就报错
@@ -121,15 +124,22 @@ public class JParser {
         print("\(_currentTk)")
         switch startType {
         case .break, .continue:
+            // DONE
             node = parseBreakContinueStatement()
         case .debugger:
+            // DONE
             node = parseDebuggerStatement()
         case .do:
+            // DONE
             node = parseDoStatement()
         case .for:
+            // DONE
             node = parseForStatement()
         case .function:
-            // TODO: 需要通过查找前一个 token 看看类型是否是 dot，如果是就 break
+            // DONE
+            if _lastTK.type == .dot {
+                break
+            }
             node = parseFunctionStatement()
         case .class:
             node = parseClass()
@@ -144,6 +154,7 @@ public class JParser {
         case .try:
             node = parseTryStatement()
         case .let, .const, .var:
+            // DONE
             node = parseVarStatement(kind: startType)
         case .while:
             node = parseWhileStatement()
@@ -176,8 +187,8 @@ public class JParser {
     }
     
     // ------ 不同节点类型 Parser --------
-    // TODO:
-    func parseBreakContinueStatement() -> JNodeContinueStatement {
+    // DONE
+    func parseBreakContinueStatement() -> JNodeStatement {
         let isBreak = _currentTk.type == .break
         advance()
         
@@ -189,30 +200,147 @@ public class JParser {
             fatalError("Error: parseBreakContinueStatement not match name token type")
         } else {
             label = parseIdentifier()
-            
+            semicolon()
         }
         
-        return JNodeContinueStatement(label: JNodeIdentifier(name: ""))
+        if isBreak {
+            return JNodeBreakStatement(label: label)
+        } else {
+            return JNodeContinueStatement(label: label)
+        }
     }
     
-    func parseDebuggerStatement() -> JNodeStatement {
-        return JNodeStatementBase()
+    // DONE
+    func parseDebuggerStatement() -> JNodeDebuggerStatement {
+        advance()
+        semicolon()
+        return JNodeDebuggerStatement()
     }
     
-    func parseDoStatement() -> JNodeStatement {
-        return JNodeStatementBase()
+    // DONE
+    func parseDoStatement() -> JNodeDoWhileStatement {
+        advance()
+        let body = parseStatement()
+        expect(.while)
+        let test = parseParenExpression()
+        _ = eat(.eof)
+        return JNodeDoWhileStatement(body: body, test: test)
     }
     
+    // DONE
+    func parseParenExpression() -> JNodeExpression {
+        expect(.parenL)
+        let val = parseExpression()
+        expect(.parenR)
+        return val
+    }
+    
+    // DONE
     func parseForStatement() -> JNodeStatement {
-        return JNodeStatementBase()
+        advance()
+        expect(.parenL)
+        
+        if match(.eof) {
+            return parseFor(initialization: nil)
+        }
+        
+        if match(.var) || match(.let) || match(.const) {
+            let varKind = _currentTk.type
+            advance()
+            let initialization = parseVar(kind: varKind)
+            
+            if match(.in) {
+                if initialization.declarations.count == 1 {
+                    let declaration = initialization.declarations[0]
+                    let isForInInitializer = varKind == .var && (declaration.initialization != nil) && declaration.id.type != "ObjectPattern" && declaration.id.type != "ArrayPattern"
+                    if isForInInitializer {
+                        fatalError("Error: parseForStatement for-in initializer in strict mode")
+                    } else if isForInInitializer || !(declaration.initialization != nil) {
+                        return parseForIn(initialization: initialization)
+                    } // end if
+                } // end if
+            } // end if
+            
+            return parseFor(initialization: initialization)
+        }
+        
+        let initialization = parseExpression()
+        if match(.in) {
+            return parseForIn(initialization: initialization)
+        }
+        
+        return parseFor(initialization: initialization)
     }
     
-    func parseFunctionStatement() -> JNodeStatement {
-        return JNodeStatementBase()
+    // DONE
+    func parseForIn(initialization: JNodeExpression) -> JNodeForInStatement {
+        //let type = match(.in) ? "ForInStatement" : "ForOfStatement"
+        // TODO: forAwait
+        advance()
+        let left = initialization
+        let right = parseExpression()
+        expect(.parenR)
+        let body = parseStatement()
+        return JNodeForInStatement(left: left, right: right, body: body)
     }
     
+    // DONE
+    func parseFor(initialization: JNodeExpression?) -> JNodeForStatement {
+        expect(.eof)
+        let test = match(.eof) ? nil : parseExpression()
+        expect(.eof)
+        let update = match(.parenR) ? nil : parseExpression()
+        expect(.parenR)
+        let body = parseStatement()
+        return JNodeForStatement(initialization: initialization, test: test, update: update, body: body)
+    }
+    
+    // DONE
+    func parseFunctionStatement() -> JNodeFunction {
+        advance()
+        return parseFunction(isStatement: true)
+    }
+    
+    // TODO
     func parseClass() -> JNodeClass {
-        return JNodeClass(id: nil, superClass: nil, body: JNodeClassBody(body: [JNode]()), decorators: [JNodeDecorator]())
+        advance()
+        let id = parseClassId()
+        let sp = parseClassSuper()
+        let body = parseClassBody()
+        return JNodeClass(id: id, superClass: sp, body: body, decorators: [JNodeDecorator]())
+    }
+    
+    // DONE
+    func parseClassId() -> JNodeIdentifier? {
+        if match(.name) {
+            return parseIdentifier()
+        } else {
+            return nil
+        }
+    }
+    
+    // DONE
+    func parseClassSuper() -> JNodeExpression? {
+        if eat(.extends) {
+            return parseExprSubscripts()
+        } else {
+            return nil
+        }
+    }
+    
+    // TODO:
+    func parseClassBody() -> JNodeClassBody {
+        expect(.braceL)
+        
+        while !eat(.braceR) {
+            if eat(.eof) {
+                continue
+            }
+            
+            // TODO:
+        }
+        
+        return JNodeClassBody(body: [JNode]())
     }
     
     func parseIfStatement() -> JNodeStatement {

@@ -16,7 +16,7 @@ public protocol JNode {
 // A literal token. May or may not represent an expression.
 public protocol JNodeLiteral: JNode {}
 public protocol JNodePattern: JNode {}
-public protocol JNodeStatement: JNode {}
+public protocol JNodeStatement: JNodeExpression {}
 // Any expression node. Since the left-hand side of an assignment may be any expression in general, an expression can also be a pattern.
 public protocol JNodeExpression: JNode {}
 // Any declaration node. Note that declarations are considered statements; this is because declarations can appear in any statement context.
@@ -127,7 +127,7 @@ public class JNodeProgram: JNodeStatement {
 }
 
 // A function [declaration](#functiondeclaration) or [expression](#functionexpression).
-public class JNodeFunction: JNodeFunctionP {
+public class JNodeFunction: JNodeFunctionP, JNodeStatement {
     public var type = "Function"
     public var id: JNodeIdentifier
     public let params: [JNodePattern]
@@ -320,10 +320,12 @@ public class JNodeForStatement: JNodeStatement {
     let initialization: JNodeExpression?
     let test: JNodeExpression?
     let update: JNodeExpression?
-    init(initialization: JNodeExpression?, test: JNodeExpression?, update: JNodeExpression?) {
+    let body: JNodeStatement
+    init(initialization: JNodeExpression?, test: JNodeExpression?, update: JNodeExpression?, body: JNodeStatement) {
         self.initialization = initialization
         self.test = test
         self.update = update
+        self.body = body
     }
 }
 
