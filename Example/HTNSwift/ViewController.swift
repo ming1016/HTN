@@ -82,30 +82,23 @@ class ViewController: NSViewController {
         super.viewDidLoad()
         self.nativeCodeLb.font = NSFont.userFont(ofSize: 16)
         
-        //justTest()
-        VueTest().LetTestBegin()
+//        VueTest().LetTestBegin()
+        
+        let jsonStringClear = justTest().replacingOccurrences(of: "\n", with: "")
+        let jsonData = jsonStringClear.data(using: .utf8)!
+        
+        do {
+            let a = try JSONSerialization.jsonObject(with: jsonData, options: JSONSerialization.ReadingOptions(rawValue: 0)) as! [Dictionary<String, Any>]
+            for c in a {
+                print(c["type"] ?? "")
+            }
+        } catch let error as NSError { print(error) }
         
     }
-//    class CM {
-//
-//        func shell(_ args: String..., path: String = "/usr/bin/") -> (Int32, String) {
-//            let process = Process()
-//            process.launchPath = path
-//            process.arguments = args
-//
-//            let pipe = Pipe()
-//            process.standardOutput = pipe
-//
-//            process.launch()
-//            process.waitUntilExit()
-//
-//
-//            let data = pipe.fileHandleForReading.readDataToEndOfFile()
-//            let output: String = String(data: data, encoding: .utf8)!
-//
-//            return (process.terminationStatus, output)
-//        }
-//    }
 
 }
+
+
+
+
 

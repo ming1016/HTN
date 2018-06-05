@@ -5,9 +5,9 @@ import PackageDescription
 
 let package = Package(
     name: "HTNCLI",
-//    products: [
-//        .executable(name: "htn", targets: ["CLI"])
-//    ],
+    products: [
+        .executable(name: "htn", targets: ["HTNCLI"])
+    ],
     dependencies: [
         .package(url: "https://github.com/ming1016/HTN", from: "0.1.0"),
 //        .package(url: "../../HTN", .branch("master")),
