@@ -82,17 +82,21 @@ class ViewController: NSViewController {
         super.viewDidLoad()
         self.nativeCodeLb.font = NSFont.userFont(ofSize: 16)
         
+        let interperter = OCInterpreter("31 + 8")
+        let result = interperter.expr()
+        print(result)
+        
 //        VueTest().LetTestBegin()
         
-        let jsonStringClear = justTest().replacingOccurrences(of: "\n", with: "")
-        let jsonData = jsonStringClear.data(using: .utf8)!
-        
-        do {
-            let a = try JSONSerialization.jsonObject(with: jsonData, options: JSONSerialization.ReadingOptions(rawValue: 0)) as! [Dictionary<String, Any>]
-            for c in a {
-                print(c["type"] ?? "")
-            }
-        } catch let error as NSError { print(error) }
+//        let jsonStringClear = justTest().replacingOccurrences(of: "\n", with: "")
+//        let jsonData = jsonStringClear.data(using: .utf8)!
+//
+//        do {
+//            let a = try JSONSerialization.jsonObject(with: jsonData, options: JSONSerialization.ReadingOptions(rawValue: 0)) as! [Dictionary<String, Any>]
+//            for c in a {
+//                print(c["type"] ?? "")
+//            }
+//        } catch let error as NSError { print(error) }
         
     }
 
