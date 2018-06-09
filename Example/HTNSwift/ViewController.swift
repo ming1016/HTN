@@ -82,7 +82,9 @@ class ViewController: NSViewController {
         super.viewDidLoad()
         self.nativeCodeLb.font = NSFont.userFont(ofSize: 16)
         
-        let interperter = OCInterpreter("31 * 8")
+        let caseStr = "31 + 8/1 * 3"
+        
+        let interperter = OCInterpreter(caseStr)
         let result = interperter.expr()
         print(result)
         

@@ -134,29 +134,43 @@ public class OCInterpreter {
     public func expr() -> Int {
         currentTk = nextTk()
         
-        guard case let .constant(.integer(left)) = currentTk else {
+        var result = term()
+        
+        while [.operation(.plus), .operation(.minus)].contains(currentTk) {
+            let tk = currentTk
+            eat(currentTk)
+            if tk == .operation(.plus) {
+                result = result + self.term()
+            } else if tk == .operation(.minus) {
+                result = result - self.term()
+            }
+        }
+        
+        return result
+    }
+    
+    // 语法解析中对数字的处理
+    private func term() -> Int {
+        var result = factor()
+        
+        while [.operation(.mult), .operation(.intDiv)].contains(currentTk) {
+            let tk = currentTk
+            eat(currentTk)
+            if tk == .operation(.mult) {
+                result = result * factor()
+            } else if tk == .operation(.intDiv) {
+                result = result / factor()
+            }
+        }
+        return result
+    }
+    
+    private func factor() -> Int {
+        guard case let .constant(.integer(result)) = currentTk else {
             return 0
         }
         eat(currentTk)
-        
-        let op = currentTk
-        eat(currentTk)
-        
-        guard case let .constant(.integer(right)) = currentTk else {
-            return 0
-        }
-        eat(currentTk)
-        
-        if op == .operation(.plus) {
-            return left + right
-        } else if op == .operation(.minus) {
-            return left - right
-        } else if op == .operation(.mult) {
-            return left * right
-        } else if op == .operation(.intDiv) {
-            return left / right
-        }
-        return left + right
+        return result
     }
     
     // 数字处理
