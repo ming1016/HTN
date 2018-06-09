@@ -16,6 +16,9 @@ public enum OCConstant {
 
 public enum OCOperation {
     case plus
+    case minus
+    case mult
+    case intDiv
 }
 
 public enum OCToken {
@@ -47,6 +50,14 @@ extension OCOperation: Equatable {
         switch (lhs, rhs) {
         case (.plus, .plus):
             return true
+        case (.minus, .minus):
+            return true
+        case (.mult, .mult):
+            return true
+        case (.intDiv, .intDiv):
+            return true
+        default:
+            return false
         }
     }
 }
@@ -104,6 +115,18 @@ public class OCInterpreter {
             advance()
             return .operation(.plus)
         }
+        if currentCharacter == "-" {
+            advance()
+            return .operation(.minus)
+        }
+        if currentCharacter == "*" {
+            advance()
+            return .operation(.mult)
+        }
+        if currentCharacter == "/" {
+            advance()
+            return .operation(.intDiv)
+        }
         advance()
         return .eof
     }
@@ -116,13 +139,23 @@ public class OCInterpreter {
         }
         eat(currentTk)
         
-        eat(.operation(.plus))
+        let op = currentTk
+        eat(currentTk)
         
         guard case let .constant(.integer(right)) = currentTk else {
             return 0
         }
         eat(currentTk)
         
+        if op == .operation(.plus) {
+            return left + right
+        } else if op == .operation(.minus) {
+            return left - right
+        } else if op == .operation(.mult) {
+            return left * right
+        } else if op == .operation(.intDiv) {
+            return left / right
+        }
         return left + right
     }
     
