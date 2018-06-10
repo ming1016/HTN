@@ -21,9 +21,15 @@ public enum OCOperation {
     case intDiv
 }
 
+public enum OCDirection {
+    case left
+    case right
+}
+
 public enum OCToken {
     case constant(OCConstant)
     case operation(OCOperation)
+    case paren(OCDirection)
     case eof
     case whiteSpaceAndNewLine
 }
@@ -62,6 +68,19 @@ extension OCOperation: Equatable {
     }
 }
 
+extension OCDirection: Equatable {
+    public static func == (lhs: OCDirection, rhs: OCDirection) -> Bool {
+        switch (lhs, rhs) {
+        case (.left, .left):
+            return true
+        case (.right, .right):
+            return true
+        default:
+            return false
+        }
+    }
+}
+
 extension OCToken: Equatable {
     public static func == (lhs: OCToken, rhs: OCToken) -> Bool {
         switch (lhs, rhs) {
@@ -73,18 +92,18 @@ extension OCToken: Equatable {
             return true
         case (.whiteSpaceAndNewLine, .whiteSpaceAndNewLine):
             return true
+        case let (.paren(left), .paren(right)):
+            return left == right
         default:
             return false
         }
     }
 }
 
-public class OCInterpreter {
+public class OCLexer {
     private let text: String
     private var currentIndex: Int
     private var currentCharacter: Character?
-    
-    private var currentTk: OCToken
     
     public init(_ input: String) {
         if input.count == 0 {
@@ -93,7 +112,6 @@ public class OCInterpreter {
         self.text = input
         currentIndex = 0
         currentCharacter = text[text.startIndex]
-        currentTk = .eof
     }
     
     // 流程函数
@@ -127,52 +145,17 @@ public class OCInterpreter {
             advance()
             return .operation(.intDiv)
         }
+        if currentCharacter == "(" {
+            advance()
+            return .paren(.left)
+        }
+        if currentCharacter == ")" {
+            advance()
+            return .paren(.right)
+        }
         advance()
         return .eof
     }
-    
-    public func expr() -> Int {
-        currentTk = nextTk()
-        
-        var result = term()
-        
-        while [.operation(.plus), .operation(.minus)].contains(currentTk) {
-            let tk = currentTk
-            eat(currentTk)
-            if tk == .operation(.plus) {
-                result = result + self.term()
-            } else if tk == .operation(.minus) {
-                result = result - self.term()
-            }
-        }
-        
-        return result
-    }
-    
-    // 语法解析中对数字的处理
-    private func term() -> Int {
-        var result = factor()
-        
-        while [.operation(.mult), .operation(.intDiv)].contains(currentTk) {
-            let tk = currentTk
-            eat(currentTk)
-            if tk == .operation(.mult) {
-                result = result * factor()
-            } else if tk == .operation(.intDiv) {
-                result = result / factor()
-            }
-        }
-        return result
-    }
-    
-    private func factor() -> Int {
-        guard case let .constant(.integer(result)) = currentTk else {
-            return 0
-        }
-        eat(currentTk)
-        return result
-    }
-    
     // 数字处理
     private func number() -> OCToken {
         var numStr = ""
@@ -208,12 +191,72 @@ public class OCInterpreter {
             advance()
         }
     }
+}
+
+public class OCInterpreter {
+    
+    private var lexer: OCLexer
+    private var currentTk: OCToken
+    
+    public init(_ input: String) {
+        lexer = OCLexer(input)
+        currentTk = lexer.nextTk()
+    }
+    
+    public func expr() -> Int {
+        
+        var result = term()
+        
+        while [.operation(.plus), .operation(.minus)].contains(currentTk) {
+            let tk = currentTk
+            eat(currentTk)
+            if tk == .operation(.plus) {
+                result = result + self.term()
+            } else if tk == .operation(.minus) {
+                result = result - self.term()
+            }
+        }
+        
+        return result
+    }
+    
+    // 语法解析中对数字的处理
+    private func term() -> Int {
+        var result = factor()
+        
+        while [.operation(.mult), .operation(.intDiv)].contains(currentTk) {
+            let tk = currentTk
+            eat(currentTk)
+            if tk == .operation(.mult) {
+                result = result * factor()
+            } else if tk == .operation(.intDiv) {
+                result = result / factor()
+            }
+        }
+        return result
+    }
+    
+    private func factor() -> Int {
+        let tk = currentTk
+        switch tk {
+        case let .constant(.integer(result)):
+            eat(.constant(.integer(result)))
+            return result
+        case .paren(.left):
+            eat(.paren(.left))
+            let result = expr()
+            eat(.paren(.right))
+            return result
+        default:
+            return 0
+        }
+    }
     
     private func eat(_ token: OCToken) {
         if  currentTk == token {
-            currentTk = nextTk()
+            currentTk = lexer.nextTk()
             if currentTk == OCToken.whiteSpaceAndNewLine {
-                currentTk = nextTk()
+                currentTk = lexer.nextTk()
             }
         } else {
             error()
