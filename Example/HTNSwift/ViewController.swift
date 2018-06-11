@@ -85,10 +85,12 @@ class ViewController: NSViewController {
         var caseStr = "31 + 8 / 2 * 3"
         
         caseStr = "31 + (4 + 5 - (3 + 3)) * 4 - (1 + (51 - 4))"
-        caseStr = "4 + (3 - 1)"
+        caseStr = "4 + 3 * 2"
+        //caseStr = "4 + 3 - 2"
         
         let interperter = OCInterpreter(caseStr)
-        let result = interperter.expr()
+        let node = interperter.expr()
+        let result = interperter.eval(node: node)
         print(result)
         
 //        VueTest().LetTestBegin()

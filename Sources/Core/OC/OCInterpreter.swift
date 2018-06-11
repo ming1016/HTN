@@ -7,6 +7,13 @@
 
 import Foundation
 
+public enum OCValue {
+    case none
+    case number(OCNumber)
+    case boolean(Bool)
+    case string(String)
+}
+
 public enum OCConstant {
     case integer(Int)
     case float(Float)
@@ -203,52 +210,84 @@ public class OCInterpreter {
         currentTk = lexer.nextTk()
     }
     
-    public func expr() -> Int {
+    // eval
+    public func eval(node: OCAST) -> OCValue {
+        switch node {
+        case let number as OCNumber:
+            return eval(number: number)
+        case let binOp as OCBinOp:
+            return eval(binOp: binOp)
+        default:
+            return .none
+        }
+    }
+    
+    func eval(number: OCNumber) -> OCValue {
+        return .number(number)
+    }
+    
+    func eval(binOp: OCBinOp) -> OCValue {
+        guard case let .number(leftResult) = eval(node: binOp.left), case let .number(rightResult) = eval(node: binOp.right) else {
+            fatalError("Error! binOp is wrong")
+        }
         
-        var result = term()
+        switch binOp.operation {
+        case .plus:
+            return .number(leftResult + rightResult)
+        case .minus:
+            return .number(leftResult - rightResult)
+        case .mult:
+            return .number(leftResult * rightResult)
+        case .intDiv:
+            return .number(leftResult / rightResult)
+        }
+        
+    }
+    
+    public func expr() -> OCAST {
+        var node = term()
         
         while [.operation(.plus), .operation(.minus)].contains(currentTk) {
             let tk = currentTk
             eat(currentTk)
             if tk == .operation(.plus) {
-                result = result + self.term()
+                node = OCBinOp(left: node, operation: .plus, right: term())
             } else if tk == .operation(.minus) {
-                result = result - self.term()
+                node = OCBinOp(left: node, operation: .minus, right: term())
             }
         }
-        
-        return result
+        return node
     }
     
     // 语法解析中对数字的处理
-    private func term() -> Int {
-        var result = factor()
+    private func term() -> OCAST {
+        var node = factor()
         
         while [.operation(.mult), .operation(.intDiv)].contains(currentTk) {
             let tk = currentTk
             eat(currentTk)
             if tk == .operation(.mult) {
-                result = result * factor()
+                node = OCBinOp(left: node, operation: .mult, right: factor())
             } else if tk == .operation(.intDiv) {
-                result = result / factor()
+                node = OCBinOp(left: node, operation: .intDiv, right: factor())
             }
         }
-        return result
+        return node
     }
     
-    private func factor() -> Int {
+    private func factor() -> OCAST {
         let tk = currentTk
         switch tk {
         case let .constant(.integer(result)):
             eat(.constant(.integer(result)))
-            return result
+            return OCNumber.integer(result)
         case .paren(.left):
             eat(.paren(.left))
             let result = expr()
             eat(.paren(.right))
             return result
         default:
-            return 0
+            return OCNumber.integer(0)
         }
     }
     
@@ -266,4 +305,6 @@ public class OCInterpreter {
     func error() {
         fatalError("Error!")
     }
+    
+    
 }
