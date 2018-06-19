@@ -87,6 +87,7 @@ class ViewController: NSViewController {
         caseStr = "31 + (4 + 5 - (3 + 3)) * 4 - (1 + (51 - 4))"
         caseStr = "4 + 3 * 2"
         //caseStr = "4 + 3 - 2"
+        caseStr = "4 + - 3 * 2"
         
         let interperter = OCInterpreter(caseStr)
         let node = interperter.expr()
