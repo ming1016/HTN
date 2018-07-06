@@ -9,17 +9,31 @@ import Foundation
 
 public class OCInterpreter {
     
-    private var lexer: OCLexer
-    private var currentTk: OCToken
+    private let ast: OCAST
+    private var scopes: [String: OCValue]
     
     public init(_ input: String) {
-        lexer = OCLexer(input)
-        currentTk = lexer.nextTk()
+        let parser = OCParser(input)
+        ast = parser.parse()
+        scopes = [String: OCValue]()
+        print(ast)
+        eval(node: ast)
+        print("scope is:")
+        print(scopes)
     }
     
-    // eval
-    public func eval(node: OCAST) -> OCValue {
+    @discardableResult public func eval(node: OCAST) -> OCValue {
         switch node {
+        case let program as OCProgram:
+            return eval(program: program)
+        case let implementation as OCImplementation:
+            return eval(implementation: implementation)
+        case let method as OCMethod:
+            return eval(method: method)
+        case let assign as OCAssign:
+            return eval(assign: assign)
+        case let variable as OCVar:
+            return eval(variable: variable)
         case let number as OCNumber:
             return eval(number: number)
         case let unaryOperation as OCUnaryOperation:
@@ -31,6 +45,37 @@ public class OCInterpreter {
         }
     }
     
+    func eval(program: OCProgram) -> OCValue {
+        return eval(implementation: program.implementation)
+    }
+    
+    func eval(implementation: OCImplementation) -> OCValue {
+        for method in implementation.methodList {
+            eval(method: method)
+        }
+        return .none
+    }
+    
+    @discardableResult func eval(method: OCMethod) -> OCValue {
+        for statement in method.statements {
+            eval(node: statement)
+        }
+        return .none
+    }
+    
+    func eval(assign: OCAssign) -> OCValue {
+        scopes[assign.left.name] = eval(node: assign.right)
+        return .none
+    }
+    
+    func eval(variable: OCVar) -> OCValue {
+        guard let value = scopes[variable.name] else {
+            fatalError("Error: eval var")
+        }
+        return value
+    }
+    
+    /*--------- eval 运算符 ----------*/
     func eval(number: OCNumber) -> OCValue {
         return .number(number)
     }
@@ -63,74 +108,5 @@ public class OCInterpreter {
             return .number(-result)
         }
     }
-    
-    public func expr() -> OCAST {
-        var node = term()
-        
-        while [.operation(.plus), .operation(.minus)].contains(currentTk) {
-            let tk = currentTk
-            eat(currentTk)
-            if tk == .operation(.plus) {
-                node = OCBinOp(left: node, operation: .plus, right: term())
-            } else if tk == .operation(.minus) {
-                node = OCBinOp(left: node, operation: .minus, right: term())
-            }
-        }
-        return node
-    }
-    
-    // 语法解析中对数字的处理
-    private func term() -> OCAST {
-        var node = factor()
-        
-        while [.operation(.mult), .operation(.intDiv)].contains(currentTk) {
-            let tk = currentTk
-            eat(currentTk)
-            if tk == .operation(.mult) {
-                node = OCBinOp(left: node, operation: .mult, right: factor())
-            } else if tk == .operation(.intDiv) {
-                node = OCBinOp(left: node, operation: .intDiv, right: factor())
-            }
-        }
-        return node
-    }
-    
-    private func factor() -> OCAST {
-        let tk = currentTk
-        switch tk {
-        case .operation(.plus):
-            eat(.operation(.plus))
-            return OCUnaryOperation(operation: .plus, operand: factor())
-        case .operation(.minus):
-            eat(.operation(.minus))
-            return OCUnaryOperation(operation: .minus, operand: factor())
-        case let .constant(.integer(result)):
-            eat(.constant(.integer(result)))
-            return OCNumber.integer(result)
-        case .paren(.left):
-            eat(.paren(.left))
-            let result = expr()
-            eat(.paren(.right))
-            return result
-        default:
-            return OCNumber.integer(0)
-        }
-    }
-    
-    private func eat(_ token: OCToken) {
-        if  currentTk == token {
-            currentTk = lexer.nextTk()
-            if currentTk == OCToken.whiteSpaceAndNewLine {
-                currentTk = lexer.nextTk()
-            }
-        } else {
-            error()
-        }
-    }
-    
-    func error() {
-        fatalError("Error!")
-    }
-    
     
 }

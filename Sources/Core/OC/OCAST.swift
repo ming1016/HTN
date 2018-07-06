@@ -9,6 +9,77 @@ import Foundation
 
 public protocol OCAST {}
 
+class OCProgram: OCAST {
+    let interface: OCInterface
+    let implementation: OCImplementation
+    init(interface:OCInterface, implementation: OCImplementation) {
+        self.interface = interface
+        self.implementation = implementation
+    }
+}
+
+class OCInterface: OCAST {
+    let name: String
+    init(name: String) {
+        self.name = name
+    }
+}
+
+class OCImplementation: OCAST {
+    let name: String
+    let methodList: [OCMethod]
+    init(name: String, methodList: [OCMethod]) {
+        self.name = name
+        self.methodList = methodList
+    }
+}
+
+class OCMethod: OCAST {
+    let returnIdentifier: String
+    let methodName: String
+    let statements: [OCAST]
+    init(returnIdentifier: String, methodName: String, statements:[OCAST]) {
+        self.returnIdentifier = returnIdentifier
+        self.methodName = methodName
+        self.statements = statements
+    }
+}
+
+class OCCompoundStatement: OCAST {
+    let children: [OCAST]
+    init(children: [OCAST]) {
+        self.children = children
+    }
+}
+
+class OCIdentifier: OCAST {
+    let identifier: String
+    init(identifier: String) {
+        self.identifier = identifier
+    }
+}
+
+class OCAssign: OCAST {
+    let left: OCVar
+    let right: OCAST
+    
+    init(left: OCVar, right: OCAST) {
+        self.left = left
+        self.right = right
+    }
+}
+
+class OCVar: OCAST {
+    let name: String
+    
+    init(name: String) {
+        self.name = name
+    }
+}
+
+class OCNoOp: OCAST {}
+
+/*--------- 运算符 ---------*/
 public enum OCBinOpType {
     case plus
     case minus

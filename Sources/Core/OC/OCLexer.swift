@@ -12,6 +12,10 @@ public class OCLexer {
     private var currentIndex: Int
     private var currentCharacter: Character?
     
+    private let keywords: [String: OCToken] = [
+        "return": .return
+    ]
+    
     public init(_ input: String) {
         if input.count == 0 {
             fatalError("Error! input can't be empty")
@@ -23,19 +27,28 @@ public class OCLexer {
     
     // 流程函数
     func nextTk() -> OCToken {
+        // 到文件末
         if currentIndex > self.text.count - 1 {
             return .eof
         }
         
+        // 空格换行
         if CharacterSet.whitespacesAndNewlines.contains((currentCharacter?.unicodeScalars.first!)!) {
             skipWhiteSpaceAndNewLines()
-            return .whiteSpaceAndNewLine
+            //return .whiteSpaceAndNewLine
         }
         
+        // 数字
         if CharacterSet.decimalDigits.contains((currentCharacter?.unicodeScalars.first!)!) {
             return number()
         }
         
+        // identifier
+        if CharacterSet.alphanumerics.contains((currentCharacter?.unicodeScalars.first!)!) {
+            return id()
+        }
+        
+        // 符号
         if currentCharacter == "+" {
             advance()
             return .operation(.plus)
@@ -61,22 +74,66 @@ public class OCLexer {
             return .paren(.right)
         }
         if currentCharacter == "@" {
-            
+            return at()
+        }
+        if currentCharacter == ";" {
+            advance()
+            return .semi
+        }
+        if currentCharacter == "=" {
+            advance()
+            return .assign
+        }
+        if currentCharacter == "{" {
+            advance()
+            return .brace(.left)
+        }
+        if currentCharacter == "}" {
+            advance()
+            return .brace(.right)
+        }
+        if currentCharacter == "*" {
+            advance()
+            return .asterisk
         }
         advance()
         return .eof
     }
+    
+    // identifier and keywords
+    private func id() -> OCToken {
+        var idStr = ""
+        while let character = currentCharacter, CharacterSet.alphanumerics.contains(character.unicodeScalars.first!) {
+            idStr += String(character)
+            advance()
+        }
+        
+        // 关键字
+        if let token = keywords[idStr] {
+            return token
+        }
+        
+        return .id(idStr)
+    }
+    
     // @符号的处理
     private func at() -> OCToken {
         advance()
         var atStr = ""
-        while let character = currentCharacter,  CharacterSet.whitespacesAndNewlines.contains((character.unicodeScalars.first!)) {
+        while let character = currentCharacter,  CharacterSet.alphanumerics.contains((character.unicodeScalars.first!)) {
             atStr += String(character)
             advance()
         }
         if atStr == "interface" {
-            return .atInterface
+            return .interface
         }
+        if atStr == "end" {
+            return .end
+        }
+        if atStr == "implementation" {
+            return .implementation
+        }
+        
         fatalError("Error: at string not support")
     }
     // 数字处理
