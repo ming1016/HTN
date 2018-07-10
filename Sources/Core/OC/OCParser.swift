@@ -24,7 +24,12 @@ public class OCParser {
         var all = [tk]
         while tk != .eof {
             tk = lexer.nextTk()
-            all.append(tk)
+            switch tk {
+            case let .comments(cmStr):
+                print(cmStr)
+            default:
+                all.append(tk)
+            }
         }
         tks = all
     }
@@ -58,8 +63,49 @@ public class OCParser {
             fatalError("Error interface")
         }
         eat(.id(name))
+        let pl = propertyList()
         eat(.end)
-        return OCInterface(name: name)
+        return OCInterface(name: name, propertyList: pl)
+    }
+    
+    private func propertyList() -> [OCPropertyDeclaration] {
+        var properties = [OCPropertyDeclaration]()
+        while currentTk == .property {
+            eat(.property)
+            eat(.paren(.left))
+            let pa = propertyAttributes()
+            eat(.paren(.right))
+            guard case let .id(pType) = currentTk else {
+                fatalError("Error: property type wrong")
+            }
+            eat(.id(pType))
+            guard case let .id(name) = currentTk else {
+                fatalError("Error: property name wrong")
+            }
+            eat(.id(name))
+            let pd = OCPropertyDeclaration(propertyAttributesList: pa, type: pType, name: name)
+            properties.append(pd)
+            eat(.semi)
+        }
+        return properties
+    }
+    
+    private func propertyAttributes() -> [OCPropertyAttribute] {
+        let p = propertyAttribute()
+        var pa = [p]
+        while currentTk == .comma {
+            eat(.comma)
+            pa.append(propertyAttribute())
+        }
+        return pa
+    }
+    
+    private func propertyAttribute() -> OCPropertyAttribute {
+        guard case let .id(name) = currentTk else {
+            fatalError("Error: propertyAttribute wrong")
+        }
+        eat(.id(name))
+        return OCPropertyAttribute(name: name)
     }
     
     private func implementation() -> OCImplementation {
@@ -184,6 +230,9 @@ public class OCParser {
         case let .constant(.integer(result)):
             eat(.constant(.integer(result)))
             return OCNumber.integer(result)
+        case let .constant(.float(result)):
+            eat(.constant(.float(result)))
+            return OCNumber.float(result)
         case .paren(.left):
             eat(.paren(.left))
             let result = expr()

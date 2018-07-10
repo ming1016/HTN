@@ -90,13 +90,17 @@ class ViewController: NSViewController {
         caseStr = "4 + - 3 * 2"
         caseStr = """
         @interface OurClass
+        // 定义属性
+        @property (nonatomic, assign) NSUInteger pa;
+        @property (nonatomic, assign) NSUInteger pb;
         
         @end
         
         @implementation OurClass
         
+        /* 开始运算 */
         - (void)run {
-            a = 13;
+            a = 13.3;
             ab = (3 + 2) + a * 2;
         }
         

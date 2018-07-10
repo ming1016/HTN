@@ -20,6 +20,26 @@ class OCProgram: OCAST {
 
 class OCInterface: OCAST {
     let name: String
+    let propertyList: [OCPropertyDeclaration]
+    init(name: String, propertyList: [OCPropertyDeclaration]) {
+        self.name = name
+        self.propertyList = propertyList
+    }
+}
+
+class OCPropertyDeclaration: OCAST {
+    let propertyAttributesList: [OCPropertyAttribute]
+    let type: String
+    let name: String
+    init(propertyAttributesList: [OCPropertyAttribute], type: String, name: String) {
+        self.propertyAttributesList = propertyAttributesList
+        self.type = type
+        self.name = name
+    }
+}
+
+class OCPropertyAttribute: OCAST {
+    let name :String
     init(name: String) {
         self.name = name
     }

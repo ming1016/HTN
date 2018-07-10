@@ -36,18 +36,21 @@ public enum OCDirection {
 public enum OCToken {
     case eof
     case whiteSpaceAndNewLine
+    case comments(String)       // 注释 // 和 /**/
     case constant(OCConstant)   // int float string bool
     case operation(OCOperation) // + - * /
     case paren(OCDirection)     // ( )
     case brace(OCDirection)     // { }
     case asterisk               // *
-    case interface
-    case end
-    case implementation
+    case interface              // @interface
+    case end                    // @end
+    case implementation         // @implementation
     case id(String)             // string
-    case semi
-    case assign
+    case semi                   // ;
+    case assign                 // =
     case `return`
+    case comma                  // ,
+    case property               // @property
 }
 
 extension OCConstant: Equatable {
@@ -108,6 +111,8 @@ extension OCToken: Equatable {
             return true
         case (.whiteSpaceAndNewLine, .whiteSpaceAndNewLine):
             return true
+        case let (.comments(left), .comments(right)):
+            return left == right
         case let (.paren(left), .paren(right)):
             return left == right
         case let (.brace(left), .brace(right)):
@@ -127,6 +132,10 @@ extension OCToken: Equatable {
         case (.assign, .assign):
             return true
         case (.return, .return):
+            return true
+        case (.comma, .comma):
+            return true
+        case (.property, .property):
             return true
         default:
             return false
