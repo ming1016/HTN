@@ -11,6 +11,8 @@ protocol OCVisitor: class {
     func visit(node: OCAST)
     func visit(program: OCProgram)
     func visit(interface: OCInterface)
+    func visit(propertyDeclaration: OCPropertyDeclaration)
+    func visit(propertyAttribute: OCPropertyAttribute)
     func visit(implementation: OCImplementation)
     func visit(method: OCMethod)
     func visit(compoundStatement: OCCompoundStatement)
@@ -30,6 +32,10 @@ extension OCVisitor {
             visit(program: program)
         case let interface as OCInterface:
             visit(interface: interface)
+        case let propertyDeclaration as OCPropertyDeclaration:
+            visit(propertyDeclaration: propertyDeclaration)
+        case let propertyAttribute as OCPropertyAttribute:
+            visit(propertyAttribute: propertyAttribute)
         case let implementation as OCImplementation:
             visit(implementation: implementation)
         case let method as OCMethod:
@@ -48,6 +54,8 @@ extension OCVisitor {
             visit(unaryOperation: unaryOperation)
         case let binOp as OCBinOp:
             visit(binOp: binOp)
+        case let noOp as OCNoOp:
+            visit(noOp: noOp)
         default:
             fatalError("Error: Visitor type error")
         }
@@ -59,8 +67,21 @@ extension OCVisitor {
     }
     
     func visit(interface: OCInterface) {
+        for property in interface.propertyList {
+            visit(propertyDeclaration: property)
+        }
+    }
+    
+    func visit(propertyDeclaration: OCPropertyDeclaration) {
+        for propertyAttribute in propertyDeclaration.propertyAttributesList {
+            visit(propertyAttribute: propertyAttribute)
+        }
+    }
+    
+    func visit(propertyAttribute: OCPropertyAttribute) {
         
     }
+    
     
     func visit(implementation: OCImplementation) {
         for method in implementation.methodList {

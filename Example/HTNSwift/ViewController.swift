@@ -92,7 +92,7 @@ class ViewController: NSViewController {
         @interface OurClass
         // 定义属性
         @property (nonatomic, assign) NSUInteger pa;
-        @property (nonatomic, assign) NSUInteger pb;
+        @property (nonatomic, assign) CGFloat pb;
         
         @end
         
@@ -100,8 +100,8 @@ class ViewController: NSViewController {
         
         /* 开始运算 */
         - (void)run {
-            a = 13.3;
-            ab = (3 + 2) + a * 2;
+            pb = 13.3;
+            pa = (3 + 2) + pb * 2;
         }
         
         @end
