@@ -11,9 +11,14 @@ public class OCSymbolTable {
     var symbols: [String: OCSymbol] = [:]
     
     let name: String
+    let level: Int
+    let enclosingScope: OCSymbolTable?
     
-    init(name: String) {
+    init(name: String, level: Int, enclosingScope: OCSymbolTable?) {
         self.name = name
+        self.level = level
+        self.enclosingScope = enclosingScope
+        
         defineBuiltInTypes()
     }
     
@@ -28,10 +33,13 @@ public class OCSymbolTable {
         symbols[symbol.name] = symbol
     }
     
-    func lookup(_ name: String) -> OCSymbol? {
+    func lookup(_ name: String, currentScopeOnly: Bool = false) -> OCSymbol? {
         if let symbol = symbols[name] {
             return symbol
         }
-        return nil
+        if currentScopeOnly {
+            return nil
+        }
+        return enclosingScope?.lookup(name)
     }
 }

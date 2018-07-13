@@ -158,6 +158,20 @@ public class OCParser {
     private func statement() -> OCAST {
         switch currentTk {
         case .id:
+            if case .id = nextTk {
+                guard case let .id(name) = currentTk else {
+                    fatalError("Error: wrong")
+                }
+                eat(.id(name))
+                let v = variable()
+                if currentTk == .assign {
+                    eat(.assign)
+                    let right = expr()
+                    return OCVariableDeclaration(variable: v, type: name, right: right)
+                } else {
+                    fatalError("Error: wrong")
+                }
+            }
             return assignStatement()
         default:
             return empty()

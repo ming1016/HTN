@@ -100,8 +100,9 @@ class ViewController: NSViewController {
         
         /* 开始运算 */
         - (void)run {
+            CGFloat ta = 4.3;
             pb = 13.3;
-            pa = (3 + 2) + pb * 2;
+            pa = (3 + 2) + pb * 2 - ta;
         }
         
         @end

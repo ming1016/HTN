@@ -39,6 +39,8 @@ public class OCInterpreter {
             return eval(assign: assign)
         case let variable as OCVar:
             return eval(variable: variable)
+        case let variableDeclaration as OCVariableDeclaration:
+            return eval(variableDeclaration: variableDeclaration)
         case let number as OCNumber:
             return eval(number: number)
         case let unaryOperation as OCUnaryOperation:
@@ -78,6 +80,11 @@ public class OCInterpreter {
             fatalError("Error: eval var")
         }
         return value
+    }
+    
+    func eval(variableDeclaration: OCVariableDeclaration) -> OCValue {
+        scopes[variableDeclaration.variable.name] = eval(node: variableDeclaration.right)
+        return .none
     }
     
     /*--------- eval 运算符 ----------*/

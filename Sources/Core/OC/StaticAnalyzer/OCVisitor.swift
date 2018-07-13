@@ -23,6 +23,7 @@ protocol OCVisitor: class {
     func visit(unaryOperation: OCUnaryOperation)
     func visit(binOp: OCBinOp)
     func visit(noOp: OCNoOp)
+    func visit(variableDeclaration: OCVariableDeclaration)
 }
 
 extension OCVisitor {
@@ -56,6 +57,8 @@ extension OCVisitor {
             visit(binOp: binOp)
         case let noOp as OCNoOp:
             visit(noOp: noOp)
+        case let variableDeclaration as OCVariableDeclaration:
+            visit(variableDeclaration: variableDeclaration)
         default:
             fatalError("Error: Visitor type error")
         }
@@ -81,7 +84,6 @@ extension OCVisitor {
     func visit(propertyAttribute: OCPropertyAttribute) {
         
     }
-    
     
     func visit(implementation: OCImplementation) {
         for method in implementation.methodList {
@@ -110,6 +112,11 @@ extension OCVisitor {
     
     func visit(variable: OCVar) {
         
+    }
+    
+    func visit(variableDeclaration: OCVariableDeclaration) {
+        visit(node: variableDeclaration.variable)
+        visit(node: variableDeclaration.right)
     }
     
     /*--------- 运算符 --------*/

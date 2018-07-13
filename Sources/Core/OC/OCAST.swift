@@ -8,6 +8,7 @@
 import Foundation
 
 public protocol OCAST {}
+public protocol OCDeclaration: OCAST {}
 
 class OCProgram: OCAST {
     let interface: OCInterface
@@ -69,6 +70,18 @@ class OCCompoundStatement: OCAST {
     let children: [OCAST]
     init(children: [OCAST]) {
         self.children = children
+    }
+}
+
+class OCVariableDeclaration: OCDeclaration {
+    let variable: OCVar
+    let type: String
+    let right: OCAST
+    
+    init(variable: OCVar, type: String, right: OCAST) {
+        self.variable = variable
+        self.type = type
+        self.right = right
     }
 }
 
